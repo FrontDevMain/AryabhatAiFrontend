@@ -1,43 +1,20 @@
-import React from "react";
 import {
   AppBar,
   Box,
   Toolbar,
   Typography,
   Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  Card,
-  CardContent,
-  CardMedia,
-  Switch,
-  IconButton,
   Stack,
   useTheme,
-  Divider,
 } from "@mui/material";
-import MenuIcon from "@mui/material";
 import Logo from "src/components/logo";
 import Navbar from "./navbar/Navbar";
 import ChangeMode from "./navbar/ChangeMode";
 import AccountPopover from "./navbar/AccountPopover";
-import MainDashboard from "src/pages/dashboard/MainDashboard";
-import HeaderDashboard from "src/pages/dashboard/HeaderDashboard";
-import SearchBar from "src/pages/dashboard/SearchBar";
 import { Outlet } from "react-router-dom";
 
 const DashboardLayout = () => {
   const theme = useTheme();
-
-  const textStyle = {
-    color: theme.palette.text.secondary,
-    borderRadius: 2,
-    textAlign: "center",
-    width: "90%",
-    px: 4,
-    py: 2,
-  };
 
   return (
     <Box
@@ -116,8 +93,8 @@ const DashboardLayout = () => {
         {/* Content Area */}
         <Box
           sx={{
-            p: 2,
-            mx: 3,
+            p: 3,
+            mx: 1,
             flexGrow: 1,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,

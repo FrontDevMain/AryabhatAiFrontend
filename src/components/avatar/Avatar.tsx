@@ -1,4 +1,4 @@
-import Avatar from '@mui/material/Avatar';
+import Avatar from "@mui/material/Avatar";
 
 type props = {
   src: string;
@@ -8,11 +8,18 @@ type props = {
 
 function CustomAvatar({ src, name, sx }: props) {
   if (src) {
-    return <Avatar sx={{ ...sx, height: 50, width: 50 }} src={src} />;
+    return <Avatar sx={{ height: 50, width: 50, ...sx }} src={src} />;
   }
 
   return (
-    <Avatar sx={{ ...sx, bgcolor: (theme) => theme.palette.primary.main, height: 50, width: 50 }}>
+    <Avatar
+      sx={{
+        bgcolor: (theme) => theme.palette.primary.main,
+        height: 50,
+        width: 50,
+        ...sx,
+      }}
+    >
       {name?.charAt(0).toUpperCase()}
     </Avatar>
   );

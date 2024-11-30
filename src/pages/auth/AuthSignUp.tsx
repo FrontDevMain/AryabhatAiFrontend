@@ -1,13 +1,20 @@
-import { IconButton, InputAdornment, Link, Stack, Typography } from '@mui/material';
-import { Icon } from '@iconify/react';
-import * as Yup from 'yup';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import FormProvider, { RHFTextField } from '../../components/hook-form';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import fetcher from 'src/utils/fetcher';
-import { LoadingButton } from '@mui/lab';
+import {
+  IconButton,
+  InputAdornment,
+  Link,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { Icon } from "@iconify/react";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import FormProvider, { RHFTextField } from "../../components/hook-form";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { LoadingButton } from "@mui/lab";
+import fetcher from "src/api/fetcher";
 
 type FormValuesProps = {
   email: string;
@@ -22,29 +29,29 @@ function AuthSignUp() {
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
-      .required('Email or mobile number is required')
+      .required("Email or mobile number is required")
       .test(
-        'valid-email-or-mobile',
-        'Enter a valid email address or mobile number',
+        "valid-email-or-mobile",
+        "Enter a valid email address or mobile number",
         function (value) {
           const isEmail = Yup.string().email().isValidSync(value);
           const isMobile = Yup.string()
-            .matches(/^[0-9]{10}$/, 'Invalid mobile number')
+            .matches(/^[0-9]{10}$/, "Invalid mobile number")
             .isValidSync(value);
 
           return isEmail || isMobile;
         }
       ),
-    password: Yup.string().required('Password is required'),
+    password: Yup.string().required("Password is required"),
     confirmPassword: Yup.string()
-      .required('Confirm password is required')
-      .oneOf([Yup.ref('password'), null], 'Passwords must match'),
+      .required("Confirm password is required")
+      .oneOf([Yup.ref("password"), null], "Passwords must match"),
   });
 
   const defaultValues = {
-    email: '',
-    password: '',
-    confirmPassword: '',
+    email: "",
+    password: "",
+    confirmPassword: "",
   };
 
   const methods = useForm<FormValuesProps>({
@@ -62,12 +69,12 @@ function AuthSignUp() {
   const onSubmit = async (data: FormValuesProps) => {
     try {
       const body = new URLSearchParams();
-      body.append('email', data.email);
-      body.append('password', data.password);
-      body.append('confirm_password', data.confirmPassword);
+      body.append("email", data.email);
+      body.append("password", data.password);
+      body.append("confirm_password", data.confirmPassword);
 
-      const Response = await fetcher.post('auth/signup', body);
-      navigate('/verify-signup-otp');
+      const Response = await fetcher.post("auth/signup", body);
+      navigate("/verify-signup-otp");
     } catch (err) {
       console.log(err.detail);
     }
@@ -75,7 +82,7 @@ function AuthSignUp() {
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="h3" textAlign={'center'} mb={3}>
+      <Typography variant="h3" textAlign={"center"} mb={3}>
         Signup
       </Typography>
       <Stack gap={2}>
@@ -92,12 +99,17 @@ function AuthSignUp() {
           </Typography>
           <RHFTextField
             name="password"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                    <Icon icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    <Icon
+                      icon={showPassword ? "eva:eye-fill" : "eva:eye-off-fill"}
+                    />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -110,12 +122,17 @@ function AuthSignUp() {
           </Typography>
           <RHFTextField
             name="confirmPassword"
-            type={showPassword1 ? 'text' : 'password'}
+            type={showPassword1 ? "text" : "password"}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword1(!showPassword1)} edge="end">
-                    <Icon icon={showPassword1 ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                  <IconButton
+                    onClick={() => setShowPassword1(!showPassword1)}
+                    edge="end"
+                  >
+                    <Icon
+                      icon={showPassword1 ? "eva:eye-fill" : "eva:eye-off-fill"}
+                    />
                   </IconButton>
                 </InputAdornment>
               ),
@@ -123,19 +140,24 @@ function AuthSignUp() {
           />
         </Stack>
 
-        <LoadingButton fullWidth type="submit" variant="contained" loading={isSubmitting}>
+        <LoadingButton
+          fullWidth
+          type="submit"
+          variant="contained"
+          loading={isSubmitting}
+        >
           Sign Up
         </LoadingButton>
       </Stack>
 
-      <Typography textAlign={'center'} my={2}>
+      <Typography textAlign={"center"} my={2}>
         Already have an account?
         <Link
           variant="body2"
           color="primary"
           underline="none"
-          sx={{ cursor: 'pointer' }}
-          onClick={() => navigate('/')}
+          sx={{ cursor: "pointer" }}
+          onClick={() => navigate("/")}
         >
           Login
         </Link>

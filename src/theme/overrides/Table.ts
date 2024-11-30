@@ -28,6 +28,7 @@ export default function Table(theme: Theme) {
       styleOverrides: {
         root: {
           borderBottom: "none",
+          padding: "10px 20px",
           fontSize: "16px",
         },
         head: {

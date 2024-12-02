@@ -20,6 +20,8 @@ import google from "../../assets/login/google.svg.svg";
 import fb from "../../assets/login/fb.svg.svg";
 import { LoadingButton } from "@mui/lab";
 import fetcher from "src/api/fetcher";
+import { useAuthContext } from "src/auth/useAuthContext";
+import { END_POINTS } from "src/api/EndPoints";
 
 type FormValuesProps = {
   email: string;
@@ -32,24 +34,12 @@ const IconStyle = {
 };
 
 function AuthLoginForm() {
+  const { login } = useAuthContext();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string()
-      .required("Email or mobile number is required")
-      .test(
-        "valid-email-or-mobile",
-        "Enter a valid email address or mobile number",
-        function (value) {
-          const isEmail = Yup.string().email().isValidSync(value);
-          const isMobile = Yup.string()
-            .matches(/^[0-9]{10}$/, "Invalid mobile number")
-            .isValidSync(value);
-
-          return isEmail || isMobile;
-        }
-      ),
+    email: Yup.string().required("Email or mobile number is required"),
     password: Yup.string().required("Password is required"),
   });
 
@@ -75,11 +65,11 @@ function AuthLoginForm() {
       const body = new URLSearchParams();
       body.append("username", data.email);
       body.append("password", data.password);
-
-      const Response = await fetcher.post("auth/login", body);
-      console.log(Response);
+      const Response = await fetcher.post(END_POINTS.AUTH.LOGIN, body);
+      localStorage.setItem("auth", Response.access_token);
+      login();
     } catch (err) {
-      console.log(err.detail);
+      console.log(err);
     }
   };
 

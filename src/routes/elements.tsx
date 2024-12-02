@@ -7,18 +7,42 @@ const Loadable = (Component: ElementType) => (props: any) =>
     </Suspense>
   );
 
-//login page
+//AUTH PAGES
 export const LoginPage = Loadable(
   lazy(() => import("../pages/auth/AuthLoginForm"))
 );
+export const ForgotPassword = Loadable(
+  lazy(() => import("../pages/auth/ForgotPassword"))
+);
+export const ForgotPasswordOtp = Loadable(
+  lazy(() => import("../pages/auth/VerifyForgotPasswordOtp"))
+);
+export const NewPassword = Loadable(
+  lazy(() => import("../pages/auth/AuthNewPassword"))
+);
+export const SignUp = Loadable(lazy(() => import("../pages/auth/AuthSignUp")));
+export const SignUpOtp = Loadable(
+  lazy(() => import("../pages/auth/VerifySignUpOtp"))
+);
+export const SignUpRegistration = Loadable(
+  lazy(() => import("../pages/auth/AuthSignUpDetails"))
+);
 
-export const Dashboard = Loadable(lazy(() => import("../pages/Dashboard")));
+//ADMIN PAGES
+export const Dashboard = Loadable(
+  lazy(() => import("../pages/Admin/Dashboard"))
+);
 export const FIleRepository = Loadable(
-  lazy(() => import("../pages/FIleRepository"))
+  lazy(() => import("../pages/Admin/FIleRepository"))
 );
-export const License = Loadable(lazy(() => import("../pages/License")));
-export const LLM = Loadable(lazy(() => import("../pages/LLM")));
+export const License = Loadable(lazy(() => import("../pages/Admin/License")));
+export const LLM = Loadable(lazy(() => import("../pages/Admin/LLM")));
 export const OtherStorageDevices = Loadable(
-  lazy(() => import("../pages/OtherStorageDevices"))
+  lazy(() => import("../pages/Admin/OtherStorageDevices"))
 );
-export const Users = Loadable(lazy(() => import("../pages/Users")));
+export const Users = Loadable(lazy(() => import("../pages/Admin/Users")));
+
+//USER PAGES
+export const UserDashboard = Loadable(
+  lazy(() => import("../pages/Users/UserDashboard"))
+);

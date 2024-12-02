@@ -8,10 +8,11 @@ import {
   useTheme,
 } from "@mui/material";
 import Logo from "src/components/logo";
-import Navbar from "./navbar/Navbar";
-import ChangeMode from "./navbar/ChangeMode";
-import AccountPopover from "./navbar/AccountPopover";
+import AdminNavbar from "./navbar/admin/AdminNavbar";
+import ChangeMode from "./navbar/common/ChangeMode";
+import AccountPopover from "./navbar/common/AccountPopover";
 import { Outlet } from "react-router-dom";
+import UserNavbar from "./navbar/user/UserNavbar";
 
 const DashboardLayout = () => {
   const theme = useTheme();
@@ -47,7 +48,7 @@ const DashboardLayout = () => {
           >
             <Box>
               <Logo />
-              <Navbar />
+              {true ? <AdminNavbar /> : <UserNavbar />}
             </Box>
             <Box>
               <AccountPopover />

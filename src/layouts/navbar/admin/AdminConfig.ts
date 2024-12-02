@@ -1,38 +1,38 @@
 // routes
-import { PATH_DASHBOARD } from "../../routes/path";
+import { PATH_ADMIN_DASHBOARD } from "../../../routes/path";
 
 // ----------------------------------------------------------------------
 
-const NavConfig = [
+const AdminNavConfig = [
   {
     subheader: "Dashboard",
     items: [
       {
         title: "Dashboard",
-        path: PATH_DASHBOARD.dashboard,
+        path: PATH_ADMIN_DASHBOARD.dashboard,
       },
       {
         title: "Users",
-        path: PATH_DASHBOARD.users,
+        path: PATH_ADMIN_DASHBOARD.users,
       },
       {
         title: "File Repository",
-        path: PATH_DASHBOARD.fileRepository,
+        path: PATH_ADMIN_DASHBOARD.fileRepository,
       },
       {
         title: "Other Storage Devices",
-        path: PATH_DASHBOARD.otherStorageDevices,
+        path: PATH_ADMIN_DASHBOARD.otherStorageDevices,
       },
       {
         title: "License",
-        path: PATH_DASHBOARD.license,
+        path: PATH_ADMIN_DASHBOARD.license,
       },
       {
         title: "LLM",
-        path: PATH_DASHBOARD.llm,
+        path: PATH_ADMIN_DASHBOARD.llm,
       },
     ],
   },
 ];
 
-export default NavConfig;
+export default AdminNavConfig;

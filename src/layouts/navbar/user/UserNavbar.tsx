@@ -12,34 +12,59 @@ import {
   useTheme,
 } from "@mui/material";
 import { useState } from "react";
-import { ArrowRight, ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import NavConfig from "./config";
-import { useNavigate } from "react-router-dom";
 
-const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
-  borderRadius: theme.shape.borderRadius, // Rounded corners
-  marginBottom: theme.spacing(0.5), // Spacing between items
-  padding: theme.spacing(1),
-  color: theme.palette.text.secondary,
-  "&:hover": {
-    backgroundColor: theme.palette.primary.main, // Hover background
-    color: theme.palette.background.default, // Selected text color
-  },
-  "&.Mui-selected": {
-    backgroundColor: theme.palette.primary.main, // Selected background
-    color: theme.palette.background.default, // Selected text color
-    "&:hover": {
-      backgroundColor: theme.palette.primary.dark, // Darker on hover when selected
-      color: theme.palette.background.default, // Selected text color
-    },
-  },
-}));
-
-function Navbar() {
-  const navigate = useNavigate();
+export default function UserNavbar() {
   const theme = useTheme();
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState({ item: "Notebook", subItem: "Chat 1" });
+
+  const [navbarList, setNavbarList] = useState([
+    {
+      segment: "Notebook",
+      title: "Notebook",
+      icon: "",
+      children: [
+        {
+          segment: "Chat 1",
+          title: "Chat 1",
+          icon: "",
+        },
+        {
+          segment: "Chat 2",
+          title: "Chat 2",
+          icon: "",
+        },
+        {
+          segment: "Chat 3",
+          title: "Chat 3",
+          icon: "",
+        },
+      ],
+    },
+    {
+      segment: "Archive",
+      title: "Archive",
+      icon: "",
+      children: [
+        {
+          segment: "Chat 1",
+          title: "Chat 1",
+          icon: "",
+        },
+        {
+          segment: "Chat 2",
+          title: "Chat 2",
+          icon: "",
+        },
+        {
+          segment: "Chat 3",
+          title: "Chat 3",
+          icon: "",
+        },
+      ],
+    },
+  ]);
 
   return (
     <Box
@@ -53,18 +78,14 @@ function Navbar() {
         component="nav"
         aria-labelledby="nested-list-subheader"
       >
-        {NavConfig[0].items.map((item) => {
+        {navbarList.map((item) => {
           return (
-            <CustomListItemButton
-              onClick={() => {
-                setActive(item.title);
-                navigate(item.path);
-              }}
-              selected={active == item.title}
-            >
-              <ListItemText primary={item.title} />
-              {<ArrowRight />}
-            </CustomListItemButton>
+            <NavbarItems
+              key={item.title}
+              item={item}
+              active={active}
+              setActive={setActive}
+            />
           );
         })}
       </List>
@@ -207,5 +228,3 @@ function NavbarItems({ item, active, setActive }: any) {
     </Box>
   );
 }
-
-export default Navbar;

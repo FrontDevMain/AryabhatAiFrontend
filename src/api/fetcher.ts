@@ -60,6 +60,8 @@ const fetcher = {
     if (isLoggedin()) {
       headers.Authorization = "Bearer " + localStorage.getItem("auth");
     }
+    console.log("headers", headers);
+    console.log("data", data);
     const response = await apiClient.post(endpoint, data, { headers });
     return response.data;
   },

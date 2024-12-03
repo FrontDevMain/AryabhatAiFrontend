@@ -65,6 +65,10 @@ function AuthLoginForm() {
       const body = new URLSearchParams();
       body.append("username", data.email);
       body.append("password", data.password);
+      // const body = {
+      //   email: data.email,
+      //   password: data.password,
+      // };
       const Response = await fetcher.post(END_POINTS.AUTH.LOGIN, body);
       localStorage.setItem("auth", Response.access_token);
       login();

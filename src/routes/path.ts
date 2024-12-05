@@ -8,13 +8,13 @@ const ROOTS_USER_DASHBOARD = "/user";
 
 export const PATH_AUTH = {
   root: ROOTS_AUTH,
-  login: path(ROOTS_AUTH, "/login"),
-  forgotPassword: path(ROOTS_AUTH, "/forgot-password"),
-  verifyForgotPasswordOtp: path(ROOTS_AUTH, "/verify-forgot-password-otp"),
-  newPassword: path(ROOTS_AUTH, "/new-password"),
-  signup: path(ROOTS_AUTH, "/signup"),
-  verifySignupOtp: path(ROOTS_AUTH, "/verify-signup-otp"),
-  signupDetails: path(ROOTS_AUTH, "/signup-details"),
+  login: path(ROOTS_AUTH, "login"),
+  forgotPassword: path(ROOTS_AUTH, "forgot-password"),
+  verifyForgotPasswordOtp: path(ROOTS_AUTH, "verify-forgot-password-otp"),
+  newPassword: path(ROOTS_AUTH, "new-password"),
+  signup: path(ROOTS_AUTH, "signup"),
+  verifySignupOtp: path(ROOTS_AUTH, "verify-signup-otp"),
+  signupDetails: path(ROOTS_AUTH, "signup-details"),
 };
 
 export const PATH_ADMIN_DASHBOARD = {
@@ -25,6 +25,7 @@ export const PATH_ADMIN_DASHBOARD = {
   llm: path(ROOTS_ADMIN_DASHBOARD, "/llm"),
   otherStorageDevices: path(ROOTS_ADMIN_DASHBOARD, "/otherStorageDevices"),
   users: path(ROOTS_ADMIN_DASHBOARD, "/users"),
+  tags: path(ROOTS_ADMIN_DASHBOARD, "/tags"),
 };
 
 export const PATH_USER_DASHBOARD = {

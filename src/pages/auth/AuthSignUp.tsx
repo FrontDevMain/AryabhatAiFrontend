@@ -15,6 +15,8 @@ import { useNavigate } from "react-router-dom";
 
 import { LoadingButton } from "@mui/lab";
 import fetcher from "src/api/fetcher";
+import { END_POINTS } from "src/api/EndPoints";
+import { PATH_AUTH } from "src/routes/path";
 
 type FormValuesProps = {
   email: string;
@@ -29,19 +31,8 @@ function AuthSignUp() {
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
-      .required("Email or mobile number is required")
-      .test(
-        "valid-email-or-mobile",
-        "Enter a valid email address or mobile number",
-        function (value) {
-          const isEmail = Yup.string().email().isValidSync(value);
-          const isMobile = Yup.string()
-            .matches(/^[0-9]{10}$/, "Invalid mobile number")
-            .isValidSync(value);
-
-          return isEmail || isMobile;
-        }
-      ),
+      .email("Please enter valid email.")
+      .required("Email or mobile number is required"),
     password: Yup.string().required("Password is required"),
     confirmPassword: Yup.string()
       .required("Confirm password is required")
@@ -72,11 +63,15 @@ function AuthSignUp() {
       body.append("email", data.email);
       body.append("password", data.password);
       body.append("confirm_password", data.confirmPassword);
-
-      const Response = await fetcher.post("auth/signup", body);
-      navigate("/verify-signup-otp");
+      const Response = await fetcher.post(END_POINTS.AUTH.SIGN_UP, body);
+      console.log(Response);
+      localStorage.setItem("gen_ai_email", data.email);
+      navigate(PATH_AUTH.verifySignupOtp);
     } catch (err) {
-      console.log(err.detail);
+      if (err.status == 409) {
+        navigate(PATH_AUTH.signupDetails);
+      }
+      console.log(err);
     }
   };
 

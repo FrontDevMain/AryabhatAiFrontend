@@ -13,8 +13,10 @@ import ChangeMode from "./navbar/common/ChangeMode";
 import AccountPopover from "./navbar/common/AccountPopover";
 import { Outlet } from "react-router-dom";
 import UserNavbar from "./navbar/user/UserNavbar";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 const DashboardLayout = () => {
+  const { user } = useAuthContext();
   const theme = useTheme();
 
   return (
@@ -48,7 +50,11 @@ const DashboardLayout = () => {
           >
             <Box>
               <Logo />
-              {false ? <AdminNavbar /> : <UserNavbar />}
+              {user.user_accountType == "user" ? (
+                <UserNavbar />
+              ) : (
+                <AdminNavbar />
+              )}
             </Box>
             <Box>
               <AccountPopover />

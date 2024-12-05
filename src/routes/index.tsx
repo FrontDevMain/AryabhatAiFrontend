@@ -13,6 +13,7 @@ import {
   SignUp,
   SignUpOtp,
   SignUpRegistration,
+  Tags,
   UserDashboard,
   Users,
 } from "./elements";
@@ -25,9 +26,9 @@ export default function Router() {
     {
       path: "/",
       element: (
-        // <GuestGaurd>
-        <GuestLayout />
-        // </GuestGaurd>
+        <GuestGaurd>
+          <GuestLayout />
+        </GuestGaurd>
       ),
       children: [
         { element: <Navigate to={"/login"} replace />, index: true },
@@ -43,9 +44,9 @@ export default function Router() {
     {
       path: "/admin",
       element: (
-        // <AuthGaurd>
-        <DashboardLayout />
-        // </AuthGaurd>
+        <AuthGaurd>
+          <DashboardLayout />
+        </AuthGaurd>
       ),
       children: [
         { element: <Navigate to={"/admin/dashboard"} replace />, index: true },
@@ -55,14 +56,15 @@ export default function Router() {
         { path: "llm", element: <LLM /> },
         { path: "otherStorageDevices", element: <OtherStorageDevices /> },
         { path: "users", element: <Users /> },
+        { path: "tags", element: <Tags /> },
       ],
     },
     {
       path: "/user",
       element: (
-        // <AuthGaurd>
-        <DashboardLayout />
-        // </AuthGaurd>
+        <AuthGaurd>
+          <DashboardLayout />
+        </AuthGaurd>
       ),
       children: [
         { element: <Navigate to={"/user/dashboard"} replace />, index: true },

@@ -1,6 +1,7 @@
 import { ExpandMore } from "@mui/icons-material";
 import {
   Accordion,
+  AccordionActions,
   AccordionDetails,
   AccordionSummary,
   Box,
@@ -22,51 +23,50 @@ export default function LLM() {
     };
 
   return (
-    <>
-      <Stack
-        direction={"row"}
-        justifyContent={"space-between"}
-        alignItems={"center"}
-      >
-        <Typography>LLM list</Typography>
-
-        <Button variant="contained" sx={{ borderRadius: 12 }}>
-          <Plus /> Create Model LLM
-        </Button>
-      </Stack>
-
-      <Accordion
-        expanded={expanded === "panel1"}
-        onChange={handleChange("panel1")}
-        sx={{
-          borderRadius: 2,
-          border: "none",
-          boxShadow: "none",
-          my: 1,
-          "&.MuiAccordion-root::before": {
-            display: "none",
-          },
-        }}
-      >
+    <div>
+      <Accordion>
         <AccordionSummary
-          aria-controls="panel1bh-content"
-          id="panel1bh-header"
-          sx={{ border: "none" }}
+          expandIcon={<ExpandMore />}
+          aria-controls="panel1-content"
+          id="panel1-header"
         >
-          <ExpandMore />
-          <Typography>Open Ai</Typography>
+          Open Ai
         </AccordionSummary>
         <AccordionDetails>
-          <Stack>
-            <Box>
-              <Typography>Api key</Typography>
-              <Typography color="text.disabled">
-                Please enter your OpenAI API Key
-              </Typography>
-            </Box>
-          </Stack>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+          malesuada lacus ex, sit amet blandit leo lobortis eget.
         </AccordionDetails>
       </Accordion>
-    </>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          aria-controls="panel2-content"
+          id="panel2-header"
+        >
+          Accordion 2
+        </AccordionSummary>
+        <AccordionDetails>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+          malesuada lacus ex, sit amet blandit leo lobortis eget.
+        </AccordionDetails>
+      </Accordion>
+      <Accordion defaultExpanded>
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          aria-controls="panel3-content"
+          id="panel3-header"
+        >
+          Accordion Actions
+        </AccordionSummary>
+        <AccordionDetails>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+          malesuada lacus ex, sit amet blandit leo lobortis eget.
+        </AccordionDetails>
+        <AccordionActions>
+          <Button>Cancel</Button>
+          <Button>Agree</Button>
+        </AccordionActions>
+      </Accordion>
+    </div>
   );
 }

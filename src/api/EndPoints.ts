@@ -14,4 +14,21 @@ export const END_POINTS = {
     LOGIN_WITH_GOOGLE: "auth/google",
     LOGIN_WITH_MICROSOFT: "auth/microsoft",
   },
+  ADMIN: {
+    ADMIN_PRIVILEGES: {
+      USER_DETAILS: "UserDetails",
+      USERS_LICENSE: "Users/License",
+      INVITE_USERS: "invite-users",
+    },
+    FILE_REPOSITORIES: {
+      GET_ALL_FILES: "Files/GetFiles",
+      DOWNLOAD_FILES: (id: string) => `Files/DownloadFiles/${id}`,
+    },
+    TAGS: {
+      GET_TAGS: "Tags/GetTags",
+      CREATE_TAGS: "Tags/CreateTag",
+      RENAME_TAGS: "Tags/RenameTag",
+      DELETE_TAGS: (id: string) => `Tags/DeleteTag/${id}`,
+    },
+  },
 };

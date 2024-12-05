@@ -19,7 +19,9 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { END_POINTS } from "src/api/EndPoints";
+import fetcher from "src/api/fetcher";
 
 import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
@@ -48,29 +50,40 @@ const CustomListItemText = styled(ListItemText)(({ theme }) => ({
   },
 }));
 
+type filesType = {
+  _id: string;
+  filename: string;
+  filetype: string;
+  filesize: number;
+  time_of_upload: string;
+  department_tag: string;
+  file_status: string;
+  user_id: string;
+  username: string;
+  modified_at: string;
+  modified_by: string;
+  modified_by_username: string;
+};
+
 export default function FileRepository() {
-  const users = [
-    {
-      id: 0,
-      name: "Alpha",
-      filename: "file01",
-      filetype: "PDF",
-      filesize: "32.04kb",
-      timeOfUpload: "25-04-2024",
-      departmentTag: "Sales",
-      fileStatus: "uploading",
-    },
-    {
-      id: 1,
-      name: "Alpha",
-      filename: "file02",
-      filetype: "PNG",
-      filesize: "1.01mb",
-      timeOfUpload: "25-04-2024",
-      departmentTag: "Finance",
-      fileStatus: "processed",
-    },
-  ];
+  const [files, setFiles] = useState<filesType[]>([]);
+
+  useEffect(() => {
+    getAllFiles();
+  }, []);
+
+  const getAllFiles = async () => {
+    try {
+      const Response = await fetcher.get(
+        END_POINTS.ADMIN.FILE_REPOSITORIES.GET_ALL_FILES
+      );
+      if (Response.status == 200) {
+        setFiles(Response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <>
@@ -103,7 +116,7 @@ export default function FileRepository() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map((item, index) => (
+          {files.map((item, index) => (
             <UserDetail item={item} />
           ))}
         </TableBody>
@@ -112,7 +125,7 @@ export default function FileRepository() {
   );
 }
 
-function UserDetail({ item }: any) {
+function UserDetail({ item }: { item: filesType }) {
   const theme = useTheme();
 
   //onclick popover
@@ -140,24 +153,32 @@ function UserDetail({ item }: any) {
     p: 3,
   };
 
+  const downloadFiles = async (id: string) => {
+    const Response = await fetcher.get(
+      END_POINTS.ADMIN.FILE_REPOSITORIES.DOWNLOAD_FILES(id)
+    );
+    try {
+      if (Response.status == 200) {
+        console.log(Response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       <TableRow>
         <TableCell sx={{ p: 0.5 }}></TableCell>
       </TableRow>
       <CustomTableRow>
-        <TableCell sx={{ borderTopLeftRadius: 20, borderBottomLeftRadius: 20 }}>
-          <Stack flexDirection={"row"} gap={1} alignItems={"center"}>
-            <Avatar src="" name={item.name} sx={{ height: 33, width: 33 }} />
-            {item.name}
-          </Stack>
-        </TableCell>
+        <TableCell>{item.username}</TableCell>
         <TableCell>{item.filename}</TableCell>
         <TableCell>{item.filetype}</TableCell>
         <TableCell>{item.filesize}</TableCell>
-        <TableCell>{item.timeOfUpload}</TableCell>
-        <TableCell>{item.departmentTag}</TableCell>
-        <TableCell>{item.fileStatus}</TableCell>
+        <TableCell>{new Date(item.time_of_upload).toLocaleString()}</TableCell>
+        <TableCell>{item.department_tag}</TableCell>
+        <TableCell>{item.file_status}</TableCell>
 
         <TableCell
           sx={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}
@@ -190,7 +211,9 @@ function UserDetail({ item }: any) {
             <CustomList disablePadding>
               <CustomListItemText>Preview</CustomListItemText>
               <CustomListItemText>Delete</CustomListItemText>
-              <CustomListItemText>Download</CustomListItemText>
+              <CustomListItemText onClick={() => downloadFiles(item._id)}>
+                Download
+              </CustomListItemText>
               <CustomListItemText>Modify Department</CustomListItemText>
             </CustomList>
           </Popover>

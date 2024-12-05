@@ -31,6 +31,10 @@ const AdminNavConfig = [
         title: "LLM",
         path: PATH_ADMIN_DASHBOARD.llm,
       },
+      {
+        title: "Tags",
+        path: PATH_ADMIN_DASHBOARD.tags,
+      },
     ],
   },
 ];

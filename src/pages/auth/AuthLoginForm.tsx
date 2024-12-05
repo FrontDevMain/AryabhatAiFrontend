@@ -22,6 +22,7 @@ import { LoadingButton } from "@mui/lab";
 import fetcher from "src/api/fetcher";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { END_POINTS } from "src/api/EndPoints";
+import { PATH_AUTH } from "src/routes/path";
 
 type FormValuesProps = {
   email: string;
@@ -65,14 +66,15 @@ function AuthLoginForm() {
       const body = new URLSearchParams();
       body.append("username", data.email);
       body.append("password", data.password);
-      // const body = {
-      //   email: data.email,
-      //   password: data.password,
-      // };
       const Response = await fetcher.post(END_POINTS.AUTH.LOGIN, body);
-      localStorage.setItem("auth", Response.access_token);
-      login();
+      if (Response.status == 200) {
+        localStorage.setItem("auth", Response.data.access_token);
+        login();
+      }
     } catch (err) {
+      if (err.status == 400) {
+        navigate(PATH_AUTH.signupDetails);
+      }
       console.log(err);
     }
   };

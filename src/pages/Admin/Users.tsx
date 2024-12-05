@@ -16,10 +16,13 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { END_POINTS } from "src/api/EndPoints";
+import fetcher from "src/api/fetcher";
 
 import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
@@ -48,30 +51,72 @@ const CustomListItemText = styled(ListItemText)(({ theme }) => ({
   },
 }));
 
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.default",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 3,
+};
+
+type usersList = {
+  username: "Aryabhat";
+  email: "aryabhat@aryahat.ai";
+  roles: "SuperAdmin";
+  license: true;
+};
+
 function Users() {
-  const users = [
-    {
-      id: 0,
-      name: "Alpha",
-      email: "Alpha@xyz.com",
-      role: "User",
-      license: "No",
-    },
-    {
-      id: 1,
-      name: "Alpha",
-      email: "Alpha@xyz.com",
-      role: "Admin",
-      license: "No",
-    },
-    {
-      id: 2,
-      name: "Alpha",
-      email: "Alpha@xyz.com",
-      role: "User",
-      license: "Yes",
-    },
-  ];
+  const [users, setUsers] = useState<usersList[]>([]);
+  const [inviteEmails, setInviteEmails] = useState("");
+
+  //modal
+  const [openModal, setOpenModal] = useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
+
+  const getAllUsers = async () => {
+    try {
+      const Response = await fetcher.get(
+        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USER_DETAILS
+      );
+      if (Response.status == 200) {
+        const array = [];
+        for (let keys in Response.data) {
+          array.push(Response.data[keys]);
+        }
+        setUsers(array);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const onInvite = async () => {
+    try {
+      const body = {
+        emails: inviteEmails.split("\n"),
+      };
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.ADMIN_PRIVILEGES.INVITE_USERS,
+        body
+      );
+      if (Response.status == 200) {
+        handleCloseModal();
+        setInviteEmails("");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <>
@@ -85,7 +130,11 @@ function Users() {
           <IconButton>
             <Filters />
           </IconButton>
-          <Button variant="contained" sx={{ borderRadius: 12 }}>
+          <Button
+            variant="contained"
+            sx={{ borderRadius: 12 }}
+            onClick={handleOpenModal}
+          >
             <Plus /> Invite User
           </Button>
         </Stack>
@@ -106,11 +155,39 @@ function Users() {
           ))}
         </TableBody>
       </Table>
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h4" mb={3}>
+            Invite Users
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            maxRows={6}
+            label="Enter Emails"
+            value={inviteEmails}
+            onChange={(e) => setInviteEmails(e.target.value)}
+          />
+          <Stack direction={"row"} gap={2} mt={3}>
+            <Button variant="outlined" fullWidth onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button variant="contained" fullWidth onClick={onInvite}>
+              Invite
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
     </>
   );
 }
 
-function UserDetail({ item }: any) {
+function UserDetail({ item }: { item: usersList }) {
   const theme = useTheme();
 
   //onclick popover
@@ -142,16 +219,19 @@ function UserDetail({ item }: any) {
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.default",
-    borderRadius: 2,
-    boxShadow: 24,
-    p: 3,
+  const toggleLicense = async (username: string) => {
+    try {
+      const body = { user_username: username };
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USERS_LICENSE,
+        body
+      );
+      if (Response.status == 200) {
+        console.log(Response);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -162,20 +242,23 @@ function UserDetail({ item }: any) {
       <CustomTableRow>
         <TableCell sx={{ borderTopLeftRadius: 20, borderBottomLeftRadius: 20 }}>
           <Stack flexDirection={"row"} gap={1} alignItems={"center"}>
-            <Avatar src="" name={item.name} sx={{ height: 33, width: 33 }} />
-            {item.name}
+            <Avatar
+              src=""
+              name={item.username}
+              sx={{ height: 33, width: 33 }}
+            />
+            {item.username}
           </Stack>
         </TableCell>
         <TableCell>{item.email}</TableCell>
-        <TableCell>{item.role}</TableCell>
+        <TableCell>{item.roles}</TableCell>
         <TableCell>
           {" "}
           <Chip
-            label={item.license}
+            label={item.license ? "YES" : "NO"}
             sx={{
               color: "common.white",
-              backgroundColor:
-                item.license == "No" ? "secondary.main" : "#008080",
+              backgroundColor: item.license ? "#008080" : "secondary.main",
             }}
           />
         </TableCell>
@@ -237,7 +320,7 @@ function UserDetail({ item }: any) {
               </Popover>
               <CustomListItemText
                 aria-describedby={id2}
-                onClick={handlePopoverOpen2}
+                onClick={() => toggleLicense(item.username)}
               >
                 Apply License
               </CustomListItemText>

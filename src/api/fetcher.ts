@@ -11,6 +11,7 @@ apiClient.interceptors.response.use(
     return response;
   },
   function (error) {
+    console.log(error);
     if (error.response) {
       switch (error.response.status) {
         case 322:
@@ -20,15 +21,15 @@ apiClient.interceptors.response.use(
           console.error("Bad request");
           break;
         case 401:
-          console.error("Unauthorized");
-          localStorage.removeItem("auth");
+          console.error(error.response.data.detail);
+          // localStorage.removeItem("auth");
           redirectToLogin();
           break;
         case 403:
           console.error("Forbidden");
           break;
         case 404:
-          console.error(error.response);
+          console.error(error.response.data.detail);
           break;
         case 500:
           console.error("Internal server error");
@@ -38,6 +39,7 @@ apiClient.interceptors.response.use(
       }
     } else if (error.request) {
       console.error("No response");
+      // localStorage.removeItem("auth");
     } else {
       console.error("Request error");
     }
@@ -53,33 +55,39 @@ const fetcher = {
       headers.Authorization = "Bearer " + localStorage.getItem("auth");
     }
     const response = await apiClient.get(endpoint, { params, headers });
-    return response.data;
+    return response;
   },
   post: async function (endpoint: string, data: any) {
     const headers = { Authorization: "" };
     if (isLoggedin()) {
       headers.Authorization = "Bearer " + localStorage.getItem("auth");
     }
-    console.log("headers", headers);
-    console.log("data", data);
     const response = await apiClient.post(endpoint, data, { headers });
-    return response.data;
+    return response;
   },
   patch: async function (endpoint: string, data = null) {
+    const headers = { Authorization: "" };
+    if (isLoggedin()) {
+      headers.Authorization = "Bearer " + localStorage.getItem("auth");
+    }
     const response = await apiClient.patch(endpoint, data);
-    return response.data;
+    return response;
   },
   delete: async function (endpoint: string) {
-    const response = await apiClient.delete(endpoint);
-    return response.data;
+    const headers = { Authorization: "" };
+    if (isLoggedin()) {
+      headers.Authorization = "Bearer " + localStorage.getItem("auth");
+    }
+    const response = await apiClient.delete(endpoint, { headers });
+    return response;
   },
-  put: async function (endpoint: string, data = null) {
+  put: async function (endpoint: string, data: any) {
     const headers = { Authorization: "" };
     if (isLoggedin()) {
       headers.Authorization = "Bearer " + localStorage.getItem("auth");
     }
     const response = await apiClient.put(endpoint, data, { headers });
-    return response.data;
+    return response;
   },
   postFile: async function (endpoint: string, formData: FormData) {
     const headers = {
@@ -90,7 +98,7 @@ const fetcher = {
       headers.Authorization = "Bearer " + localStorage.getItem("auth");
     }
     const response = await apiClient.post(endpoint, formData, { headers });
-    return response.data;
+    return response;
   },
 };
 export default fetcher;

@@ -1,7 +1,7 @@
 import Avatar from "@mui/material/Avatar";
 
 type props = {
-  src: string;
+  src: string | null;
   name?: string;
   sx?: any;
 };

@@ -10,6 +10,7 @@ import {
   LoginPage,
   NewPassword,
   OtherStorageDevices,
+  Settings,
   SignUp,
   SignUpOtp,
   SignUpRegistration,
@@ -57,6 +58,7 @@ export default function Router() {
         { path: "otherStorageDevices", element: <OtherStorageDevices /> },
         { path: "users", element: <Users /> },
         { path: "tags", element: <Tags /> },
+        { path: "settings", element: <Settings /> },
       ],
     },
     {

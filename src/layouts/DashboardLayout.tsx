@@ -50,7 +50,7 @@ const DashboardLayout = () => {
           >
             <Box>
               <Logo />
-              {user.user_accountType == "user" ? (
+              {user.user_accountType == "User" ? (
                 <UserNavbar />
               ) : (
                 <AdminNavbar />
@@ -106,6 +106,7 @@ const DashboardLayout = () => {
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             backgroundColor: theme.palette.background.neutral,
+            overflow: "scroll",
           }}
         >
           <Outlet />

@@ -62,7 +62,10 @@ function AccountPopover() {
       gap={1}
       sx={{ mb: 2, px: 2 }}
     >
-      <CustomAvatar src={user.user_profile_picture} name={user.user_username} />
+      <CustomAvatar
+        src={`data:image/png;base64,${user.user_profile_picture}`}
+        name={user.user_username}
+      />
       <Box sx={{ maxWidth: 130 }}>
         <Typography color="text.secondary" noWrap textOverflow={"ellipsis"}>
           {user.user_firstname}

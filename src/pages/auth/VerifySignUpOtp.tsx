@@ -1,12 +1,16 @@
-import { Button, FormHelperText, Stack, Typography } from "@mui/material";
+import { Button, FormHelperText, Link, Stack, Typography } from "@mui/material";
 //form
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, { RHFCodes } from "../../components/hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import fetcher from "src/api/fetcher";
 import { END_POINTS } from "src/api/EndPoints";
+import useCountdown from "src/components/hooks/useCountdown";
+import { useEffect } from "react";
+import { PATH_AUTH } from "src/routes/path";
+import { LoadingButton } from "@mui/lab";
 
 type FormValuesProps = {
   code1: string;
@@ -19,6 +23,9 @@ type FormValuesProps = {
 
 function VerifySignUpOtp() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  const { timeLeft, start, resetTimer } = useCountdown(60);
 
   const LoginSchema = Yup.object().shape({
     code1: Yup.string().required(),
@@ -44,25 +51,45 @@ function VerifySignUpOtp() {
   });
 
   const {
+    reset,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = methods;
 
+  useEffect(() => {
+    if (!state?.email) navigate(PATH_AUTH.login);
+    else start();
+  }, []);
+
+  const resendOtp = async () => {
+    reset(defaultValues);
+    try {
+      const body = new URLSearchParams();
+      body.append("email", state?.email);
+      const Response = await fetcher.put(END_POINTS.AUTH.RESEND_OTP, body);
+      if (Response.status == 200) {
+        resetTimer();
+        start();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const onSubmit = async (data: FormValuesProps) => {
-    // const body = new URLSearchParams();
-    // body.append("email", localStorage.getItem("gen_ai_email") || "");
-    // body.append(
-    //   "otp",
-    //   `${data.code1}${data.code2}${data.code3}${data.code4}${data.code5}${data.code6}`
-    // );
-    const body = {
-      email: localStorage.getItem("gen_ai_email") || "",
-      otp: `${data.code1}${data.code2}${data.code3}${data.code4}${data.code5}${data.code6}`,
-    };
-    const Response = await fetcher.post(END_POINTS.AUTH.OTP_VALIDATION, body);
-    localStorage.removeItem("gen_ai_email");
-    navigate("/signup-details");
-    console.log(data);
+    try {
+      const body = {
+        email: state?.email,
+        otp: `${data.code1}${data.code2}${data.code3}${data.code4}${data.code5}${data.code6}`,
+      };
+      const Response = await fetcher.post(END_POINTS.AUTH.OTP_VALIDATION, body);
+      if (Response.status == 200) {
+        navigate(PATH_AUTH.signupDetails, { state: state });
+      }
+    } catch (err) {
+      reset(defaultValues);
+      console.log(err);
+    }
   };
 
   return (
@@ -96,9 +123,33 @@ function VerifySignUpOtp() {
           )}
         </Stack>
 
-        <Button fullWidth size="medium" type="submit" variant="contained">
+        <LoadingButton
+          fullWidth
+          size="medium"
+          type="submit"
+          variant="contained"
+          loading={isSubmitting}
+        >
           Continue
-        </Button>
+        </LoadingButton>
+        {timeLeft > 0 ? (
+          <Typography textAlign={"center"} color="error.main">
+            Resend OTP in 00:{timeLeft.toString().padStart(2, "00")} sec
+          </Typography>
+        ) : (
+          <Typography textAlign={"center"} my={2}>
+            If you didn't receive a code ?{" "}
+            <Link
+              variant="body2"
+              color="primary"
+              underline="none"
+              sx={{ cursor: "pointer" }}
+              onClick={resendOtp}
+            >
+              Resend
+            </Link>
+          </Typography>
+        )}
       </Stack>
     </FormProvider>
   );

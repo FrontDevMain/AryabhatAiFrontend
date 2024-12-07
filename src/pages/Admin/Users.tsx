@@ -26,7 +26,9 @@ import fetcher from "src/api/fetcher";
 
 import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
+import { useAuthContext } from "src/auth/useAuthContext";
 import { Avatar } from "src/components/avatar";
+import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -64,10 +66,10 @@ const style = {
 };
 
 type usersList = {
-  username: "Aryabhat";
-  email: "aryabhat@aryahat.ai";
-  roles: "SuperAdmin";
-  license: true;
+  username: string;
+  email: string;
+  roles: string;
+  license: boolean;
 };
 
 function Users() {
@@ -118,6 +120,14 @@ function Users() {
     }
   };
 
+  const changeRole = (username: string, role: string) => {
+    setUsers([
+      ...users.map((item) =>
+        item.username == username ? { ...item, roles: role } : item
+      ),
+    ]);
+  };
+
   return (
     <>
       <Stack
@@ -151,7 +161,7 @@ function Users() {
         </TableHead>
         <TableBody>
           {users.map((item, index) => (
-            <UserDetail item={item} />
+            <UserDetail key={index} item={item} changeRole={changeRole} />
           ))}
         </TableBody>
       </Table>
@@ -187,9 +197,16 @@ function Users() {
   );
 }
 
-function UserDetail({ item }: { item: usersList }) {
+function UserDetail({
+  item,
+  changeRole,
+}: {
+  item: usersList;
+  changeRole: (username: string, role: string) => void;
+}) {
   const theme = useTheme();
-
+  const { user } = useAuthContext();
+  const [isloading, setIsLoading] = useState(false);
   //onclick popover
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>
@@ -198,21 +215,9 @@ function UserDetail({ item }: { item: usersList }) {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-  // nested popoover for roles
-  const [anchorEl1, setAnchorEl1] = useState<HTMLElement | null>(null);
-  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) =>
-    setAnchorEl1(event.currentTarget);
-  const handlePopoverClose = () => setAnchorEl1(null);
-  const open1 = Boolean(anchorEl1);
-  const id1 = open1 ? "simple-popover" : undefined;
-
-  // nested popoover for roles
-  const [anchorEl2, setAnchorEl2] = useState<HTMLElement | null>(null);
-  const handlePopoverOpen2 = (event: React.MouseEvent<HTMLElement>) =>
-    setAnchorEl2(event.currentTarget);
-  const handlePopoverClose2 = () => setAnchorEl2(null);
-  const open2 = Boolean(anchorEl2);
-  const id2 = open2 ? "simple-popover" : undefined;
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const handleOpenConfirm = () => setOpenConfirm(true);
+  const handleCloseConfirm = () => setOpenConfirm(false);
 
   //modal
   const [openModal, setOpenModal] = useState(false);
@@ -220,6 +225,7 @@ function UserDetail({ item }: { item: usersList }) {
   const handleCloseModal = () => setOpenModal(false);
 
   const toggleLicense = async (username: string) => {
+    setIsLoading(true);
     try {
       const body = { user_username: username };
       const Response = await fetcher.post(
@@ -231,6 +237,31 @@ function UserDetail({ item }: { item: usersList }) {
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onChangeRole = async () => {
+    try {
+      setIsLoading(true);
+      const body = {
+        user_username: item.username,
+        roles: item.roles == "User" ? "Admin" : "User",
+      };
+      const Response = await fetcher.put(
+        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USERS_ROLE,
+        body
+      );
+      if (Response.status == 200) {
+        handleCloseConfirm();
+        handleClosePopover();
+        changeRole(item.username, body.roles);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -265,17 +296,19 @@ function UserDetail({ item }: { item: usersList }) {
         <TableCell
           sx={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}
         >
-          <IconButton aria-describedby={id} onClick={handleOpenPopover}>
-            <Icon
-              icon="mynaui:dots-solid"
-              width="30px"
-              height="30px"
-              style={{
-                backgroundColor: theme.palette.background.neutral,
-                borderRadius: 20,
-              }}
-            />
-          </IconButton>
+          {item.roles != "SuperAdmin" && (
+            <IconButton aria-describedby={id} onClick={handleOpenPopover}>
+              <Icon
+                icon="mynaui:dots-solid"
+                width="30px"
+                height="30px"
+                style={{
+                  backgroundColor: theme.palette.background.neutral,
+                  borderRadius: 20,
+                }}
+              />
+            </IconButton>
+          )}
           <Popover
             id={id}
             anchorEl={anchorEl}
@@ -291,69 +324,40 @@ function UserDetail({ item }: { item: usersList }) {
             }}
           >
             <CustomList disablePadding>
-              <CustomListItemText
-                aria-describedby={id1}
-                onClick={handlePopoverOpen}
-              >
-                Edit Roles
+              <CustomListItemText onClick={handleOpenConfirm}>
+                {item.roles == "User" ? "Switch to Admin" : "Switch to User"}
               </CustomListItemText>
-              <Popover
-                id={id1}
-                open={open1}
-                anchorEl={anchorEl1}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                onMouseLeave={handlePopoverClose}
-                onClose={handlePopoverClose}
-                disableRestoreFocus
-              >
-                <CustomList disablePadding>
-                  <CustomListItemText>User</CustomListItemText>
-                  <CustomListItemText>Admin</CustomListItemText>
-                </CustomList>
-              </Popover>
-              <CustomListItemText
-                aria-describedby={id2}
-                onClick={() => toggleLicense(item.username)}
-              >
-                Apply License
-              </CustomListItemText>
-              <Popover
-                id={id2}
-                open={open2}
-                anchorEl={anchorEl2}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                onMouseLeave={handlePopoverClose2}
-                onClose={handlePopoverClose2}
-                disableRestoreFocus
-              >
-                <CustomList disablePadding>
-                  <CustomListItemText onClick={handleOpenModal}>
-                    Yes
-                  </CustomListItemText>
-                  <CustomListItemText onClick={handleOpenModal}>
-                    No
-                  </CustomListItemText>
-                </CustomList>
-              </Popover>
+              {!item.license && (
+                <CustomListItemText
+                  onClick={() => toggleLicense(item.username)}
+                >
+                  Apply License
+                </CustomListItemText>
+              )}
+              {item.license && user.user_accountType == "SuperAdmin" && (
+                <CustomListItemText
+                  onClick={() => toggleLicense(item.username)}
+                >
+                  Cancel License
+                </CustomListItemText>
+              )}
+
               <CustomListItemText>View</CustomListItemText>
             </CustomList>
           </Popover>
         </TableCell>
       </CustomTableRow>
+
+      <ConfirmationModal
+        open={openConfirm}
+        handleClose={handleCloseConfirm}
+        onConfirm={onChangeRole}
+        loading={isloading}
+        title={"Delete Confirmation"}
+        content={`Are you sure you want to change the role from ${
+          item.roles == "User" ? "User to Admin" : "Admin To User"
+        } ?`}
+      />
 
       <Modal
         open={openModal}

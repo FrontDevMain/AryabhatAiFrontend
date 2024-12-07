@@ -1,10 +1,16 @@
-import { ReactNode, createContext, useEffect, useContext, useMemo, useCallback } from 'react';
+import {
+  ReactNode,
+  createContext,
+  useEffect,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react";
 // hooks
-import useLocalStorage from '../hooks/useLocalStorage';
+import useLocalStorage from "../hooks/useLocalStorage";
 //
-import { defaultSettings } from './config';
-import { SettingsContextProps } from './types';
-import { defaultPreset, getPresets, presetsOption } from './presets';
+import { defaultSettings } from "./config";
+import { SettingsContextProps } from "./types";
 
 // ----------------------------------------------------------------------
 
@@ -13,15 +19,14 @@ const initialState: SettingsContextProps = {
   // Mode
   onToggleMode: () => {},
   onChangeMode: () => {},
+  onChangeFontSize: () => {},
   // Layout
   onChangeLayout: () => {},
   // Contrast
   onToggleContrast: () => {},
   onChangeContrast: () => {},
-  // Color
-  onChangeColorPresets: () => {},
-  presetsColor: defaultPreset,
-  presetsOption: [],
+  onChangeColor: () => {},
+  onChangeNeturalColor: () => {},
 };
 
 // ----------------------------------------------------------------------
@@ -31,7 +36,8 @@ export const SettingsContext = createContext(initialState);
 export const useSettingsContext = () => {
   const context = useContext(SettingsContext);
 
-  if (!context) throw new Error('useSettingsContext must be use inside SettingsProvider');
+  if (!context)
+    throw new Error("useSettingsContext must be use inside SettingsProvider");
 
   return context;
 };
@@ -43,11 +49,11 @@ type SettingsProviderProps = {
 };
 
 export function SettingsProvider({ children }: SettingsProviderProps) {
-  const [settings, setSettings] = useLocalStorage('settings', defaultSettings);
+  const [settings, setSettings] = useLocalStorage("settings", defaultSettings);
 
   // Mode
   const onToggleMode = useCallback(() => {
-    const themeMode = settings.themeMode === 'light' ? 'dark' : 'light';
+    const themeMode = settings.themeMode === "light" ? "dark" : "light";
     setSettings({ ...settings, themeMode });
   }, [setSettings, settings]);
 
@@ -55,6 +61,14 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const themeMode = event.target.value;
       setSettings({ ...settings, themeMode });
+    },
+    [setSettings, settings]
+  );
+
+  const onChangeFontSize = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const fontSize = event.target.value;
+      setSettings({ ...settings, fontSize: fontSize });
     },
     [setSettings, settings]
   );
@@ -70,7 +84,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
   // Contrast
   const onToggleContrast = useCallback(() => {
-    const themeContrast = settings.themeContrast === 'default' ? 'bold' : 'default';
+    const themeContrast =
+      settings.themeContrast === "default" ? "bold" : "default";
     setSettings({ ...settings, themeContrast });
   }, [setSettings, settings]);
 
@@ -81,12 +96,17 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     },
     [setSettings, settings]
   );
-
-  // Color
-  const onChangeColorPresets = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const themeColorPresets = event.target.value;
-      setSettings({ ...settings, themeColorPresets });
+  const onChangeColor = useCallback(
+    (value: string) => {
+      const primaryColor = value;
+      setSettings({ ...settings, primaryColor });
+    },
+    [setSettings, settings]
+  );
+  const onChangeNeturalColor = useCallback(
+    (value: string) => {
+      const neturalColor = value;
+      setSettings({ ...settings, neturalColor });
     },
     [setSettings, settings]
   );
@@ -97,30 +117,34 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       // Mode
       onToggleMode,
       onChangeMode,
+      onChangeFontSize,
       // Layout
       onChangeLayout,
       // Contrast
       onChangeContrast,
       onToggleContrast,
-      // Color
-      onChangeColorPresets,
-      presetsOption,
-      presetsColor: getPresets(settings.themeColorPresets),
+      onChangeColor,
+      onChangeNeturalColor,
     }),
     [
       settings,
       // Mode
       onToggleMode,
       onChangeMode,
+      onChangeFontSize,
       // Layout
       onChangeLayout,
       onChangeContrast,
       // Contrast
       onToggleContrast,
-      // Color
-      onChangeColorPresets,
+      onChangeColor,
+      onChangeNeturalColor,
     ]
   );
 
-  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
+  return (
+    <SettingsContext.Provider value={value}>
+      {children}
+    </SettingsContext.Provider>
+  );
 }

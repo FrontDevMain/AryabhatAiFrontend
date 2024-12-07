@@ -64,11 +64,10 @@ function AuthSignUp() {
       body.append("password", data.password);
       body.append("confirm_password", data.confirmPassword);
       const Response = await fetcher.post(END_POINTS.AUTH.SIGN_UP, body);
-      console.log(Response);
       localStorage.setItem("gen_ai_email", data.email);
-      navigate(PATH_AUTH.verifySignupOtp);
+      navigate(PATH_AUTH.verifySignupOtp, { state: { email: data.email } });
     } catch (err) {
-      if (err.status == 409) {
+      if (err?.status == 409) {
         navigate(PATH_AUTH.signupDetails);
       }
       console.log(err);

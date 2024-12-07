@@ -35,6 +35,10 @@ const AdminNavConfig = [
         title: "Tags",
         path: PATH_ADMIN_DASHBOARD.tags,
       },
+      {
+        title: "Settings",
+        path: PATH_ADMIN_DASHBOARD.settings,
+      },
     ],
   },
 ];

@@ -22,15 +22,16 @@ type Props = {
 };
 
 export default function ThemeProvider({ children }: Props) {
-  const { themeMode } = useSettingsContext();
+  const { themeMode, fontSize, primaryColor, neturalColor } =
+    useSettingsContext();
 
   const themeOptions: ThemeOptions = useMemo(
     () => ({
-      palette: palette(themeMode),
-      typography,
+      palette: palette(themeMode, primaryColor, neturalColor),
+      typography: typography(fontSize),
       shape: { borderRadius: 8 },
     }),
-    [themeMode]
+    [themeMode, fontSize, primaryColor, neturalColor]
   );
 
   const theme = createTheme(themeOptions);

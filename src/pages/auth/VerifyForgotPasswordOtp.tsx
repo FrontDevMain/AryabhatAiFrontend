@@ -1,10 +1,15 @@
-import { Button, FormHelperText, Link, Stack, Typography } from '@mui/material';
+import { Button, FormHelperText, Link, Stack, Typography } from "@mui/material";
 //form
-import * as Yup from 'yup';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import FormProvider, { RHFCodes } from '../../components/hook-form';
-import { useNavigate } from 'react-router-dom';
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import FormProvider, { RHFCodes } from "../../components/hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { PATH_AUTH } from "src/routes/path";
+import useCountdown from "src/components/hooks/useCountdown";
+import fetcher from "src/api/fetcher";
+import { END_POINTS } from "src/api/EndPoints";
 
 type FormValuesProps = {
   code1: string;
@@ -17,6 +22,9 @@ type FormValuesProps = {
 
 function VerifyForgotPasswordOtp() {
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  const { timeLeft, start, resetTimer } = useCountdown(60);
 
   const LoginSchema = Yup.object().shape({
     code1: Yup.string().required(),
@@ -28,12 +36,12 @@ function VerifyForgotPasswordOtp() {
   });
 
   const defaultValues = {
-    code1: '',
-    code2: '',
-    code3: '',
-    code4: '',
-    code5: '',
-    code6: '',
+    code1: "",
+    code2: "",
+    code3: "",
+    code4: "",
+    code5: "",
+    code6: "",
   };
 
   const methods = useForm<FormValuesProps>({
@@ -42,27 +50,64 @@ function VerifyForgotPasswordOtp() {
   });
 
   const {
+    reset,
     handleSubmit,
     formState: { errors },
   } = methods;
 
-  const onSubmit = (data: FormValuesProps) => {
-    navigate('/new-password');
+  useEffect(() => {
+    if (!state?.email) navigate(PATH_AUTH.login);
+    else start();
+  }, []);
+
+  const resendOtp = async () => {
+    reset(defaultValues);
+    try {
+      const body = new URLSearchParams();
+      body.append("email", state?.email);
+      const Response = await fetcher.put(END_POINTS.AUTH.RESEND_OTP, body);
+      if (Response.status == 200) {
+        resetTimer();
+        start();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const onSubmit = async (data: FormValuesProps) => {
+    try {
+      const body = {
+        email: state?.email,
+        otp: `${data.code1}${data.code2}${data.code3}${data.code4}${data.code5}${data.code6}`,
+      };
+      const Response = await fetcher.post(END_POINTS.AUTH.OTP_VALIDATION, body);
+      if (Response.status == 200) {
+        navigate(PATH_AUTH.newPassword, { state: state });
+      }
+    } catch (err) {
+      reset(defaultValues);
+      console.log(err);
+    }
   };
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Typography variant="h3" textAlign={'center'}>
+      <Typography variant="h3" textAlign={"center"}>
         Verification
       </Typography>
-      <Typography color="text.disabled" textAlign={'center'} sx={{ width: '80%', margin: 'auto' }}>
+      <Typography
+        color="text.disabled"
+        textAlign={"center"}
+        sx={{ width: "80%", margin: "auto" }}
+      >
         Enter your 6 digit code that you received on your email.
       </Typography>
       <Stack gap={2} mt={4}>
         <Stack>
           <RHFCodes
             keyName="code"
-            inputs={['code1', 'code2', 'code3', 'code4', 'code5', 'code6']}
+            inputs={["code1", "code2", "code3", "code4", "code5", "code6"]}
           />
 
           {(!!errors.code1 ||
@@ -76,16 +121,28 @@ function VerifyForgotPasswordOtp() {
             </FormHelperText>
           )}
         </Stack>
-        <Typography textAlign={'center'} my={2}>
-          If you didn’t receive a code?
-          <Link variant="body2" color="primary" underline="none" sx={{ cursor: 'pointer' }}>
-            Resend
-          </Link>
-        </Typography>
 
         <Button fullWidth size="medium" type="submit" variant="contained">
           Continue
         </Button>
+        {timeLeft > 0 ? (
+          <Typography textAlign={"center"} color="error.main">
+            Resend OTP in 00:{timeLeft.toString().padStart(2, "00")} sec
+          </Typography>
+        ) : (
+          <Typography textAlign={"center"} my={2}>
+            If you didn't receive a code ?{" "}
+            <Link
+              variant="body2"
+              color="primary"
+              underline="none"
+              sx={{ cursor: "pointer" }}
+              onClick={resendOtp}
+            >
+              Resend
+            </Link>
+          </Typography>
+        )}
       </Stack>
     </FormProvider>
   );

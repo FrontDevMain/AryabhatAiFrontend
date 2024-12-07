@@ -17,6 +17,7 @@ export const END_POINTS = {
   ADMIN: {
     ADMIN_PRIVILEGES: {
       USER_DETAILS: "UserDetails",
+      USERS_ROLE: "Users/Role",
       USERS_LICENSE: "Users/License",
       INVITE_USERS: "invite-users",
     },
@@ -29,6 +30,9 @@ export const END_POINTS = {
       CREATE_TAGS: "Tags/CreateTag",
       RENAME_TAGS: "Tags/RenameTag",
       DELETE_TAGS: (id: string) => `Tags/DeleteTag/${id}`,
+    },
+    SETTINGS: {
+      GET_CONFIG: "app_settings/config",
     },
   },
 };

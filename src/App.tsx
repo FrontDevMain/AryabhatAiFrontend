@@ -1,19 +1,21 @@
 import { BrowserRouter } from "react-router-dom";
-import { SettingsProvider, ThemeSettings } from "./components/settings";
+import { SettingsProvider } from "./components/settings";
 import ThemeProvider from "./theme";
 import Router from "./routes";
 import { AuthProvider } from "./auth/AuthContext";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 function App() {
   return (
     <AuthProvider>
       <SettingsProvider>
         <ThemeProvider>
-          <ThemeSettings>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <BrowserRouter>
               <Router />
             </BrowserRouter>
-          </ThemeSettings>
+          </LocalizationProvider>
         </ThemeProvider>
       </SettingsProvider>
     </AuthProvider>

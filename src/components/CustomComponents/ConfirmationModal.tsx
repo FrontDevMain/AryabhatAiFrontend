@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab";
 import {
   Button,
   Dialog,
@@ -11,6 +12,7 @@ type childProps = {
   title: string;
   content: React.ReactNode | string;
   open: boolean;
+  loading?: boolean;
   handleClose: () => void;
   onConfirm: () => void;
 };
@@ -19,6 +21,7 @@ function ConfirmationModal({
   title,
   content,
   open,
+  loading = false,
   handleClose,
   onConfirm,
 }: childProps) {
@@ -35,13 +38,18 @@ function ConfirmationModal({
           {content}
         </DialogContentText>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ p: 3 }}>
         <Button onClick={handleClose} variant="outlined" fullWidth>
           No
         </Button>
-        <Button onClick={onConfirm} variant="contained" fullWidth>
+        <LoadingButton
+          onClick={onConfirm}
+          variant="contained"
+          fullWidth
+          loading={loading}
+        >
           Yes
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

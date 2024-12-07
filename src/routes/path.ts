@@ -26,6 +26,7 @@ export const PATH_ADMIN_DASHBOARD = {
   otherStorageDevices: path(ROOTS_ADMIN_DASHBOARD, "/otherStorageDevices"),
   users: path(ROOTS_ADMIN_DASHBOARD, "/users"),
   tags: path(ROOTS_ADMIN_DASHBOARD, "/tags"),
+  settings: path(ROOTS_ADMIN_DASHBOARD, "/settings"),
 };
 
 export const PATH_USER_DASHBOARD = {

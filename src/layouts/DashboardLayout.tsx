@@ -67,7 +67,7 @@ const DashboardLayout = () => {
       {/* Main Content */}
       <Box
         sx={{
-          flexGrow: 1,
+          // flexGrow: 1,
           display: "flex",
           flexDirection: "column",
         }}
@@ -106,7 +106,6 @@ const DashboardLayout = () => {
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             backgroundColor: theme.palette.background.neutral,
-            overflow: "scroll",
           }}
         >
           <Outlet />

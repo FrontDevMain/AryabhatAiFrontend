@@ -16,6 +16,7 @@ import fetcher from "src/api/fetcher";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { Avatar } from "src/components/avatar";
 import CustomAvatar from "src/components/avatar/Avatar";
+import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
 
 function AccountPopover() {
   const { user, logout } = useAuthContext();
@@ -26,6 +27,10 @@ function AccountPopover() {
   const handleClosePopover = () => setAnchorEl(null);
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
+
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const handleOpenConfirm = () => setOpenConfirm(true);
+  const handleCloseConfirm = () => setOpenConfirm(false);
 
   const CustomList = styled(List)(({ theme }) => ({
     padding: theme.spacing(1),
@@ -96,11 +101,20 @@ function AccountPopover() {
         >
           <CustomList disablePadding>
             <CustomListItemText>Change Profile Picture</CustomListItemText>
-            <CustomListItemText onClick={logoutUser}>Logout</CustomListItemText>
+            <CustomListItemText onClick={handleOpenConfirm}>
+              Logout
+            </CustomListItemText>
             <CustomListItemText>Choose LLM</CustomListItemText>
           </CustomList>
         </Popover>
       </div>
+      <ConfirmationModal
+        open={openConfirm}
+        handleClose={handleCloseConfirm}
+        onConfirm={logoutUser}
+        title={"Logout"}
+        content={"Are you sure want to Logout from your account?"}
+      />
     </Stack>
   );
 }

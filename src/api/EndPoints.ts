@@ -22,17 +22,21 @@ export const END_POINTS = {
       INVITE_USERS: "invite-users",
     },
     FILE_REPOSITORIES: {
+      UPLOAD_FILE: "Files/Upload",
       GET_ALL_FILES: "Files/GetFiles",
-      DOWNLOAD_FILES: (id: string) => `Files/DownloadFiles/${id}`,
+      DOWNLOAD_FILES: (id: string) => `Files/DownloadFile/${id}`,
+      DOWNLOAD_PREVIEW: (id: string) => `Files/Preview/${id}`,
+      MODIFY_DEPARTMENT: `Files/ModifyDepartment`,
+      DELETE_FILE: (id: string) => `Files/DeleteFile?file_id=${id}`,
     },
     TAGS: {
       GET_TAGS: "Tags/GetTags",
       CREATE_TAGS: "Tags/CreateTag",
       RENAME_TAGS: "Tags/RenameTag",
-      DELETE_TAGS: (id: string) => `Tags/DeleteTag/${id}`,
+      DELETE_TAGS: (id: string) => `Tags/DeleteTag?tag_id=${id}`,
     },
     SETTINGS: {
-      GET_CONFIG: "app_settings/config",
+      GET_CONFIG: "app_settings/configure-db",
     },
   },
 };

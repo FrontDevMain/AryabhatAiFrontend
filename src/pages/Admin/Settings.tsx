@@ -144,7 +144,7 @@ export default function Settings() {
   } = methods;
 
   useEffect(() => {
-    // getConfig();
+    getConfig();
   }, []);
 
   const getConfig = async () => {

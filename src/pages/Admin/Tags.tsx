@@ -25,6 +25,7 @@ import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import { formatDate } from "src/utils/utility";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -263,7 +264,9 @@ function TagsRow({
       <CustomTableRow key={item._id}>
         <TableCell>{item.tag_name}</TableCell>
         <TableCell>{item.username}</TableCell>
-        <TableCell>{new Date(item.created_at).toLocaleString()}</TableCell>
+        <TableCell>
+          <Typography noWrap>{formatDate(item.created_at)}</Typography>
+        </TableCell>
 
         <TableCell
           sx={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}

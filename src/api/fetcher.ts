@@ -100,5 +100,16 @@ const fetcher = {
     const response = await apiClient.post(endpoint, formData, { headers });
     return response;
   },
+  putFile: async function (endpoint: string, formData: FormData) {
+    const headers = {
+      "Content-Type": "multipart/form-data",
+      Authorization: "",
+    };
+    if (isLoggedin()) {
+      headers.Authorization = "Bearer " + localStorage.getItem("auth");
+    }
+    const response = await apiClient.put(endpoint, formData, { headers });
+    return response;
+  },
 };
 export default fetcher;

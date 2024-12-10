@@ -1,10 +1,13 @@
-import { MoreVert } from "@mui/icons-material";
+import { Close, MoreVert } from "@mui/icons-material";
 import {
+  AvatarGroup,
   Box,
+  Button,
   Icon,
   IconButton,
   List,
   ListItemText,
+  Modal,
   Popover,
   Stack,
   styled,
@@ -14,12 +17,40 @@ import { useState } from "react";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { Avatar } from "src/components/avatar";
 import CustomAvatar from "src/components/avatar/Avatar";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
 
+const CustomList = styled(List)(({ theme }) => ({
+  padding: theme.spacing(1),
+}));
+
+const CustomListItemText = styled(ListItemText)(({ theme }) => ({
+  padding: "15px 10px",
+  width: 200,
+  borderRadius: 5,
+  color: "text.secondary",
+  cursor: "pointer",
+  "&:hover": {
+    color: theme.palette.background.default,
+    backgroundColor: theme.palette.secondary.light, // Selected text color
+  },
+}));
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: { xs: "95%", md: 600 },
+  bgcolor: "background.default",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 3,
+};
+
 function AccountPopover() {
-  const { user, logout } = useAuthContext();
+  const { user, logout, initialize } = useAuthContext();
+
   //openpopover
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>
@@ -32,27 +63,50 @@ function AccountPopover() {
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
-  const CustomList = styled(List)(({ theme }) => ({
-    padding: theme.spacing(1),
-  }));
-
-  const CustomListItemText = styled(ListItemText)(({ theme }) => ({
-    padding: "15px 10px",
-    width: 200,
-    borderRadius: 5,
-    color: "text.secondary",
-    cursor: "pointer",
-    "&:hover": {
-      color: theme.palette.background.default,
-      backgroundColor: theme.palette.secondary.light, // Selected text color
-    },
-  }));
+  //modal
+  const [openModal, setOpenModal] = useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   const logoutUser = async () => {
     try {
       const Response = await fetcher.post(END_POINTS.AUTH.LOGOUT, {});
       if (Response.status == 200) {
         logout();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const onChangeProfile = async (event: any) => {
+    const uploadedFile = event.target.files[0];
+    if (uploadedFile) {
+      if (uploadedFile.size > 25 * 1024 * 1024) {
+        alert("File size exceeds 25MB.");
+        return;
+      }
+    }
+    try {
+      const formData = new FormData();
+      formData.append("profile_picture", uploadedFile);
+      const Response = await fetcher.putFile(
+        END_POINTS.AUTH.CHANGE_PROFILE,
+        formData
+      );
+      console.log(Response);
+      if (Response.status == 200) {
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const onDeleteProfile = async () => {
+    try {
+      const Response = await fetcher.delete(END_POINTS.AUTH.CHANGE_PROFILE);
+      if (Response.status == 200) {
+        initialize();
       }
     } catch (err) {
       console.log(err);
@@ -100,7 +154,9 @@ function AccountPopover() {
           }}
         >
           <CustomList disablePadding>
-            <CustomListItemText>Change Profile Picture</CustomListItemText>
+            <CustomListItemText onClick={handleOpenModal}>
+              Change Profile Picture
+            </CustomListItemText>
             <CustomListItemText onClick={handleOpenConfirm}>
               Logout
             </CustomListItemText>
@@ -115,6 +171,52 @@ function AccountPopover() {
         title={"Logout"}
         content={"Are you sure want to Logout from your account?"}
       />
+
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography
+              id="modal-modal-title"
+              variant="h4"
+              sx={{ fontSize: 40 }}
+            >
+              Uplaod
+            </Typography>
+            <IconButton>
+              <Close />
+            </IconButton>
+          </Stack>
+          <Stack flexDirection={"row"} gap={5} alignItems={"center"} mt={2}>
+            <CustomAvatar
+              src={`data:image/png;base64,${user.user_profile_picture}`}
+              sx={{ height: 120, width: 120 }}
+            />
+            <Button variant="contained" sx={{ position: "relative" }}>
+              <input
+                id="file-upload"
+                type="file"
+                style={{ display: "none" }}
+                onChange={onChangeProfile}
+              />
+              <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
+                Click to Upload
+              </label>{" "}
+            </Button>
+            <Button variant="outlined" onClick={onDeleteProfile}>
+              Delete Picture
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
     </Stack>
   );
 }

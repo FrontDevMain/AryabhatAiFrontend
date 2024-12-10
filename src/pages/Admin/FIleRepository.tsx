@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { CloseOutlined, CloudUpload, Delete } from "@mui/icons-material";
+import { Close, CloseOutlined, CloudUpload, Delete } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
   Box,
@@ -338,6 +338,7 @@ function UserDetail({
   const theme = useTheme();
   const { user } = useAuthContext();
   const [tagName, setTagName] = useState(item.department_tag);
+  const [htmlContent, setHtmlContent] = useState("");
 
   //onclick popover
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -355,6 +356,11 @@ function UserDetail({
   const [openModal, setOpenModal] = useState(false);
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+
+  //preview modal
+  const [openModal1, setOpenModal1] = useState(false);
+  const handleOpenModal1 = () => setOpenModal1(true);
+  const handleCloseModal1 = () => setOpenModal1(false);
 
   const downloadFiles = async (id: string) => {
     handleClosePopover();
@@ -388,19 +394,14 @@ function UserDetail({
   };
 
   const previewFile = async (id: string) => {
-    handleClosePopover();
-    const Response = await fetcher.get(
-      END_POINTS.ADMIN.FILE_REPOSITORIES.DOWNLOAD_PREVIEW(id)
-    );
     try {
+      handleClosePopover();
+      const Response = await fetcher.get(
+        END_POINTS.ADMIN.FILE_REPOSITORIES.DOWNLOAD_PREVIEW(id)
+      );
       if (Response.status == 200) {
-        console.log(Response);
-        const blobFile = Response.data.blob();
-        console.log("blobfile", blobFile);
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(blobFile);
-        document.body.appendChild(img);
-        console.log(img);
+        handleOpenModal1();
+        setHtmlContent(Response.data);
       }
     } catch (err) {
       console.log(err);
@@ -549,6 +550,26 @@ function UserDetail({
               Submit
             </Button>
           </Stack>
+        </Box>
+      </Modal>
+
+      <Modal
+        open={openModal1}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{ ...style, width: "90%", height: "90%" }}>
+          <IconButton
+            sx={{ position: "absolute", top: 10, left: 15 }}
+            onClick={handleCloseModal1}
+          >
+            <Close />
+          </IconButton>
+          <Typography textAlign={"center"}>Preview</Typography>
+          <div
+            style={{ height: "100%", width: "100%", marginTop: 10 }}
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
+          />
         </Box>
       </Modal>
     </>

@@ -67,7 +67,7 @@ const DashboardLayout = () => {
       {/* Main Content */}
       <Box
         sx={{
-          // flexGrow: 1,
+          flexGrow: 1,
           display: "flex",
           flexDirection: "column",
         }}

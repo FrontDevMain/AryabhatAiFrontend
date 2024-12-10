@@ -52,7 +52,7 @@ function AccountPopover() {
     try {
       const Response = await fetcher.post(END_POINTS.AUTH.LOGOUT, {});
       if (Response.status == 200) {
-        console.log(Response);
+        logout();
       }
     } catch (err) {
       console.log(err);

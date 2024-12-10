@@ -83,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    localStorage.removeItem("auth");
     dispatch({
       type: "logout",
     });

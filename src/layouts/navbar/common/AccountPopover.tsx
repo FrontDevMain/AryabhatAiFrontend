@@ -1,4 +1,5 @@
 import { Close, MoreVert } from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
 import {
   AvatarGroup,
   Box,
@@ -59,6 +60,8 @@ function AccountPopover() {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [openConfirm, setOpenConfirm] = useState(false);
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
@@ -80,31 +83,34 @@ function AccountPopover() {
   };
 
   const onChangeProfile = async (event: any) => {
-    const uploadedFile = event.target.files[0];
-    if (uploadedFile) {
-      if (uploadedFile.size > 25 * 1024 * 1024) {
-        alert("File size exceeds 25MB.");
-        return;
-      }
-    }
+    setIsLoading(true);
     try {
+      const uploadedFile = event.target.files[0];
+      if (uploadedFile) {
+        if (uploadedFile.size > 25 * 1024 * 1024) {
+          alert("File size exceeds 25MB.");
+          return;
+        }
+      }
       const formData = new FormData();
       formData.append("profile_picture", uploadedFile);
       const Response = await fetcher.putFile(
         END_POINTS.AUTH.CHANGE_PROFILE,
         formData
       );
-      console.log(Response);
       if (Response.status == 200) {
+        initialize();
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const onDeleteProfile = async () => {
     try {
-      const Response = await fetcher.delete(END_POINTS.AUTH.CHANGE_PROFILE);
+      const Response = await fetcher.delete(END_POINTS.AUTH.DELETE_PROFILE);
       if (Response.status == 200) {
         initialize();
       }
@@ -160,7 +166,6 @@ function AccountPopover() {
             <CustomListItemText onClick={handleOpenConfirm}>
               Logout
             </CustomListItemText>
-            <CustomListItemText>Choose LLM</CustomListItemText>
           </CustomList>
         </Popover>
       </div>
@@ -191,7 +196,7 @@ function AccountPopover() {
             >
               Uplaod
             </Typography>
-            <IconButton>
+            <IconButton onClick={handleCloseModal}>
               <Close />
             </IconButton>
           </Stack>
@@ -200,7 +205,11 @@ function AccountPopover() {
               src={`data:image/png;base64,${user.user_profile_picture}`}
               sx={{ height: 120, width: 120 }}
             />
-            <Button variant="contained" sx={{ position: "relative" }}>
+            <LoadingButton
+              variant="contained"
+              sx={{ position: "relative" }}
+              loading={isLoading}
+            >
               <input
                 id="file-upload"
                 type="file"
@@ -210,8 +219,12 @@ function AccountPopover() {
               <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
                 Click to Upload
               </label>{" "}
-            </Button>
-            <Button variant="outlined" onClick={onDeleteProfile}>
+            </LoadingButton>
+            <Button
+              variant="outlined"
+              onClick={onDeleteProfile}
+              disabled={isLoading}
+            >
               Delete Picture
             </Button>
           </Stack>

@@ -12,6 +12,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   TextField,
@@ -148,21 +149,27 @@ function Tags() {
           </Button>
         </Stack>
       </Stack>
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell>Tags Name</TableCell>
-            <TableCell>Created Username</TableCell>
-            <TableCell>Created Date</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {tags.map((item) => (
-            <TagsRow key={item._id} item={item} updateTagList={updateTagList} />
-          ))}
-        </TableBody>
-      </Table>
+      <TableContainer>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell>Tags Name</TableCell>
+              <TableCell>Created Username</TableCell>
+              <TableCell>Created Date</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {tags.map((item) => (
+              <TagsRow
+                key={item._id}
+                item={item}
+                updateTagList={updateTagList}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -262,8 +269,12 @@ function TagsRow({
         <TableCell sx={{ p: 0.5 }}></TableCell>
       </TableRow>
       <CustomTableRow key={item._id}>
-        <TableCell>{item.tag_name}</TableCell>
-        <TableCell>{item.username}</TableCell>
+        <TableCell>
+          <Typography>{item.tag_name}</Typography>
+        </TableCell>
+        <TableCell>
+          <Typography>{item.username}</Typography>
+        </TableCell>
         <TableCell>
           <Typography noWrap>{formatDate(item.created_at)}</Typography>
         </TableCell>

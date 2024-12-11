@@ -14,6 +14,7 @@ import AccountPopover from "./navbar/common/AccountPopover";
 import { Outlet } from "react-router-dom";
 import UserNavbar from "./navbar/user/UserNavbar";
 import { useAuthContext } from "src/auth/useAuthContext";
+import Scrollbar from "src/components/scrollbar";
 
 const DashboardLayout = () => {
   const { user } = useAuthContext();
@@ -21,11 +22,11 @@ const DashboardLayout = () => {
 
   return (
     <Box
-      sx={{
-        display: "flex",
-        height: "100vh",
-        backgroundColor: theme.palette.background.default,
-      }}
+    // sx={{
+    //   display: "flex",
+    //   height: "100vh",
+    //   backgroundColor: theme.palette.background.default,
+    // }}
     >
       {/* Drawer for Sidebar */}
       <Drawer
@@ -65,51 +66,48 @@ const DashboardLayout = () => {
       </Drawer>
 
       {/* Main Content */}
+      <AppBar
+        position="static"
+        color="transparent"
+        elevation={0}
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          position: "fixed",
+          top: 0,
+          zIndex: 1100,
+        }}
+      >
+        <Toolbar>
+          <Stack direction={"row"} justifyContent={"flex-end"} width={"100%"}>
+            <Typography
+              variant="h6"
+              color="text.disabled"
+              sx={{
+                border: "1px dashed #000",
+                borderRadius: 1,
+                px: 1,
+                justifySelf: "end",
+              }}
+            >
+              Company Name
+            </Typography>
+          </Stack>
+        </Toolbar>
+      </AppBar>
       <Box
         sx={{
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
+          ml: 37,
+          mt: 8,
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
+          backgroundColor: theme.palette.background.neutral,
+          p: 3,
         }}
       >
-        {/* AppBar */}
-        <AppBar
-          position="static"
-          color="transparent"
-          elevation={0}
-          sx={{ backgroundColor: theme.palette.background.default }}
-        >
-          <Toolbar>
-            <Stack direction={"row"} justifyContent={"flex-end"} width={"100%"}>
-              <Typography
-                variant="h6"
-                color="text.disabled"
-                sx={{
-                  border: "1px dashed #000",
-                  borderRadius: 1,
-                  px: 1,
-                  justifySelf: "end",
-                }}
-              >
-                Company Name
-              </Typography>
-            </Stack>
-          </Toolbar>
-        </AppBar>
-
-        {/* Content Area */}
-        <Box
-          sx={{
-            p: 3,
-            mx: 1,
-            flexGrow: 1,
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            backgroundColor: theme.palette.background.neutral,
-          }}
-        >
-          <Outlet />
-        </Box>
+        <Outlet />
       </Box>
     </Box>
   );

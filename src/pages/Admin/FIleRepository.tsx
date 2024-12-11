@@ -19,6 +19,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   Typography,
@@ -32,6 +33,7 @@ import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import Scrollbar from "src/components/scrollbar";
 import { formatDate } from "src/utils/utility";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
@@ -102,6 +104,7 @@ export default function FileRepository() {
   const [tags, setTags] = useState<tagListTypes[]>([]);
 
   const [file, setFile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   //modal
   const [open, setOpen] = useState(false);
@@ -169,6 +172,7 @@ export default function FileRepository() {
 
   const onUploadFile = async () => {
     try {
+      setIsLoading(true);
       const formData = new FormData();
       formData.append("file", file);
       formData.append("user_id", user.user_id);
@@ -182,6 +186,8 @@ export default function FileRepository() {
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -202,7 +208,7 @@ export default function FileRepository() {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <Typography>File Repository list</Typography>
+        <Typography>File Repository</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
           <IconButton>
             <Filters />
@@ -216,30 +222,32 @@ export default function FileRepository() {
           </Button>
         </Stack>
       </Stack>
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>File name</TableCell>
-            <TableCell>File type</TableCell>
-            <TableCell>File size</TableCell>
-            <TableCell>Time of upload</TableCell>
-            <TableCell>Department tags</TableCell>
-            <TableCell>File Status</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {files.map((item, index) => (
-            <UserDetail
-              key={item._id}
-              item={item}
-              tags={tags}
-              updateFileList={updateFileList}
-            />
-          ))}
-        </TableBody>
-      </Table>
+      <TableContainer>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell>Username</TableCell>
+              <TableCell>File name</TableCell>
+              <TableCell>File type</TableCell>
+              <TableCell>File size</TableCell>
+              <TableCell>Time of upload</TableCell>
+              <TableCell>Tag</TableCell>
+              <TableCell>File Status</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {files.map((item, index) => (
+              <UserDetail
+                key={item._id}
+                item={item}
+                tags={tags}
+                updateFileList={updateFileList}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Modal
         open={open}
@@ -315,7 +323,11 @@ export default function FileRepository() {
                   <Delete />
                 </IconButton>
               </Stack>
-              <LoadingButton variant="contained" onClick={onUploadFile}>
+              <LoadingButton
+                variant="contained"
+                onClick={onUploadFile}
+                loading={isLoading}
+              >
                 Upload
               </LoadingButton>
             </Stack>
@@ -370,23 +382,20 @@ function UserDetail({
       );
 
       if (Response.status == 200) {
-        const blob = Response.data;
-        const url = window.URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-
-        const contentDisposition = Response.headers["content-disposition"];
-        const filename = contentDisposition
-          ? contentDisposition.split("filename=")[1].replace(/"/g, "")
-          : "default-filename.ext";
-        a.download = filename;
-
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        // const blob = new Blob([Response.data], {
+        //   type: Response.headers["content-type"] || "application/octet-stream",
+        // });
+        // const url = window.URL.createObjectURL(blob);
+        // const link = document.createElement("a");
+        // link.href = url;
+        // link.setAttribute("download", item.filename);
+        // document.body.appendChild(link);
+        // link.click();
+        // link.remove();
+        // console.log(link);
+        // console.log(url);
+        // // Revoke the object URL after download
+        // window.URL.revokeObjectURL(url);
       }
     } catch (err) {
       console.log(err);
@@ -451,16 +460,30 @@ function UserDetail({
         <TableCell sx={{ p: 0.5 }}></TableCell>
       </TableRow>
       <CustomTableRow>
-        <TableCell>{item.username}</TableCell>
-        <TableCell>{item.filename}</TableCell>
-        <TableCell>{item.filetype}</TableCell>
-        <TableCell>{item.filesize}</TableCell>
+        <TableCell>
+          <Typography>{item.username}</Typography>
+        </TableCell>
+        <TableCell>
+          <Typography>{item.filename}</Typography>
+        </TableCell>
+        <TableCell>
+          <Typography>{item.filetype}</Typography>
+        </TableCell>
+        <TableCell>
+          <Typography>{item.filesize}</Typography>
+        </TableCell>
         <TableCell>
           {" "}
           <Typography noWrap>{formatDate(item.time_of_upload)}</Typography>
         </TableCell>
-        <TableCell>{item.department_tag}</TableCell>
-        <TableCell>{item.file_status}</TableCell>
+        <TableCell>
+          {" "}
+          <Typography>{item.department_tag}</Typography>
+        </TableCell>
+        <TableCell>
+          {" "}
+          <Typography>{item.file_status}</Typography>
+        </TableCell>
 
         <TableCell
           sx={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}
@@ -501,7 +524,7 @@ function UserDetail({
                 Download
               </CustomListItemText>
               <CustomListItemText onClick={handleOpenModal}>
-                Modify Department
+                Modify Tag
               </CustomListItemText>
             </CustomList>
           </Popover>

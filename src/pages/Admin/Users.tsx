@@ -14,6 +14,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   TextField,
@@ -149,22 +150,24 @@ function Users() {
           </Button>
         </Stack>
       </Stack>
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell>Username</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Role</TableCell>
-            <TableCell>License</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {users.map((item, index) => (
-            <UserDetail key={index} item={item} changeRole={changeRole} />
-          ))}
-        </TableBody>
-      </Table>
+      <TableContainer>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell>Username</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell>License</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((item, index) => (
+              <UserDetail key={index} item={item} changeRole={changeRole} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -278,20 +281,26 @@ function UserDetail({
               name={item.username}
               sx={{ height: 33, width: 33 }}
             />
-            {item.username}
+            <Typography> {item.username}</Typography>
           </Stack>
         </TableCell>
-        <TableCell>{item.email}</TableCell>
-        <TableCell>{item.roles}</TableCell>
         <TableCell>
-          {" "}
-          <Chip
-            label={item.license ? "YES" : "NO"}
-            sx={{
-              color: "common.white",
-              backgroundColor: item.license ? "#008080" : "secondary.main",
-            }}
-          />
+          <Typography>{item.email}</Typography>
+        </TableCell>
+        <TableCell>
+          <Typography>{item.roles}</Typography>
+        </TableCell>
+        <TableCell>
+          <Typography>
+            {" "}
+            <Chip
+              label={item.license ? "YES" : "NO"}
+              sx={{
+                color: "common.white",
+                backgroundColor: item.license ? "#008080" : "secondary.main",
+              }}
+            />
+          </Typography>
         </TableCell>
         <TableCell
           sx={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}

@@ -4,6 +4,7 @@ import {
   Card,
   Divider,
   Grid,
+  IconButton,
   Modal,
   Slider,
   Stack,
@@ -25,6 +26,7 @@ import FormProvider, {
   RHFRadioGroup,
   RHFTextField,
 } from "../../components/hook-form";
+import { Close } from "@mui/icons-material";
 
 const PrettoSlider = styled(Slider)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -185,32 +187,7 @@ export default function Settings() {
           <img src={`data:image/png;base64,${themeData.Theme_logo}`} />
         </Stack>
         <Divider />
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-        >
-          <Typography>Theme</Typography>
-          <Stack flexDirection={"row"} gap={2}>
-            {[
-              { label: "Light", value: "#F4F4F5" },
-              { label: "Dark", value: "#000" },
-            ].map((item) => (
-              <Stack gap={0.5}>
-                <span
-                  style={{
-                    width: 85,
-                    height: 50,
-                    backgroundColor: item.value,
-                    borderRadius: 10,
-                  }}
-                ></span>
-                <Typography textAlign={"center"}>{item.label}</Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Stack>
-        <Divider />
+
         <Stack
           direction={"row"}
           justifyContent={"space-between"}
@@ -359,7 +336,16 @@ export default function Settings() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography>SMTP Detail</Typography>
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography>SMTP Details</Typography>
+            <IconButton onClick={handleClose}>
+              <Close />
+            </IconButton>
+          </Stack>
           <Divider sx={{ my: 1 }} />
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Grid container sx={{ alignItems: "center" }}>
@@ -388,7 +374,7 @@ export default function Settings() {
                 <RHFRadioGroup
                   name="security"
                   options={[
-                    { label: "StartTLC", value: "StartTLC" },
+                    { label: "StartTLS", value: "StartTLS" },
                     { label: "SSL/TLS", value: "SSL/TLS" },
                     { label: "None", value: "None" },
                   ]}

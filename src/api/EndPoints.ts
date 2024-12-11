@@ -13,7 +13,8 @@ export const END_POINTS = {
     LOGOUT: "auth/logout",
     LOGIN_WITH_GOOGLE: "auth/google",
     LOGIN_WITH_MICROSOFT: "auth/microsoft",
-    CHANGE_PROFILE: "user/delete-profile-picture",
+    DELETE_PROFILE: "user/delete-profile-picture",
+    CHANGE_PROFILE: "user/update-profile-picture",
   },
   ADMIN: {
     ADMIN_PRIVILEGES: {

@@ -567,7 +567,12 @@ function UserDetail({
           </IconButton>
           <Typography textAlign={"center"}>Preview</Typography>
           <div
-            style={{ height: "100%", width: "100%", marginTop: 10 }}
+            style={{
+              height: "95%",
+              width: "100%",
+              marginTop: 10,
+              overflow: "scroll",
+            }}
             dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
         </Box>

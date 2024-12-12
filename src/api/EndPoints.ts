@@ -40,5 +40,16 @@ export const END_POINTS = {
     SETTINGS: {
       GET_CONFIG: "app_settings/configure-db",
     },
+    LICENSE: {
+      CHECK_LICENSE_STATUS: "License/check-license-status",
+      CHECK_LICENSE_OVERVIEW: "License/license-overview",
+      REVOKE_USER_LICENSE: "License/revoke-user-license",
+      ISSUE_LICENSE: "License/issue-license",
+      ACTIVATE_LICENSE: "License/activate-license",
+    },
+    LLM: {
+      GET_LLM_DETAILS: "Llms/GetLlmDetails",
+      LLM_PROVIDER: "Llms/LlmProvider",
+    },
   },
 };

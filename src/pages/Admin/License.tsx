@@ -1,4 +1,5 @@
 import {
+  alpha,
   Button,
   Card,
   Grid,
@@ -13,10 +14,70 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { Filters } from "src/assets/icons/filter";
+import { sentenceCase } from "change-case";
+import { log } from "console";
+import { useEffect, useState } from "react";
+import { END_POINTS } from "src/api/EndPoints";
+import fetcher from "src/api/fetcher";
+import { formatDate } from "src/utils/utility";
 
-function License() {
+type licenseTypes = {
+  status: string;
+  created_at: string;
+  expiry_date: string;
+  users: number;
+  translation: boolean;
+  database: boolean;
+  storage_device: boolean;
+  active_users: number;
+  license_number: string;
+  signed_license_key: string;
+};
+
+type licenseOverviewTypes = {
+  total_users: number;
+  active_users: number;
+  remaining_users: number;
+};
+
+export default function License() {
   const theme = useTheme();
+  const [licenseDetail, setLicenseDetail] = useState({} as licenseTypes);
+  const [licenseOverviewDetail, setLicenseOverviewDetail] = useState(
+    {} as licenseOverviewTypes
+  );
+
+  useEffect(() => {
+    getLicenseStatus();
+    getLicenseoverView();
+  }, []);
+
+  const getLicenseStatus = async () => {
+    try {
+      const Response = await fetcher.get(
+        END_POINTS.ADMIN.LICENSE.CHECK_LICENSE_STATUS
+      );
+      if (Response.status == 200) {
+        setLicenseDetail(Response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getLicenseoverView = async () => {
+    try {
+      const Response = await fetcher.get(
+        END_POINTS.ADMIN.LICENSE.CHECK_LICENSE_OVERVIEW
+      );
+      if (Response.status == 200) {
+        setLicenseOverviewDetail(Response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       <Stack
@@ -46,11 +107,20 @@ function License() {
               fullWidth
               multiline
               rows={6.5}
-              value={
-                "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJsaWNlbnNlX251bWJlciI6IjlXOTExVFNTSlFHMVUxTUZPUzdRMjZPOFpCQ0tJSjVUIiwiZXhwIjoxNzM0MzczNzk5fQ.EvA5u78FQ8YcR8yZfVSt9jgaSeq_hoxQCDgV8__gtREaB5N-p3STDDQ8YOUG1hYzWQlLeg13ej7w4zI0EZBOS1utuao02tM_BO3Hh3egHwCR3g6f3VHc3mN-dzU2CXQOVS8VeEUmkhheqsywzm-RB15HQalT2FrzGwaUF69Kun3pZWDb7wwrya8VjqdhypIMXgDXlEiMXPEAsiKEetA49uWnnwwnRpr2jnuemL5vEre2JIJXSP3Swl9SNFlrJ7RnS9IArrdrSMpAOSngfD8g94WYOG0JjUQNPAqUqpm4cPggptqNIiFtHMLLvTToitusVGbHUGnC2Tkz5ehsPWRPPA"
-              }
-              // onChange={(e) => setInviteEmails(e.target.value)}
+              value={licenseDetail.signed_license_key}
             />
+            <Typography
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.background.default,
+                borderRadius: 1,
+                width: "fit-content",
+                p: 1,
+                mt: 0.5,
+              }}
+            >
+              License Number : {licenseDetail.license_number}
+            </Typography>
           </Grid>
         </Grid>
 
@@ -60,28 +130,59 @@ function License() {
             <Typography>License Details</Typography>
           </Grid>
           <Grid item xs={8}>
-            <TextField
-              fullWidth
-              multiline
-              rows={6.5}
-              value={
-                "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJsaWNlbnNlX251bWJlciI6IjlXOTExVFNTSlFHMVUxTUZPUzdRMjZPOFpCQ0tJSjVUIiwiZXhwIjoxNzM0MzczNzk5fQ.EvA5u78FQ8YcR8yZfVSt9jgaSeq_hoxQCDgV8__gtREaB5N-p3STDDQ8YOUG1hYzWQlLeg13ej7w4zI0EZBOS1utuao02tM_BO3Hh3egHwCR3g6f3VHc3mN-dzU2CXQOVS8VeEUmkhheqsywzm-RB15HQalT2FrzGwaUF69Kun3pZWDb7wwrya8VjqdhypIMXgDXlEiMXPEAsiKEetA49uWnnwwnRpr2jnuemL5vEre2JIJXSP3Swl9SNFlrJ7RnS9IArrdrSMpAOSngfD8g94WYOG0JjUQNPAqUqpm4cPggptqNIiFtHMLLvTToitusVGbHUGnC2Tkz5ehsPWRPPA"
-              }
-              // onChange={(e) => setInviteEmails(e.target.value)}
-            />
+            <Stack
+              sx={{
+                border: `1px solid ${theme.palette.text.disabled}`,
+                borderRadius: 2,
+                p: 1,
+                bgcolor: alpha(theme.palette.text.disabled, 0.1),
+                maxHeight: 250,
+                overflow: "scroll",
+              }}
+            >
+              {Object.entries(licenseDetail).map((item, index) => {
+                console.log(item);
+                return [
+                  `license_number`,
+                  `signed_license_key`,
+                  "users",
+                  "active_users",
+                ].includes(item[0]) ? null : (
+                  <Stack>
+                    <Typography variant="body1">
+                      {" "}
+                      {`${sentenceCase(item[0])} : ${item[1]}`}
+                    </Typography>
+                    {index % 2 == 0 && <br />}
+                  </Stack>
+                );
+              })}
+            </Stack>
+            <Typography
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.background.default,
+                borderRadius: 1,
+                width: "fit-content",
+                p: 1,
+                mt: 0.5,
+              }}
+            >
+              License expiry : {formatDate(licenseDetail.expiry_date)}
+            </Typography>
           </Grid>
         </Grid>
 
         {/* License last updated */}
-        <Grid container mt={4}>
+        <Grid container mt={4} alignItems={"center"}>
           <Grid item xs={4}>
             <Typography>License definition last updated </Typography>
           </Grid>
           <Grid item xs={8}>
             <TextField
               fullWidth
-              rows={6.5}
-              value={"2022-02-08"}
+              disabled
+              value={formatDate(licenseDetail.created_at)}
               // onChange={(e) => setInviteEmails(e.target.value)}
             />
           </Grid>
@@ -112,15 +213,20 @@ function License() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  <TableCell>09</TableCell>
-                  <TableCell>04</TableCell>
-                  <TableCell>05</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>09</TableCell>
-                  <TableCell>04</TableCell>
-                  <TableCell>05</TableCell>
+                <TableRow sx={{ border: "1px solid #dadada" }}>
+                  <TableCell>
+                    <Typography>{licenseOverviewDetail.total_users}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography>
+                      {licenseOverviewDetail.active_users}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography>
+                      {licenseOverviewDetail.remaining_users}
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -130,5 +236,3 @@ function License() {
     </>
   );
 }
-
-export default License;

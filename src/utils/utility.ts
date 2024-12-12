@@ -19,6 +19,8 @@ export const base64toBlob = (base64: string) => {
 };
 
 export function formatDate(dateStr: string) {
+  if (!dateStr) return null;
+
   // Split the input string into date and time parts
   const [datePart] = dateStr.split(" ");
 

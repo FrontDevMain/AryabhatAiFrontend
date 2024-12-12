@@ -21,13 +21,7 @@ const DashboardLayout = () => {
   const theme = useTheme();
 
   return (
-    <Box
-    // sx={{
-    //   display: "flex",
-    //   height: "100vh",
-    //   backgroundColor: theme.palette.background.default,
-    // }}
-    >
+    <Box sx={{ pt: 8 }}>
       {/* Drawer for Sidebar */}
       <Drawer
         variant="permanent"
@@ -96,15 +90,16 @@ const DashboardLayout = () => {
       </AppBar>
       <Box
         sx={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
+          // flexGrow: 1,
+          // display: "flex",
+          // flexDirection: "column",
           ml: 37,
-          mt: 8,
+          // mt: 8,
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
           backgroundColor: theme.palette.background.neutral,
           p: 3,
+          height: "93vh",
         }}
       >
         <Outlet />

@@ -382,20 +382,15 @@ function UserDetail({
       );
 
       if (Response.status == 200) {
-        // const blob = new Blob([Response.data], {
-        //   type: Response.headers["content-type"] || "application/octet-stream",
-        // });
-        // const url = window.URL.createObjectURL(blob);
-        // const link = document.createElement("a");
-        // link.href = url;
-        // link.setAttribute("download", item.filename);
-        // document.body.appendChild(link);
-        // link.click();
-        // link.remove();
-        // console.log(link);
-        // console.log(url);
-        // // Revoke the object URL after download
-        // window.URL.revokeObjectURL(url);
+        const htmlString = Response.data;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
+        const anchorTags = doc.querySelectorAll("a");
+        const downloadLink = document.createElement("a");
+        downloadLink.href = anchorTags[0].href;
+        downloadLink.download = anchorTags[0].download;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
       }
     } catch (err) {
       console.log(err);
@@ -405,11 +400,11 @@ function UserDetail({
   const previewFile = async (id: string) => {
     try {
       handleClosePopover();
+      handleOpenModal1();
       const Response = await fetcher.get(
         END_POINTS.ADMIN.FILE_REPOSITORIES.DOWNLOAD_PREVIEW(id)
       );
       if (Response.status == 200) {
-        handleOpenModal1();
         setHtmlContent(Response.data);
       }
     } catch (err) {

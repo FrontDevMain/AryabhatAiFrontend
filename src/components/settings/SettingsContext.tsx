@@ -49,7 +49,10 @@ type SettingsProviderProps = {
 };
 
 export function SettingsProvider({ children }: SettingsProviderProps) {
-  const [settings, setSettings] = useLocalStorage("settings", defaultSettings);
+  const [settings, setSettings] = useLocalStorage(
+    "Gen_ai_settings",
+    defaultSettings
+  );
 
   // Mode
   const onToggleMode = useCallback(() => {

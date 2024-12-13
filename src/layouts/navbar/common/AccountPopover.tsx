@@ -128,15 +128,15 @@ function AccountPopover() {
       sx={{ mb: 2, px: 2 }}
     >
       <CustomAvatar
-        src={`data:image/png;base64,${user.user_profile_picture}`}
-        name={user.user_username}
+        src={`data:image/png;base64,${user?.user_profile_picture}`}
+        name={user?.user_username}
       />
       <Box sx={{ maxWidth: 130 }}>
         <Typography color="text.secondary" noWrap textOverflow={"ellipsis"}>
-          {user.user_firstname}
+          {user?.user_firstname}
         </Typography>
         <Typography color="text.disabled" noWrap textOverflow={"ellipsis"}>
-          {user.user_email}
+          {user?.user_email}
         </Typography>
       </Box>
       <div style={{ position: "relative" }}>
@@ -202,7 +202,7 @@ function AccountPopover() {
           </Stack>
           <Stack flexDirection={"row"} gap={5} alignItems={"center"} mt={2}>
             <CustomAvatar
-              src={`data:image/png;base64,${user.user_profile_picture}`}
+              src={`data:image/png;base64,${user?.user_profile_picture}`}
               sx={{ height: 120, width: 120 }}
             />
             <LoadingButton

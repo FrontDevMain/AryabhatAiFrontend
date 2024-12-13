@@ -3,7 +3,8 @@ import { isLoggedin, getToken, redirectToLogin } from "../utils/authGuard";
 
 const apiClient = axios.create({
   // Can set any default configurations here, such as base URL, headers, etc.
-  baseURL: "https://aryabhat.ai/",
+  // baseURL: "https://aryabhat.ai/",
+  baseURL: "https://20.40.41.252/",
 });
 
 apiClient.interceptors.response.use(
@@ -22,8 +23,7 @@ apiClient.interceptors.response.use(
           break;
         case 401:
           console.error(error.response.data.detail);
-          // localStorage.removeItem("auth");
-          redirectToLogin();
+          window.location.reload();
           break;
         case 403:
           console.error("Forbidden");

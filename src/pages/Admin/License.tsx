@@ -108,6 +108,12 @@ export default function License() {
               multiline
               rows={6.5}
               value={licenseDetail.signed_license_key}
+              onChange={(e) =>
+                setLicenseDetail((prevState) => ({
+                  ...prevState,
+                  signed_license_key: e.target.value,
+                }))
+              }
             />
             <Typography
               sx={{

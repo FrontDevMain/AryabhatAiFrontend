@@ -45,7 +45,7 @@ const DashboardLayout = () => {
           >
             <Box>
               <Logo />
-              {user.user_accountType == "User" ? (
+              {user?.user_accountType == "User" ? (
                 <UserNavbar />
               ) : (
                 <AdminNavbar />

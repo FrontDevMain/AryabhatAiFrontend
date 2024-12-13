@@ -72,7 +72,7 @@ function AuthLoginForm() {
         login();
       }
     } catch (err) {
-      if (err.status == 400) {
+      if (err?.status == 400) {
         navigate(PATH_AUTH.signupDetails, { state: { email: data.email } });
       }
       console.log(err);

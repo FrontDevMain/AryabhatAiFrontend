@@ -38,7 +38,7 @@ export const END_POINTS = {
       DELETE_TAGS: (id: string) => `Tags/DeleteTag?tag_id=${id}`,
     },
     SETTINGS: {
-      GET_CONFIG: "app_settings/configure-db",
+      GET_CONFIG: "app_settings/config",
     },
     LICENSE: {
       CHECK_LICENSE_STATUS: "License/check-license-status",

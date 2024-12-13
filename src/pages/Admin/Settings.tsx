@@ -27,6 +27,7 @@ import FormProvider, {
   RHFTextField,
 } from "../../components/hook-form";
 import { Close } from "@mui/icons-material";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 const PrettoSlider = styled(Slider)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -90,6 +91,7 @@ type FormValuesProps = {
 
 export default function Settings() {
   const theme = useTheme();
+  const { user } = useAuthContext();
   const { onChangeFontSize, onChangeColor, onChangeNeturalColor } =
     useSettingsContext();
 
@@ -145,14 +147,68 @@ export default function Settings() {
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
-  useEffect(() => {
-    getConfig();
-  }, []);
+  const [themeDefaultKeys, setThemeDefaultKeys] = useState({
+    themeMode: "light",
+    themeContrast: "default",
+    themeLayout: "vertical",
+    fontSize: 16,
+    primaryColor: "#1d7dc9",
+    neturalColor: "#1d7dc9",
+  });
 
-  const getConfig = async () => {
+  useEffect(() => {
+    getSettingConfig();
+  }, [user]);
+
+  const getSettingConfig = async () => {
     try {
-      const Response = await fetcher.get(END_POINTS.ADMIN.SETTINGS.GET_CONFIG);
-      console.log(Response);
+      const body = {
+        user_id: user.user_id,
+        Theme_logo: "",
+        Theme_theme: "",
+        Theme_font_size: 0,
+        Theme_primary_colour: "",
+        Theme_neutral_colour: "",
+        Setting_archive_record: 0,
+        SMTP_server_address: "",
+        SMTP_server_port: 0,
+        SMTP_server_sequrity: "",
+        SMTP_email_address: "",
+        SMTP_username: "",
+        SMTP_password: "",
+        intend: "get",
+      };
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.SETTINGS.GET_CONFIG,
+        body
+      );
+      if (Response.status == 200) {
+        const {
+          Theme_theme,
+          Theme_font_size,
+          Theme_primary_colour,
+          Theme_neutral_colour,
+        } = Response.data[0];
+        localStorage.setItem(
+          "Gen_ai_settings",
+          JSON.stringify({
+            themeMode: Theme_theme.toLowerCase(),
+            themeContrast: "default",
+            themeLayout: "vertical",
+            fontSize: Theme_font_size,
+            primaryColor: Theme_primary_colour,
+            neturalColor: Theme_neutral_colour,
+          })
+        );
+        setThemeDefaultKeys({
+          themeMode: Theme_theme.toLowerCase(),
+          themeContrast: "default",
+          themeLayout: "vertical",
+          fontSize: Theme_font_size,
+          primaryColor: Theme_primary_colour,
+          neturalColor: Theme_neutral_colour,
+        });
+      }
     } catch (err) {
       console.log(err);
     }

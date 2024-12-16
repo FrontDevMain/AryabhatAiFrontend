@@ -60,7 +60,7 @@ const DashboardLayout = () => {
       </Drawer>
 
       {/* Main Content */}
-      <Box sx={{ height: "calc(100Vh - 65px)" }}>
+      <Box sx={{ height: "calc(100Vh - 64px)" }}>
         <AppBar
           position="static"
           color="transparent"
@@ -96,7 +96,7 @@ const DashboardLayout = () => {
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             backgroundColor: theme.palette.background.neutral,
-            p: 3,
+            px: 2,
             minHeight: "100%",
             overflow: "scroll",
           }}

@@ -15,11 +15,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 import { useAuthContext } from "src/auth/useAuthContext";
 import CustomAvatar from "src/components/avatar/Avatar";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import { PATH_AFTER_ADMIN_LOGIN, PATH_AFTER_USER_LOGIN } from "src/config";
 
 const CustomList = styled(List)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -50,6 +52,7 @@ const style = {
 };
 
 function AccountPopover() {
+  const navigate = useNavigate();
   const { user, logout, initialize, updateUserType } = useAuthContext();
 
   //openpopover
@@ -160,19 +163,24 @@ function AccountPopover() {
           }}
         >
           <CustomList disablePadding>
-            {user.user_accountType !== "User" && (
+            {user?.user_accountType !== "User" && (
               <CustomListItemText
-                onClick={() =>
+                onClick={() => {
                   updateUserType(
-                    user.tempAccountType == "User"
-                      ? user.user_accountType
+                    user?.tempAccountType == "User"
+                      ? user?.user_accountType
                       : "User"
-                  )
-                }
+                  );
+                  navigate(
+                    user?.tempAccountType == "User"
+                      ? PATH_AFTER_ADMIN_LOGIN
+                      : PATH_AFTER_USER_LOGIN
+                  );
+                }}
               >
                 Switch to{" "}
-                {user.tempAccountType == "User"
-                  ? user.user_accountType
+                {user?.tempAccountType == "User"
+                  ? user?.user_accountType
                   : "User"}
               </CustomListItemText>
             )}

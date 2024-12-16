@@ -1,15 +1,17 @@
 import { BrowserRouter } from "react-router-dom";
-import { SettingsProvider } from "./components/settings";
+
 import ThemeProvider from "./theme";
 import Router from "./routes";
 import { AuthProvider } from "./auth/AuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Provider } from "react-redux";
+import store from "./redux/Store";
 
 function App() {
   return (
-    <AuthProvider>
-      <SettingsProvider>
+    <Provider store={store}>
+      <AuthProvider>
         <ThemeProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <BrowserRouter>
@@ -17,8 +19,8 @@ function App() {
             </BrowserRouter>
           </LocalizationProvider>
         </ThemeProvider>
-      </SettingsProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </Provider>
   );
 }
 

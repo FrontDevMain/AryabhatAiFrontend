@@ -15,7 +15,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
-import { useSettingsContext } from "src/components/settings";
 import { preset } from "src/components/settings/presets";
 
 //form
@@ -28,6 +27,13 @@ import FormProvider, {
 } from "../../components/hook-form";
 import { Close } from "@mui/icons-material";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
+import { useDispatch } from "react-redux";
+import {
+  fetchTheme,
+  fetchThemeSuccess,
+} from "src/redux/actions/theme/ThemeActions";
 
 const PrettoSlider = styled(Slider)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -92,8 +98,12 @@ type FormValuesProps = {
 export default function Settings() {
   const theme = useTheme();
   const { user } = useAuthContext();
-  const { onChangeFontSize, onChangeColor, onChangeNeturalColor } =
-    useSettingsContext();
+  const dispatch = useDispatch();
+  const { theme: themeSetting } = useSelector(
+    (state: RootState) => state.theme
+  );
+
+  const [isLoading, setIsLoading] = useState(false);
 
   //modal
   const [open, setOpen] = useState(false);
@@ -141,76 +151,53 @@ export default function Settings() {
   });
 
   const {
-    reset,
-    setError,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
-  const [themeDefaultKeys, setThemeDefaultKeys] = useState({
-    themeMode: "light",
-    themeContrast: "default",
-    themeLayout: "vertical",
-    fontSize: 16,
-    primaryColor: "#1d7dc9",
-    neturalColor: "#1d7dc9",
-  });
+  const [themeDefaultKeys, setThemeDefaultKeys] = useState(themeSetting);
 
   useEffect(() => {
-    getSettingConfig();
-  }, [user]);
+    setThemeDefaultKeys(themeSetting);
+  }, [themeSetting]);
 
-  const getSettingConfig = async () => {
+  const applySetting = async (method: string) => {
     try {
-      const body = {
+      setIsLoading(true);
+      let body = {
+        ...themeDefaultKeys,
         user_id: user.user_id,
-        Theme_logo: "",
-        Theme_theme: "",
-        Theme_font_size: 0,
-        Theme_primary_colour: "",
-        Theme_neutral_colour: "",
-        Setting_archive_record: 0,
-        SMTP_server_address: "",
-        SMTP_server_port: 0,
-        SMTP_server_sequrity: "",
-        SMTP_email_address: "",
-        SMTP_username: "",
-        SMTP_password: "",
-        intend: "get",
+        intend: method,
       };
       const Response = await fetcher.post(
         END_POINTS.ADMIN.SETTINGS.GET_CONFIG,
         body
       );
       if (Response.status == 200) {
-        const {
-          Theme_theme,
-          Theme_font_size,
-          Theme_primary_colour,
-          Theme_neutral_colour,
-        } = Response.data[0];
-        localStorage.setItem(
-          "Gen_ai_settings",
-          JSON.stringify({
-            themeMode: Theme_theme.toLowerCase(),
-            themeContrast: "default",
-            themeLayout: "vertical",
-            fontSize: Theme_font_size,
-            primaryColor: Theme_primary_colour,
-            neturalColor: Theme_neutral_colour,
-          })
-        );
-        setThemeDefaultKeys({
-          themeMode: Theme_theme.toLowerCase(),
-          themeContrast: "default",
-          themeLayout: "vertical",
-          fontSize: Theme_font_size,
-          primaryColor: Theme_primary_colour,
-          neturalColor: Theme_neutral_colour,
-        });
+        if (method == "set") dispatch(fetchThemeSuccess(body));
+        if (method == "reset")
+          dispatch(
+            fetchTheme({
+              user_id: user.user_id,
+              Theme_logo: "",
+              Theme_theme: "",
+              Theme_font_size: 0,
+              Theme_primary_colour: "",
+              Theme_neutral_colour: "",
+              Setting_archive_record: 0,
+              SMTP_server_address: "",
+              SMTP_server_port: 0,
+              SMTP_server_sequrity: "",
+              SMTP_email_address: "",
+              SMTP_username: "",
+              SMTP_password: "",
+              intend: "get",
+            })
+          );
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -218,11 +205,21 @@ export default function Settings() {
 
   return (
     <>
-      <Stack direction={"row"} alignItems={"center"}>
+      <Stack
+        direction={"row"}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+      >
         <Typography>Themes Setting</Typography>
+        <LoadingButton
+          variant="contained"
+          onClick={() => applySetting("set")}
+          loading={isLoading}
+        >
+          Apply Theme
+        </LoadingButton>
       </Stack>
 
-      {/* logo */}
       <Card
         sx={{
           p: 2,
@@ -231,6 +228,7 @@ export default function Settings() {
           mt: 2,
           display: "flex",
           flexDirection: "column",
+          bgcolor: theme.palette.background.default,
           gap: 2,
         }}
       >
@@ -256,8 +254,13 @@ export default function Settings() {
               aria-label="pretto slider"
               min={10}
               max={24}
-              value={parseFloat(theme.typography.body1.fontSize + "") * 16}
-              onChange={(e: any) => onChangeFontSize(e)}
+              value={themeDefaultKeys.Theme_font_size}
+              onChange={(e: any) =>
+                setThemeDefaultKeys({
+                  ...themeDefaultKeys,
+                  Theme_font_size: Number(e.target.value),
+                })
+              }
             />
             <Stack flexDirection={"row"} justifyContent={"space-between"}>
               <Typography fontSize={12}>A</Typography>
@@ -282,20 +285,37 @@ export default function Settings() {
                   borderRadius: "50%",
                   backgroundColor: item.main,
                   cursor: "pointer",
+                  border:
+                    themeDefaultKeys.Theme_primary_colour == item.main
+                      ? `3px solid ${theme.palette.text.primary}`
+                      : "none",
                 }}
-                onClick={() => onChangeColor(item.main)}
+                onClick={() =>
+                  setThemeDefaultKeys({
+                    ...themeDefaultKeys,
+                    Theme_primary_colour: item.main,
+                  })
+                }
               ></span>
             ))}
           </Stack>
         </Stack>
-        {/* <Stack
+        <Divider />
+        <Stack
           direction={"row"}
           justifyContent={"space-between"}
           alignItems={"center"}
         >
-          <Typography>Netural Colors</Typography>
+          <Typography>Neutral Color</Typography>
           <Stack flexDirection={"row"} gap={1}>
-            {["#D9D9D9", "#EAEAEA", "#F4F4F5", "#ffffff"].map((item) => (
+            {[
+              "#121212",
+              "#1E1E2F",
+              "#23262A",
+              "#F0F4F8",
+              "#F7F8FA",
+              "#ffffff",
+            ].map((item) => (
               <span
                 style={{
                   height: 30,
@@ -303,12 +323,22 @@ export default function Settings() {
                   borderRadius: "50%",
                   backgroundColor: item,
                   cursor: "pointer",
+                  border:
+                    themeDefaultKeys.Theme_neutral_colour == item
+                      ? `3px solid ${theme.palette.primary.main}`
+                      : "none",
                 }}
-                onClick={() => onChangeNeturalColor(item)}
+                onClick={() =>
+                  setThemeDefaultKeys({
+                    ...themeDefaultKeys,
+                    Theme_neutral_colour: item,
+                  })
+                }
               ></span>
             ))}
           </Stack>
-        </Stack> */}
+        </Stack>
+        <Divider />
       </Card>
 
       <Stack direction={"row"} alignItems={"center"} mt={3}>
@@ -324,6 +354,7 @@ export default function Settings() {
           mt: 2,
           display: "flex",
           flexDirection: "column",
+          bgcolor: theme.palette.background.default,
           gap: 2,
         }}
       >
@@ -333,7 +364,12 @@ export default function Settings() {
           alignItems={"center"}
         >
           <Typography>Reset All Settings</Typography>
-          <LoadingButton variant="contained">Reset Now</LoadingButton>
+          <LoadingButton
+            variant="contained"
+            onClick={() => applySetting("reset")}
+          >
+            Reset Now
+          </LoadingButton>
         </Stack>
       </Card>
 
@@ -350,6 +386,7 @@ export default function Settings() {
           mt: 2,
           display: "flex",
           flexDirection: "column",
+          bgcolor: theme.palette.background.default,
           gap: 2,
         }}
       >
@@ -371,6 +408,7 @@ export default function Settings() {
           mt: 2,
           display: "flex",
           flexDirection: "column",
+          bgcolor: theme.palette.background.default,
           gap: 2,
         }}
       >
@@ -409,7 +447,16 @@ export default function Settings() {
                 Server Address (SMTP)
               </Grid>
               <Grid item xs={8}>
-                <RHFTextField name="serverAddress" />
+                <RHFTextField
+                  name="serverAddress"
+                  value={themeDefaultKeys.SMTP_server_address}
+                  onChange={(e) => {
+                    setThemeDefaultKeys({
+                      ...themeDefaultKeys,
+                      SMTP_server_address: e.target.value,
+                    });
+                  }}
+                />
               </Grid>
             </Grid>
             <Divider sx={{ my: 2 }} />
@@ -418,7 +465,17 @@ export default function Settings() {
                 Port
               </Grid>
               <Grid item xs={8}>
-                <RHFTextField name="port" />
+                <RHFTextField
+                  name="port"
+                  type=""
+                  value={themeDefaultKeys.SMTP_server_port}
+                  onChange={(e) => {
+                    setThemeDefaultKeys({
+                      ...themeDefaultKeys,
+                      SMTP_server_port: Number(e.target.value),
+                    });
+                  }}
+                />
               </Grid>
             </Grid>
             <Divider sx={{ my: 2 }} />
@@ -434,6 +491,13 @@ export default function Settings() {
                     { label: "SSL/TLS", value: "SSL/TLS" },
                     { label: "None", value: "None" },
                   ]}
+                  value={themeDefaultKeys.SMTP_server_sequrity}
+                  onChange={(e) => {
+                    setThemeDefaultKeys({
+                      ...themeDefaultKeys,
+                      SMTP_server_sequrity: e.target.value,
+                    });
+                  }}
                 />
               </Grid>
             </Grid>
@@ -443,7 +507,16 @@ export default function Settings() {
                 Sender Email Address
               </Grid>
               <Grid item xs={8}>
-                <RHFTextField name="senderEmail" />
+                <RHFTextField
+                  name="senderEmail"
+                  value={themeDefaultKeys.SMTP_email_address}
+                  onChange={(e) => {
+                    setThemeDefaultKeys({
+                      ...themeDefaultKeys,
+                      SMTP_email_address: e.target.value,
+                    });
+                  }}
+                />
               </Grid>
             </Grid>
             <Divider sx={{ my: 2 }} />
@@ -452,7 +525,16 @@ export default function Settings() {
                 Username
               </Grid>
               <Grid item xs={8}>
-                <RHFTextField name="username" />
+                <RHFTextField
+                  name="username"
+                  value={themeDefaultKeys.SMTP_username}
+                  onChange={(e) => {
+                    setThemeDefaultKeys({
+                      ...themeDefaultKeys,
+                      SMTP_username: e.target.value,
+                    });
+                  }}
+                />
               </Grid>
             </Grid>
             <Divider sx={{ my: 2 }} />
@@ -461,7 +543,17 @@ export default function Settings() {
                 Password
               </Grid>
               <Grid item xs={8}>
-                <RHFTextField name="password" type="password" />
+                <RHFTextField
+                  name="password"
+                  type="password"
+                  value={themeDefaultKeys.SMTP_password}
+                  onChange={(e) => {
+                    setThemeDefaultKeys({
+                      ...themeDefaultKeys,
+                      SMTP_password: e.target.value,
+                    });
+                  }}
+                />
               </Grid>
             </Grid>
             <Divider sx={{ my: 2 }} />

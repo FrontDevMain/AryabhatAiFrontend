@@ -22,6 +22,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 
@@ -30,6 +31,7 @@ import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { Avatar } from "src/components/avatar";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import { RootState } from "src/redux/reducers";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -207,6 +209,7 @@ function UserDetail({
   item: usersList;
   changeRole: (username: string, role: string) => void;
 }) {
+  const { license } = useSelector((state: RootState) => state.license);
   const theme = useTheme();
   const { user } = useAuthContext();
   const [isloading, setIsLoading] = useState(false);
@@ -227,12 +230,17 @@ function UserDetail({
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  const toggleLicense = async (username: string) => {
+  const toggleLicense = async () => {
     setIsLoading(true);
     try {
-      const body = { user_username: username };
+      const body = {
+        signed_license_key: license.signed_license_key,
+        username: item.username,
+      };
       const Response = await fetcher.post(
-        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USERS_LICENSE,
+        item.license
+          ? END_POINTS.ADMIN.LICENSE.REVOKE_USER_LICENSE
+          : END_POINTS.ADMIN.LICENSE.ISSUE_LICENSE,
         body
       );
       if (Response.status == 200) {
@@ -337,16 +345,12 @@ function UserDetail({
                 {item.roles == "User" ? "Switch to Admin" : "Switch to User"}
               </CustomListItemText>
               {!item.license && (
-                <CustomListItemText
-                  onClick={() => toggleLicense(item.username)}
-                >
+                <CustomListItemText onClick={toggleLicense}>
                   Apply License
                 </CustomListItemText>
               )}
               {item.license && user.user_accountType == "SuperAdmin" && (
-                <CustomListItemText
-                  onClick={() => toggleLicense(item.username)}
-                >
+                <CustomListItemText onClick={toggleLicense}>
                   Cancel License
                 </CustomListItemText>
               )}

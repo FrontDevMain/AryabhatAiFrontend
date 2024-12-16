@@ -7,13 +7,13 @@ import {
   StyledEngineProvider,
   ThemeProvider as MUIThemeProvider,
 } from "@mui/material/styles";
-// components
-import { useSettingsContext } from "../components/settings";
 //
 import palette from "./palette";
 import typography from "./typography";
 import GlobalStyles from "./globalStyles";
 import ComponentsOverrides from "./overrides";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
 
 // ----------------------------------------------------------------------
 
@@ -22,25 +22,31 @@ type Props = {
 };
 
 export default function ThemeProvider({ children }: Props) {
-  const { themeMode, fontSize, primaryColor, neturalColor } =
-    useSettingsContext();
+  const { theme } = useSelector((state: RootState) => state.theme);
 
-  const themeOptions: ThemeOptions = useMemo(
+  const {
+    Theme_theme,
+    Theme_font_size,
+    Theme_primary_colour,
+    Theme_neutral_colour,
+  } = theme;
+
+  const themeOptions: ThemeOptions | any = useMemo(
     () => ({
-      palette: palette(themeMode, primaryColor, neturalColor),
-      typography: typography(fontSize),
+      palette: palette(Theme_theme, Theme_primary_colour, Theme_neutral_colour),
+      typography: typography(Theme_font_size),
       shape: { borderRadius: 8 },
     }),
-    [themeMode, fontSize, primaryColor, neturalColor]
+    [Theme_theme, Theme_font_size, Theme_primary_colour, Theme_neutral_colour]
   );
 
-  const theme = createTheme(themeOptions);
+  const customTheme = createTheme(themeOptions);
 
-  theme.components = ComponentsOverrides(theme) as any;
+  customTheme.components = ComponentsOverrides(customTheme) as any;
 
   return (
     <StyledEngineProvider injectFirst>
-      <MUIThemeProvider theme={theme}>
+      <MUIThemeProvider theme={customTheme}>
         <CssBaseline />
         <GlobalStyles />
         {children}

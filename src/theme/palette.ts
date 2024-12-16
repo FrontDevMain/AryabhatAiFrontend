@@ -1,5 +1,4 @@
 import { alpha } from "@mui/material/styles";
-import { preset } from "src/components/settings/presets";
 
 // ----------------------------------------------------------------------
 
@@ -116,20 +115,27 @@ const COMMON = {
 };
 
 export default function palette(
-  themeMode: "light" | "dark",
+  themeMode: string,
   primaryColor: string,
-  neturalColor: string
+  neutralColor: string
 ) {
   const light = {
     ...COMMON,
-    primary: preset.filter((item) => item.main == primaryColor)[0],
-    mode: "light",
+    primary: {
+      lighter: primaryColor,
+      light: primaryColor,
+      main: primaryColor,
+      dark: primaryColor,
+      darker: primaryColor,
+      contrastText: "#fff",
+    },
+    mode: "Light",
     text: {
       primary: "#000000",
       secondary: "#4A4A4A",
       disabled: "#979797",
     },
-    background: { default: "#FFFFFF", neutral: "#F4F4F5" },
+    background: { default: "#FFFFFF", neutral: neutralColor, paper: "#FFFFFF" },
     action: {
       ...COMMON.action,
       active: GREY[600],
@@ -138,19 +144,26 @@ export default function palette(
 
   const dark = {
     ...COMMON,
-    primary: preset.filter((item) => item.main == primaryColor)[0],
-    mode: "dark",
+    primary: {
+      lighter: alpha(primaryColor, 0.3),
+      light: alpha(primaryColor, 0.7),
+      main: alpha(primaryColor, 1),
+      dark: alpha(primaryColor, 1.3),
+      darker: alpha(primaryColor, 1.7),
+      contrastText: "#fff",
+    },
+    mode: "Dark",
     text: {
       primary: "#DDDDDD",
       secondary: "#FFFFFF",
       disabled: "#979797",
     },
-    background: { default: "#0D0D0D", neutral: "#171717" },
+    background: { default: "#0D0D0D", neutral: neutralColor, paper: "#0D0D0D" },
     action: {
       ...COMMON.action,
       active: GREY[500],
     },
   } as const;
 
-  return themeMode === "light" ? light : dark;
+  return themeMode === "Light" ? light : dark;
 }

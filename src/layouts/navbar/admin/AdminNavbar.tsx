@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { ArrowRight } from "@mui/icons-material";
 import AdminNavConfig from "./AdminConfig";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Rounded corners
@@ -33,7 +33,8 @@ const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
 export default function AdminNavbar() {
   const navigate = useNavigate();
   const theme = useTheme();
-  const [active, setActive] = useState("dashboard");
+  const { pathname } = useLocation();
+  const [active, setActive] = useState(pathname);
 
   return (
     <Box
@@ -54,10 +55,10 @@ export default function AdminNavbar() {
                 setActive(item.title);
                 navigate(item.path);
               }}
-              selected={active == item.title}
+              selected={active == item.path}
             >
               <ListItemText primary={item.title} />
-              {<ArrowRight />}
+              <ArrowRight />
             </CustomListItemButton>
           );
         })}

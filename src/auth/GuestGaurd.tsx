@@ -7,7 +7,7 @@ function GuestGaurd({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, isInitialize } = useAuthContext();
 
   if (isAuthenticated) {
-    return user.user_accountType == "user" ? (
+    return user.tempAccountType == "User" ? (
       <Navigate to={PATH_AFTER_USER_LOGIN} />
     ) : (
       <Navigate to={PATH_AFTER_ADMIN_LOGIN} />

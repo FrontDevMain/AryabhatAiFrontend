@@ -70,6 +70,7 @@ export default function Router() {
       ),
       children: [
         { element: <Navigate to={"/user/dashboard"} replace />, index: true },
+        { path: "dashboard", element: <UserDashboard /> },
         { path: "dashboard/:id", element: <UserDashboard /> },
       ],
     },

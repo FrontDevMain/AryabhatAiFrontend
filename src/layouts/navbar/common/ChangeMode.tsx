@@ -1,25 +1,66 @@
 // @mui
 import { RadioGroup, Stack, Typography } from "@mui/material";
 //
-import { useSettingsContext } from "../../../components/settings";
 import { StyledCard, StyledWrap, MaskControl } from "./styles";
 import LightMode from "src/assets/navbar/LightMode";
 import DarkMode from "src/assets/navbar/DarkMode";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
+import { useAuthContext } from "src/auth/useAuthContext";
+import fetcher from "src/api/fetcher";
+import { END_POINTS } from "src/api/EndPoints";
+import { useDispatch } from "react-redux";
+import { fetchThemeSuccess } from "src/redux/actions/theme/ThemeActions";
 
 // ----------------------------------------------------------------------
 
-const OPTIONS = ["light", "dark"] as const;
+const OPTIONS = ["Light", "Dark"] as const;
 
 export default function ChangeMode() {
-  const { themeMode, onChangeMode } = useSettingsContext();
+  const { user } = useAuthContext();
+  const dispatch = useDispatch();
+  const { theme: themeSetting } = useSelector(
+    (state: RootState) => state.theme
+  );
+  const [themeDefaultKeys, setThemeDefaultKeys] = useState(themeSetting);
+
+  useEffect(() => {
+    setThemeDefaultKeys(themeSetting);
+  }, [themeSetting]);
+
+  const onSubmit = async (val: string) => {
+    try {
+      const body = {
+        ...themeDefaultKeys,
+        Theme_theme: val,
+        user_id: user.user_id,
+        intend: "set",
+      };
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.SETTINGS.GET_CONFIG,
+        body
+      );
+      if (Response.status == 200) {
+        dispatch(fetchThemeSuccess(body));
+      }
+    } catch (error) {}
+  };
 
   return (
-    <RadioGroup name="themeMode" value={themeMode} onChange={onChangeMode}>
+    <RadioGroup
+      name="themeMode"
+      value={themeDefaultKeys.Theme_theme}
+      onChange={(e) => onSubmit(e.target.value)}
+    >
       <StyledWrap>
         {OPTIONS.map((mode) => (
-          <StyledCard key={mode} selected={themeMode === mode}>
+          <StyledCard
+            key={mode}
+            selected={themeDefaultKeys.Theme_theme === mode}
+          >
             <Stack flexDirection={"row"} gap={1}>
-              {mode == "light" ? <LightMode /> : <DarkMode />}
+              {mode == "Light" ? <LightMode /> : <DarkMode />}
               <Typography
                 sx={{
                   textTransform: "capitalize",

@@ -17,8 +17,10 @@ import {
 import { sentenceCase } from "change-case";
 import { log } from "console";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
+import { RootState } from "src/redux/reducers";
 import { formatDate } from "src/utils/utility";
 
 type licenseTypes = {
@@ -42,28 +44,15 @@ type licenseOverviewTypes = {
 
 export default function License() {
   const theme = useTheme();
-  const [licenseDetail, setLicenseDetail] = useState({} as licenseTypes);
+  const { license } = useSelector((state: RootState) => state.license);
+  const [licenseDetail, setLicenseDetail] = useState(license as licenseTypes);
   const [licenseOverviewDetail, setLicenseOverviewDetail] = useState(
     {} as licenseOverviewTypes
   );
 
   useEffect(() => {
-    getLicenseStatus();
     getLicenseoverView();
   }, []);
-
-  const getLicenseStatus = async () => {
-    try {
-      const Response = await fetcher.get(
-        END_POINTS.ADMIN.LICENSE.CHECK_LICENSE_STATUS
-      );
-      if (Response.status == 200) {
-        setLicenseDetail(Response.data);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const getLicenseoverView = async () => {
     try {
@@ -147,7 +136,6 @@ export default function License() {
               }}
             >
               {Object.entries(licenseDetail).map((item, index) => {
-                console.log(item);
                 return [
                   `license_number`,
                   `signed_license_key`,

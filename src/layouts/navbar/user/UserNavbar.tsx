@@ -1,70 +1,161 @@
 import {
   Box,
+  Button,
   Collapse,
   Icon,
   IconButton,
   List,
   ListItemButton,
   ListItemText,
+  Modal,
   Popover,
   Stack,
   styled,
+  TextField,
+  Tooltip,
+  Typography,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import React, { useEffect, useState } from "react";
+import {
+  BookmarksSharp,
+  ExpandLess,
+  ExpandMore,
+  LibraryBooksOutlined,
+  PushPinOutlined,
+} from "@mui/icons-material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
+import fetcher from "src/api/fetcher";
+import { END_POINTS } from "src/api/EndPoints";
+import { NotebookList } from "src/redux/actions/Notebook/NotebookActionTypes";
+import { useAuthContext } from "src/auth/useAuthContext";
+import { useDispatch } from "react-redux";
+import {
+  fetchNotebookList,
+  fetchNotebookListSuccess,
+} from "src/redux/actions/Notebook/NotebookActions";
+import { LoadingButton } from "@mui/lab";
+
+const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
+  borderRadius: theme.shape.borderRadius, // Rounded corners
+  marginBottom: theme.spacing(0.5), // Spacing between items
+  padding: theme.spacing(1),
+  color: theme.palette.text.secondary,
+  "&:hover": {
+    backgroundColor: theme.palette.primary.main, // Hover background
+    color: theme.palette.background.default, // Selected text color
+  },
+  "&.Mui-selected": {
+    backgroundColor: theme.palette.primary.main, // Selected background
+    color: theme.palette.background.default, // Selected text color
+    "&:hover": {
+      backgroundColor: theme.palette.primary.dark, // Darker on hover when selected
+      color: theme.palette.background.default, // Selected text color
+    },
+  },
+}));
+
+const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
+  borderRadius: theme.shape.borderRadius, // Rounded corners
+  color: theme.palette.text.secondary,
+  backgroundColor: "transparent",
+  "&:hover": {
+    color: theme.palette.primary.main, // Selected text color
+  },
+  "&.Mui-selected": {
+    color: theme.palette.primary.main, // Selected text color
+    "&:hover": {
+      color: theme.palette.primary.main, // Darker on hover when selected
+    },
+  },
+}));
+
+const CustomList = styled(List)(({ theme }) => ({
+  padding: theme.spacing(1),
+}));
+
+const CustomListItemText = styled(ListItemText)(({ theme }) => ({
+  padding: "15px 10px",
+  width: 200,
+  borderRadius: 5,
+  color: "text.secondary",
+  cursor: "pointer",
+  "&:hover": {
+    color: theme.palette.background.default,
+    backgroundColor: theme.palette.secondary.light, // Selected text color
+  },
+}));
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.default",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 3,
+};
 
 export default function UserNavbar() {
   const theme = useTheme();
-  const [active, setActive] = useState({ item: "Notebook", subItem: "Chat 1" });
+  const [active, setActive] = useState({ item: "Notebook" });
+  const { notebookList } = useSelector((state: RootState) => state.notebook);
 
-  const [navbarList, setNavbarList] = useState([
+  const [navbarList, setNavbarList] = useState<
     {
-      segment: "Notebook",
-      title: "Notebook",
-      icon: "",
-      children: [
-        {
-          segment: "Chat 1",
-          title: "Chat 1",
-          icon: "",
-        },
-        {
-          segment: "Chat 2",
-          title: "Chat 2",
-          icon: "",
-        },
-        {
-          segment: "Chat 3",
-          title: "Chat 3",
-          icon: "",
-        },
-      ],
-    },
-    {
-      segment: "Archive",
-      title: "Archive",
-      icon: "",
-      children: [
-        {
-          segment: "Chat 1",
-          title: "Chat 1",
-          icon: "",
-        },
-        {
-          segment: "Chat 2",
-          title: "Chat 2",
-          icon: "",
-        },
-        {
-          segment: "Chat 3",
-          title: "Chat 3",
-          icon: "",
-        },
-      ],
-    },
-  ]);
+      segment: string;
+      title: string;
+      icon: any;
+      children: any[];
+    }[]
+  >([]);
+
+  useEffect(() => {
+    setNavbarList([
+      {
+        segment: "notebook",
+        title: "Notebook",
+        icon: <LibraryBooksOutlined />,
+        children: notebookList
+          .filter((item) => !item.is_archieved)
+          .sort((a, b) => a.is_pin),
+      },
+      {
+        segment: "archive",
+        title: "Archive",
+        icon: <BookmarksSharp />,
+        children: notebookList.filter((item) => item.is_archieved),
+      },
+    ]);
+  }, [notebookList]);
+
+  const dispatch = useDispatch();
+  const { user } = useAuthContext();
+
+  const handleActive = (item: string) => {
+    setActive({
+      item: item,
+    });
+  };
+
+  const createNewNotebook = async (userId: string) => {
+    try {
+      const body = {
+        user_id: userId,
+      };
+      const Response = await fetcher.post(
+        END_POINTS.USER.QUERY.CREATE_NOTEBOOK,
+        body
+      );
+      if (Response.status == 200) {
+        dispatch(fetchNotebookList(userId));
+      }
+    } catch (error) {}
+  };
 
   return (
     <Box
@@ -80,12 +171,39 @@ export default function UserNavbar() {
       >
         {navbarList.map((item) => {
           return (
-            <NavbarItems
-              key={item.title}
-              item={item}
-              active={active}
-              setActive={setActive}
-            />
+            <>
+              <CustomListItemButton
+                onClick={() => handleActive(item.title)}
+                selected={active.item == item.title}
+              >
+                {/* {open ? <ExpandLess /> : <ExpandMore />} */}
+                <ListItemText primary={item.title} />
+                <Tooltip title="New Chat" placement="top">
+                  <Icon
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      createNewNotebook(user.user_id);
+                    }}
+                  >
+                    {item.icon}
+                  </Icon>
+                </Tooltip>
+              </CustomListItemButton>
+              <Collapse
+                in={active.item == item.title}
+                timeout="auto"
+                unmountOnExit
+              >
+                {item.children.map((child: NotebookList) => (
+                  <SubNotebook
+                    child={child}
+                    active={active}
+                    handleActive={handleActive}
+                    item={item}
+                  />
+                ))}
+              </Collapse>
+            </>
           );
         })}
       </List>
@@ -93,7 +211,24 @@ export default function UserNavbar() {
   );
 }
 
-function NavbarItems({ item, active, setActive }: any) {
+const SubNotebook = ({
+  child,
+  active,
+  handleActive,
+  item,
+}: {
+  child: NotebookList;
+  active: any;
+  handleActive: any;
+  item: any;
+}) => {
+  const dispatch = useDispatch();
+  const { user } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [headerName, setHeaderName] = useState("");
+  const { notebookList } = useSelector((state: RootState) => state.notebook);
+
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>
     setAnchorEl(event.currentTarget);
@@ -101,130 +236,236 @@ function NavbarItems({ item, active, setActive }: any) {
   const openPopover = Boolean(anchorEl);
   const id = openPopover ? "simple-popover" : undefined;
 
-  const [open, setOpen] = useState(active.item == item.title);
-  const handleClick = () => {
-    setOpen(!open);
+  //modal
+  const [openModal, setOpenModal] = useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setHeaderName("");
   };
 
-  const handleActive = (item: "", subItem: "") => {
-    console.log(item, subItem);
-    setActive({
-      item: item,
-      subItem: subItem,
-    });
+  const onChangeHeaderName = async (chatId: string) => {
+    try {
+      setIsLoading(true);
+      const body = {
+        user_id: user.user_id,
+        chat_id: chatId,
+        header: headerName,
+      };
+      const Response = await fetcher.put(
+        END_POINTS.USER.QUERY.RENAME_NOTEBOOK,
+        body
+      );
+      if (Response.status == 200) {
+        dispatch(
+          fetchNotebookListSuccess(
+            notebookList.map((item) =>
+              item.chat_id == chatId
+                ? { ...item, chat_header: headerName }
+                : { ...item }
+            )
+          )
+        );
+        handleCloseModal();
+        setHeaderName("");
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
-    borderRadius: theme.shape.borderRadius, // Rounded corners
-    marginBottom: theme.spacing(1), // Spacing between items
-    padding: theme.spacing(1.5),
-    color: theme.palette.text.secondary,
-    "&:hover": {
-      backgroundColor: theme.palette.primary.main, // Hover background
-      color: theme.palette.background.default, // Selected text color
-    },
-    "&.Mui-selected": {
-      backgroundColor: theme.palette.primary.main, // Selected background
-      color: theme.palette.background.default, // Selected text color
-      "&:hover": {
-        backgroundColor: theme.palette.primary.dark, // Darker on hover when selected
-        color: theme.palette.background.default, // Selected text color
-      },
-    },
-  }));
+  const onDeleteNotebook = async () => {
+    try {
+      setIsLoading(true);
+      const Response = await fetcher.delete(
+        END_POINTS.USER.QUERY.DELETE_NOTEBOOK(child.chat_id)
+      );
+      if (Response.status == 200) {
+        dispatch(
+          fetchNotebookListSuccess(
+            notebookList.filter((item) => item.chat_id != child.chat_id)
+          )
+        );
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
-    borderRadius: theme.shape.borderRadius, // Rounded corners
-    color: theme.palette.text.secondary,
-    backgroundColor: "transparent",
-    "&:hover": {
-      color: theme.palette.primary.main, // Selected text color
-    },
-    "&.Mui-selected": {
-      color: theme.palette.primary.main, // Selected text color
-      "&:hover": {
-        color: theme.palette.primary.main, // Darker on hover when selected
-      },
-    },
-  }));
+  const onPinNotebook = async () => {
+    try {
+      setIsLoading(true);
+      const body = {
+        user_id: user.user_id,
+        chat_id: child.chat_id,
+      };
+      const Response = await fetcher.put(
+        END_POINTS.USER.QUERY.PIN_NOTEBOOK,
+        body
+      );
+      if (Response.status == 200) {
+        dispatch(
+          fetchNotebookListSuccess(
+            notebookList.map((item) =>
+              item.chat_id == child.chat_id
+                ? { ...item, is_pin: item.is_pin == 1 ? 0 : 1 }
+                : { ...item }
+            )
+          )
+        );
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const CustomList = styled(List)(({ theme }) => ({
-    padding: theme.spacing(1),
-  }));
-
-  const CustomListItemText = styled(ListItemText)(({ theme }) => ({
-    padding: "15px 10px",
-    width: 200,
-    borderRadius: 5,
-    color: "text.secondary",
-    cursor: "pointer",
-    "&:hover": {
-      color: theme.palette.background.default,
-      backgroundColor: theme.palette.secondary.light, // Selected text color
-    },
-  }));
+  const onArchiveNotebook = async () => {
+    try {
+      setIsLoading(true);
+      const body = {
+        user_id: user.user_id,
+        chat_id: child.chat_id,
+      };
+      const Response = await fetcher.put(
+        END_POINTS.USER.QUERY.ARCHIVE_NOTEBOOK,
+        body
+      );
+      if (Response.status == 200) {
+        dispatch(
+          fetchNotebookListSuccess(
+            notebookList.map((item) =>
+              item.chat_id == child.chat_id
+                ? { ...item, is_archieved: item.is_archieved == 1 ? 0 : 1 }
+                : { ...item }
+            )
+          )
+        );
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <Box key={item.title}>
-      {" "}
-      <CustomListItemButton
-        onClick={() => {
-          handleClick();
-          handleActive(item.title, "");
-        }}
-        selected={active.item == item.title}
+    <List component="div" disablePadding key={child.chat_id}>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        gap={1}
       >
-        <ListItemText primary={item.title} />
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </CustomListItemButton>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        {item.children.map((child: any) => (
-          <List component="div" disablePadding>
-            <Stack
-              direction={"row"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              gap={1}
+        <CustomListSubItemButton
+          sx={{ pl: 4 }}
+          onClick={() => {
+            handleActive(item.title, child.chat_id);
+          }}
+          selected={
+            active.item == item.title && active.subItem == child.chat_id
+          }
+        >
+          <ListItemText primary={child.chat_header} />
+        </CustomListSubItemButton>
+        {child.is_pin ? (
+          <PushPinOutlined
+            sx={{ transform: "rotate(45deg)", color: "primary.main" }}
+          />
+        ) : null}
+        <IconButton aria-describedby={id} onClick={handleOpenPopover}>
+          <Icon>
+            <MoreVertIcon />
+          </Icon>
+        </IconButton>
+        <Popover
+          id={id}
+          anchorEl={anchorEl}
+          open={openPopover}
+          onClose={handleClosePopover}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+        >
+          <CustomList disablePadding key={child.chat_id}>
+            <CustomListItemText
+              onClick={() => {
+                onPinNotebook();
+                handleClosePopover();
+              }}
             >
-              <CustomListSubItemButton
-                sx={{ pl: 4 }}
-                onClick={() => handleActive(item.title, child.title)}
-                selected={
-                  active.item == item.title && active.subItem == child.title
-                }
-              >
-                <ListItemText primary={child.title} />
-              </CustomListSubItemButton>
-              <IconButton aria-describedby={id} onClick={handleOpenPopover}>
-                <Icon>
-                  <MoreVertIcon />
-                </Icon>
-              </IconButton>
-              <Popover
-                id={id}
-                anchorEl={anchorEl}
-                open={openPopover}
-                onClose={handleClosePopover}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-              >
-                <CustomList disablePadding>
-                  <CustomListItemText>Pin Chat on Top</CustomListItemText>
-                  <CustomListItemText>Archive</CustomListItemText>
-                  <CustomListItemText>Delete</CustomListItemText>
-                  <CustomListItemText>Rename</CustomListItemText>
-                </CustomList>
-              </Popover>
-            </Stack>
-          </List>
-        ))}
-      </Collapse>
-    </Box>
+              {child.is_pin ? "Unpin Chat from Top" : "Pin Chat on Top"}
+            </CustomListItemText>
+            <CustomListItemText
+              onClick={() => {
+                handleClosePopover();
+                onArchiveNotebook();
+              }}
+            >
+              {child.is_archieved ? "Unarchive" : "Archive"}
+            </CustomListItemText>
+            <CustomListItemText
+              onClick={() => {
+                handleClosePopover();
+                onDeleteNotebook();
+              }}
+            >
+              Delete
+            </CustomListItemText>
+            <CustomListItemText
+              onClick={() => {
+                setHeaderName(child.chat_header);
+                handleClosePopover();
+                handleOpenModal();
+              }}
+            >
+              Rename
+            </CustomListItemText>
+          </CustomList>
+        </Popover>
+      </Stack>
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            ...style,
+            backgroundColor: (theme) => theme.palette.background.default,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h4" mb={3}>
+            Edit Header
+          </Typography>
+          <TextField
+            fullWidth
+            label="Tag Name"
+            value={headerName}
+            onChange={(e) => setHeaderName(e.target.value)}
+          />
+          <Stack direction={"row"} gap={2} mt={3}>
+            <Button variant="outlined" fullWidth onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <LoadingButton
+              variant="contained"
+              fullWidth
+              loading={isLoading}
+              onClick={() => onChangeHeaderName(child.chat_id)}
+            >
+              Submit
+            </LoadingButton>
+          </Stack>
+        </Box>
+      </Modal>
+    </List>
   );
-}
+};

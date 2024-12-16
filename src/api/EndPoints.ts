@@ -52,4 +52,17 @@ export const END_POINTS = {
       LLM_PROVIDER: "Llms/LlmProvider",
     },
   },
+  USER: {
+    QUERY: {
+      QUERY_NOTEBOOK: "QueryService/ask",
+      CREATE_NOTEBOOK: "notebook/CreateNotebook",
+      LIST_NOTEBOOK: "notebook/ListNotebooks",
+      DELETE_NOTEBOOK: (id: string) => `notebook/Delete?chat_id=${id}`,
+      ARCHIVE_NOTEBOOK: "notebook/Archive",
+      PIN_NOTEBOOK: "notebook/Pin",
+      REACT_NOTEBOOK: "notebook/React",
+      SHOW_NOTEBOOK: "notebook/ShowHistory",
+      RENAME_NOTEBOOK: "notebook/rename_notebook",
+    },
+  },
 };

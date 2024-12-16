@@ -1,10 +1,12 @@
-import { forwardRef } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { forwardRef } from "react";
+import { Link as RouterLink } from "react-router-dom";
 // @mui
-import { useTheme } from '@mui/material/styles';
-import { Box, Link, BoxProps, Stack, Typography } from '@mui/material';
-import reverdesLogo from '../../assets/logo/Reversed.svg';
-import monotonLogo from '../../assets/logo/Monotone.svg';
+import { useTheme } from "@mui/material/styles";
+import { Box, Link, BoxProps, Stack, Typography } from "@mui/material";
+import reverdesLogo from "../../assets/logo/Reversed.svg";
+import monotonLogo from "../../assets/logo/Monotone.svg";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
 
 // ----------------------------------------------------------------------
 
@@ -14,7 +16,7 @@ export interface LogoProps extends BoxProps {
 
 const Logo = forwardRef<HTMLDivElement, LogoProps>(
   ({ disabledLink = false, sx, ...other }, ref) => {
-    const theme = useTheme();
+    const { theme } = useSelector((state: RootState) => state.theme);
 
     const logo = (
       <Box
@@ -29,13 +31,13 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
         }}
         {...other}
       >
-        <Stack direction={'row'} alignItems={'center'} gap={1}>
+        <Stack direction={"row"} alignItems={"center"} gap={1}>
           <img
-            src={theme.palette.mode == 'light' ? monotonLogo : reverdesLogo}
+            src={theme.Theme_theme == "Light" ? monotonLogo : reverdesLogo}
             alt="LOGO"
-            width={'100%'}
-            height={'100%'}
-          />{' '}
+            width={"100%"}
+            height={"100%"}
+          />{" "}
           <Typography variant="h3" color="text.primary">
             Aryabhat
           </Typography>
@@ -48,7 +50,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
     }
 
     return (
-      <Link to="/" component={RouterLink} sx={{ display: 'contents' }}>
+      <Link to="/" component={RouterLink} sx={{ display: "contents" }}>
         {logo}
       </Link>
     );

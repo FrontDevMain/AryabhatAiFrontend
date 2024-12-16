@@ -2,9 +2,9 @@ import React from "react";
 import { useParams } from "react-router-dom";
 
 function UserDashboard() {
-  const { id } = useParams();
+  // const { id } = useParams();
 
-  return <div>UserDashboard {id}</div>;
+  return <div>UserDashboard ddf </div>;
 }
 
 export default UserDashboard;

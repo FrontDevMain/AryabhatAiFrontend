@@ -31,5 +31,6 @@ export const PATH_ADMIN_DASHBOARD = {
 
 export const PATH_USER_DASHBOARD = {
   root: ROOTS_USER_DASHBOARD,
-  dashboard: (id: string) => path(ROOTS_USER_DASHBOARD, `/dashboard/${id}`),
+  dashboard: path(ROOTS_USER_DASHBOARD, `/dashboard`),
+  chatDashboard: (id: string) => path(ROOTS_USER_DASHBOARD, `/dashboard/${id}`),
 };

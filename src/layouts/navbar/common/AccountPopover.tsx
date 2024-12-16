@@ -50,7 +50,7 @@ const style = {
 };
 
 function AccountPopover() {
-  const { user, logout, initialize } = useAuthContext();
+  const { user, logout, initialize, updateUserType } = useAuthContext();
 
   //openpopover
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -160,6 +160,22 @@ function AccountPopover() {
           }}
         >
           <CustomList disablePadding>
+            {user.user_accountType !== "User" && (
+              <CustomListItemText
+                onClick={() =>
+                  updateUserType(
+                    user.tempAccountType == "User"
+                      ? user.user_accountType
+                      : "User"
+                  )
+                }
+              >
+                Switch to{" "}
+                {user.tempAccountType == "User"
+                  ? user.user_accountType
+                  : "User"}
+              </CustomListItemText>
+            )}
             <CustomListItemText onClick={handleOpenModal}>
               Change Profile Picture
             </CustomListItemText>

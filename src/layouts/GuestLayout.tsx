@@ -57,7 +57,7 @@ export default function GuestLayout() {
             <img src={user} style={{ margin: "20px auto", height: "100px" }} />
             <Box
               sx={{
-                backgroundColor: theme.palette.background.paper,
+                backgroundColor: "#fff",
                 borderRadius: 2,
                 padding: 2,
               }}

@@ -23,7 +23,7 @@ apiClient.interceptors.response.use(
           break;
         case 401:
           console.error(error.response.data.detail);
-          window.location.reload();
+          // window.location.reload();
           break;
         case 403:
           console.error("Forbidden");

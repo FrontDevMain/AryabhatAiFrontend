@@ -37,8 +37,14 @@ export const END_POINTS = {
       DELETE_FILE: (id: string) => `Files/DeleteFile?file_id=${id}`,
     },
     TAGS: {
-      GET_TAGS: (page: number, created_date: null | string) =>
-        `Tags/GetTags?page=${page}&page_size=${PAGINATION_PER_PAGE_SIZE}&created_date=${created_date}`,
+      GET_TAGS: (
+        page: number,
+        page_size: number,
+        created_date: null | string
+      ) =>
+        `Tags/GetTags?page=${page}&page_size=${
+          page_size || PAGINATION_PER_PAGE_SIZE
+        }&created_date=${created_date}`,
       CREATE_TAGS: "Tags/CreateTag",
       RENAME_TAGS: "Tags/RenameTag",
       DELETE_TAGS: (id: string) => `Tags/DeleteTag?tag_id=${id}`,

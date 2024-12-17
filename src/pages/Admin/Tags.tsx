@@ -82,7 +82,7 @@ function Tags() {
   const handleCloseModal = () => setOpenModal(false);
 
   useEffect(() => {
-    dispatch(fetchTags(page, ""));
+    dispatch(fetchTags(page, 100, ""));
   }, [page]);
 
   const createTag = useCallback(async () => {

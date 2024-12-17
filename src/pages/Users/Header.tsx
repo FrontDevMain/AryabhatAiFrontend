@@ -1,6 +1,13 @@
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { Icon } from "@iconify/react";
+import {
+  ExpandLess,
+  ExpandMore,
+  ImportExport,
+  IosShareOutlined,
+} from "@mui/icons-material";
 import {
   Collapse,
+  IconButton,
   List,
   ListItemButton,
   ListItemText,
@@ -9,10 +16,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { sentenceCase } from "change-case";
+import { useState, memo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { updateSelectedLlm } from "src/redux/actions/llm/LlmActions";
+import { updateSelectedTag } from "src/redux/actions/tags/TagsActions";
 import { RootState } from "src/redux/reducers";
 
 const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
@@ -36,77 +44,158 @@ function HeaderDashboard() {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [open1, setOpen1] = useState(false);
+  const { TAG, selectedTag } = useSelector((state: RootState) => state.tag);
   const { LLM, selectedLlm } = useSelector((state: RootState) => state.llm);
-  const handleClick = () => {
-    setOpen(!open);
-  };
 
   return (
-    <Stack direction={"row"} justifyContent={"start"} gap={2}>
-      <List
-        sx={{
-          width: 120,
-          padding: 0,
-        }}
-        aria-labelledby="nested-list-subheader"
-      >
-        <ListItemButton
-          onClick={handleClick}
+    <Stack direction={"row"} justifyContent={"space-between"} gap={2}>
+      <Stack direction={"row"} justifyContent={"start"} gap={2}>
+        <List
           sx={{
+            width: 120,
             padding: 0,
-            backgroundColor: theme.palette.background.default,
-            borderRadius: open ? "20px 20px 0 0" : 20,
-            overflow: "clip",
-            color: theme.palette.text.primary, // Hover background
-            "&:hover": {
-              color: theme.palette.background.default, // Hover background
-              backgroundColor: theme.palette.secondary.main, // Hover background
-            },
           }}
+          aria-labelledby="nested-list-subheader"
         >
-          <ListItemText
-            sx={{ padding: 1.5 }}
-            primary={selectedLlm.provider_name}
-          />
-          {open ? (
-            <ExpandLess sx={{ marginRight: 2 }} />
-          ) : (
-            <ExpandMore sx={{ marginRight: 2 }} />
-          )}
-        </ListItemButton>
-        <Collapse
-          in={open}
-          timeout="auto"
-          unmountOnExit
-          sx={{
-            position: "absolute",
-            width: "100%",
-          }}
-        >
-          <Stack
+          <ListItemButton
+            onClick={() => setOpen(!open)}
             sx={{
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
+              padding: 0,
+              backgroundColor: theme.palette.background.default,
+              borderRadius: open ? "20px 20px 0 0" : 20,
               overflow: "clip",
+              color: theme.palette.text.primary, // Hover background
+              "&:hover": {
+                color: theme.palette.background.default, // Hover background
+                backgroundColor: theme.palette.secondary.main, // Hover background
+              },
             }}
           >
-            {LLM.filter(
-              (elem) => elem.provider_id !== selectedLlm.provider_id
-            ).map((item) => (
-              <CustomListItemButton
-                key={item.provider_id}
-                onClick={() => {
-                  dispatch(updateSelectedLlm(item));
-                  handleClick();
-                }}
-              >
-                <CustomListItemText>{item.provider_name}</CustomListItemText>
-              </CustomListItemButton>
-            ))}
-          </Stack>
-        </Collapse>
-      </List>
-      <VersionCard item={selectedLlm.model_name} />
+            <ListItemText
+              sx={{ padding: 1.5 }}
+              primary={selectedLlm.provider_name}
+            />
+            {open ? (
+              <ExpandLess sx={{ marginRight: 2 }} />
+            ) : (
+              <ExpandMore sx={{ marginRight: 2 }} />
+            )}
+          </ListItemButton>
+          <Collapse
+            in={open}
+            timeout="auto"
+            unmountOnExit
+            sx={{
+              position: "absolute",
+              width: "100%",
+            }}
+          >
+            <Stack
+              sx={{
+                borderBottomLeftRadius: 20,
+                borderBottomRightRadius: 20,
+                overflow: "clip",
+              }}
+            >
+              {LLM.filter(
+                (elem) => elem.provider_id !== selectedLlm.provider_id
+              ).map((item) => (
+                <CustomListItemButton
+                  key={item.provider_id}
+                  onClick={() => {
+                    dispatch(updateSelectedLlm(item));
+                    setOpen(!open);
+                  }}
+                >
+                  <CustomListItemText>{item.provider_name}</CustomListItemText>
+                </CustomListItemButton>
+              ))}
+            </Stack>
+          </Collapse>
+        </List>
+        <VersionCard item={selectedLlm.model_name} />
+      </Stack>
+      <Stack flexDirection={"row"} gap={2}>
+        <List
+          sx={{
+            width: 200,
+            padding: 0,
+          }}
+          aria-labelledby="nested-list-subheader"
+        >
+          <ListItemButton
+            onClick={() => setOpen1(!open1)}
+            sx={{
+              padding: 0,
+              backgroundColor: theme.palette.background.default,
+              borderRadius: open1 ? "20px 20px 0 0" : 20,
+              overflow: "clip",
+              color: theme.palette.text.primary, // Hover background
+              "&:hover": {
+                color: theme.palette.background.default, // Hover background
+                backgroundColor: theme.palette.secondary.main, // Hover background
+              },
+            }}
+          >
+            <ListItemText
+              sx={{ padding: 1.5 }}
+              primary={sentenceCase(selectedTag.tag_name || "")}
+            />
+            {open1 ? (
+              <ExpandLess sx={{ marginRight: 2 }} />
+            ) : (
+              <ExpandMore sx={{ marginRight: 2 }} />
+            )}
+          </ListItemButton>
+          <Collapse
+            in={open1}
+            timeout="auto"
+            unmountOnExit
+            sx={{
+              position: "absolute",
+              width: "100%",
+            }}
+          >
+            <Stack
+              sx={{
+                borderBottomLeftRadius: 20,
+                borderBottomRightRadius: 20,
+                overflow: "clip",
+              }}
+            >
+              {TAG?.tags
+                ?.filter((elem) => elem._id !== selectedTag._id)
+                ?.map((item) => (
+                  <CustomListItemButton
+                    key={item._id}
+                    onClick={() => {
+                      dispatch(updateSelectedTag(item));
+                      setOpen1(!open1);
+                    }}
+                  >
+                    <CustomListItemText>
+                      {sentenceCase(item.tag_name || "")}
+                    </CustomListItemText>
+                  </CustomListItemButton>
+                ))}
+            </Stack>
+          </Collapse>
+        </List>
+        <IconButton sx={{ bgcolor: "#fff" }}>
+          <IosShareOutlined sx={{ width: "30px", height: "30px" }} />
+        </IconButton>
+        <IconButton sx={{ bgcolor: "#fff" }}>
+          <Icon
+            icon="mynaui:dots-solid"
+            width="30px"
+            height="30px"
+            style={{
+              borderRadius: 20,
+            }}
+          />
+        </IconButton>
+      </Stack>
     </Stack>
   );
 }
@@ -140,4 +229,4 @@ function VersionCard({ item }: { item: string }) {
   );
 }
 
-export default HeaderDashboard;
+export default memo(HeaderDashboard);

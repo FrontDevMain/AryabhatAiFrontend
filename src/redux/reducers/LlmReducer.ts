@@ -44,7 +44,6 @@ const llmReducer = (
         loading: false,
       };
     case UPDATE_SELECTED_LLM:
-      console.log(action.payload);
       return { ...state, selectedLlm: action.payload };
     default:
       return state;

@@ -19,8 +19,6 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   BookmarksSharp,
-  ExpandLess,
-  ExpandMore,
   LibraryBooksOutlined,
   PushPinOutlined,
 } from "@mui/icons-material";
@@ -35,28 +33,13 @@ import { useDispatch } from "react-redux";
 import {
   fetchNotebookList,
   fetchNotebookListSuccess,
+  onNotebookDelete,
+  toggleNotebookArchive,
+  toggleNotebookPin,
 } from "src/redux/actions/Notebook/NotebookActions";
 import { LoadingButton } from "@mui/lab";
 import { fetchChat } from "src/redux/actions/chat/ChatActions";
-
-const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
-  borderRadius: theme.shape.borderRadius, // Rounded corners
-  marginBottom: theme.spacing(0.5), // Spacing between items
-  padding: theme.spacing(1),
-  color: theme.palette.text.secondary,
-  "&:hover": {
-    backgroundColor: theme.palette.primary.main, // Hover background
-    color: theme.palette.background.default, // Selected text color
-  },
-  "&.Mui-selected": {
-    backgroundColor: theme.palette.primary.main, // Selected background
-    color: theme.palette.background.default, // Selected text color
-    "&:hover": {
-      backgroundColor: theme.palette.primary.dark, // Darker on hover when selected
-      color: theme.palette.background.default, // Selected text color
-    },
-  },
-}));
+import { CustomListItemButton } from "src/theme/globalStyles";
 
 const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Rounded corners
@@ -103,7 +86,9 @@ const style = {
 
 export default function UserNavbar() {
   const theme = useTheme();
-  const [active, setActive] = useState({ item: "Notebook" });
+  const dispatch = useDispatch();
+  const { user } = useAuthContext();
+  const [active, setActive] = useState("Notebook");
   const { notebookList } = useSelector((state: RootState) => state.notebook);
 
   const [navbarList, setNavbarList] = useState<
@@ -134,14 +119,7 @@ export default function UserNavbar() {
     ]);
   }, [notebookList]);
 
-  const dispatch = useDispatch();
-  const { user } = useAuthContext();
-
-  const handleActive = (item: string) => {
-    setActive({
-      item: item,
-    });
-  };
+  const handleActive = (item: string) => {};
 
   const createNewNotebook = async (userId: string) => {
     try {
@@ -174,10 +152,9 @@ export default function UserNavbar() {
           return (
             <>
               <CustomListItemButton
-                onClick={() => handleActive(item.title)}
-                selected={active.item == item.title}
+                onClick={() => setActive(item.title)}
+                selected={active == item.title}
               >
-                {/* {open ? <ExpandLess /> : <ExpandMore />} */}
                 <ListItemText primary={item.title} />
                 <Tooltip title="New Chat" placement="top">
                   <Icon
@@ -190,11 +167,7 @@ export default function UserNavbar() {
                   </Icon>
                 </Tooltip>
               </CustomListItemButton>
-              <Collapse
-                in={active.item == item.title}
-                timeout="auto"
-                unmountOnExit
-              >
+              <Collapse in={active == item.title} timeout="auto" unmountOnExit>
                 {item.children.map((child: NotebookList) => (
                   <SubNotebook
                     child={child}
@@ -295,62 +268,6 @@ const SubNotebook = ({
     }
   };
 
-  const onPinNotebook = async () => {
-    try {
-      setIsLoading(true);
-      const body = {
-        user_id: user.user_id,
-        chat_id: child.chat_id,
-      };
-      const Response = await fetcher.put(
-        END_POINTS.USER.QUERY.PIN_NOTEBOOK,
-        body
-      );
-      if (Response.status == 200) {
-        dispatch(
-          fetchNotebookListSuccess(
-            notebookList.map((item) =>
-              item.chat_id == child.chat_id
-                ? { ...item, is_pin: item.is_pin == 1 ? 0 : 1 }
-                : { ...item }
-            )
-          )
-        );
-      }
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const onArchiveNotebook = async () => {
-    try {
-      setIsLoading(true);
-      const body = {
-        user_id: user.user_id,
-        chat_id: child.chat_id,
-      };
-      const Response = await fetcher.put(
-        END_POINTS.USER.QUERY.ARCHIVE_NOTEBOOK,
-        body
-      );
-      if (Response.status == 200) {
-        dispatch(
-          fetchNotebookListSuccess(
-            notebookList.map((item) =>
-              item.chat_id == child.chat_id
-                ? { ...item, is_archieved: item.is_archieved == 1 ? 0 : 1 }
-                : { ...item }
-            )
-          )
-        );
-      }
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <List component="div" disablePadding key={child.chat_id}>
       <Stack
@@ -398,7 +315,7 @@ const SubNotebook = ({
           <CustomList disablePadding key={child.chat_id}>
             <CustomListItemText
               onClick={() => {
-                onPinNotebook();
+                dispatch(toggleNotebookPin(user.user_id, child.chat_id));
                 handleClosePopover();
               }}
             >
@@ -406,8 +323,8 @@ const SubNotebook = ({
             </CustomListItemText>
             <CustomListItemText
               onClick={() => {
+                dispatch(toggleNotebookArchive(user.user_id, child.chat_id));
                 handleClosePopover();
-                onArchiveNotebook();
               }}
             >
               {child.is_archieved ? "Unarchive" : "Archive"}
@@ -415,7 +332,7 @@ const SubNotebook = ({
             <CustomListItemText
               onClick={() => {
                 handleClosePopover();
-                onDeleteNotebook();
+                dispatch(onNotebookDelete(child.chat_id));
               }}
             >
               Delete

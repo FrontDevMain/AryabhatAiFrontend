@@ -5,6 +5,7 @@ import fetcher from "src/api/fetcher";
 import { fetchLicense } from "src/redux/actions/license/LicenseActions";
 import { fetchLlm } from "src/redux/actions/llm/LlmActions";
 import { fetchNotebookList } from "src/redux/actions/Notebook/NotebookActions";
+import { fetchTags } from "src/redux/actions/tags/TagsActions";
 import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
 
 type AuthContextTypes = {
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (Response.status == 200) {
           await reduxDispatch(fetchLicense());
           reduxDispatch(fetchLlm());
+          reduxDispatch(fetchTags(1, 100, ""));
           reduxDispatch(
             fetchTheme({
               user_id: Response.data.user_id,

@@ -5,6 +5,7 @@ import {
   tag,
   UPDATE_TAG_LIST,
   tagType,
+  UPDATE_SELECTED_TAG,
 } from "./TagsActionTypes";
 import fetcher from "src/api/fetcher";
 import { END_POINTS } from "src/api/EndPoints";
@@ -27,13 +28,23 @@ export const updateTags = (tagList: tagType[]) => ({
   type: UPDATE_TAG_LIST,
   payload: tagList,
 });
+
+export const updateSelectedTag = (tag: tagType) => ({
+  type: UPDATE_SELECTED_TAG,
+  payload: tag,
+});
+
 // Thunk action
-export const fetchTags = (page: number, created_date: string | null): any => {
+export const fetchTags = (
+  page: number,
+  page_size: number,
+  created_date: string | null
+): any => {
   return async (dispatch: any) => {
     dispatch(fetchTagsRequest());
     try {
       const Response = await fetcher.get(
-        END_POINTS.ADMIN.TAGS.GET_TAGS(page, created_date)
+        END_POINTS.ADMIN.TAGS.GET_TAGS(page, page_size, created_date)
       );
       dispatch(fetchTagsSuccess(Response.data));
     } catch (error) {

@@ -31,7 +31,23 @@ function SearchBar() {
   } = methods;
 
   const onSubmit = (data: FormValuesProps) => {
-    console.log(data);
+    // return async (dispatch: any) => {
+    //   dispatch(fetchChatRequest());
+    //   try {
+    //     let body = {
+    //       user_id: userId,
+    //       chat_id: chatId,
+    //     };
+    //     const Response = await fetcher.post(
+    //       END_POINTS.USER.QUERY.SHOW_HISTORY,
+    //       body
+    //     );
+    //     dispatch(fetchChatSuccess(JSON.parse(Response.data.chat_list)));
+    //     return Response.data;
+    //   } catch (error) {
+    //     dispatch(fetchChatFailure());
+    //   }
+    // };
   };
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>

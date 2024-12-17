@@ -96,7 +96,7 @@ const DashboardLayout = () => {
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             backgroundColor: theme.palette.background.neutral,
-            px: 2,
+            p: 2,
             minHeight: "100%",
             overflow: "scroll",
           }}

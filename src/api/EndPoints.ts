@@ -17,6 +17,7 @@ export const END_POINTS = {
     CHANGE_PROFILE: "user/update-profile-picture",
   },
   ADMIN: {
+    DASHBOARD: "app_settings/dashboard/analytics",
     ADMIN_PRIVILEGES: {
       USER_DETAILS: "UserDetails",
       USERS_ROLE: "Users/Role",
@@ -32,7 +33,12 @@ export const END_POINTS = {
       DELETE_FILE: (id: string) => `Files/DeleteFile?file_id=${id}`,
     },
     TAGS: {
-      GET_TAGS: "Tags/GetTags",
+      GET_TAGS: (
+        page: number,
+        page_size: number,
+        created_date: null | string
+      ) =>
+        `Tags/GetTags?page=${page}&page_size=${page_size}&created_date=${created_date}`,
       CREATE_TAGS: "Tags/CreateTag",
       RENAME_TAGS: "Tags/RenameTag",
       DELETE_TAGS: (id: string) => `Tags/DeleteTag?tag_id=${id}`,
@@ -61,7 +67,7 @@ export const END_POINTS = {
       ARCHIVE_NOTEBOOK: "notebook/Archive",
       PIN_NOTEBOOK: "notebook/Pin",
       REACT_NOTEBOOK: "notebook/React",
-      SHOW_NOTEBOOK: "notebook/ShowHistory",
+      SHOW_HISTORY: "notebook/ShowHistory",
       RENAME_NOTEBOOK: "notebook/rename_notebook",
     },
   },

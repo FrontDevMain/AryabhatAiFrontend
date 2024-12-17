@@ -116,7 +116,7 @@ export default function FileRepository() {
 
   useEffect(() => {
     getAllFiles();
-    getAllTags();
+    // getAllTags();
   }, []);
 
   const handleFileUpload = (event: any) => {
@@ -159,16 +159,16 @@ export default function FileRepository() {
     }
   }, []);
 
-  const getAllTags = useCallback(async () => {
-    try {
-      const Response = await fetcher.get(END_POINTS.ADMIN.TAGS.GET_TAGS);
-      if (Response.status == 200) {
-        setTags(Response.data);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  // const getAllTags = useCallback(async () => {
+  //   try {
+  //     const Response = await fetcher.get(END_POINTS.ADMIN.TAGS.GET_TAGS);
+  //     if (Response.status == 200) {
+  //       setTags(Response.data);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }, []);
 
   const onUploadFile = async () => {
     try {

@@ -6,9 +6,14 @@ import {
   ListItemText,
   Stack,
   styled,
+  Typography,
   useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { updateSelectedLlm } from "src/redux/actions/llm/LlmActions";
+import { RootState } from "src/redux/reducers";
 
 const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -29,7 +34,9 @@ const CustomListItemText = styled(ListItemText)(({ theme }) => ({
 
 function HeaderDashboard() {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const { LLM, selectedLlm } = useSelector((state: RootState) => state.llm);
   const handleClick = () => {
     setOpen(!open);
   };
@@ -38,7 +45,7 @@ function HeaderDashboard() {
     <Stack direction={"row"} justifyContent={"start"} gap={2}>
       <List
         sx={{
-          width: 150,
+          width: 120,
           padding: 0,
         }}
         aria-labelledby="nested-list-subheader"
@@ -57,7 +64,10 @@ function HeaderDashboard() {
             },
           }}
         >
-          <ListItemText sx={{ padding: 1.5 }} primary={"Open Ai"} />
+          <ListItemText
+            sx={{ padding: 1.5 }}
+            primary={selectedLlm.provider_name}
+          />
           {open ? (
             <ExpandLess sx={{ marginRight: 2 }} />
           ) : (
@@ -80,31 +90,32 @@ function HeaderDashboard() {
               overflow: "clip",
             }}
           >
-            <CustomListItemButton>
-              <CustomListItemText>LLAMA</CustomListItemText>
-            </CustomListItemButton>
-            <CustomListItemButton>
-              <CustomListItemText>Mistral</CustomListItemText>
-            </CustomListItemButton>
-            <CustomListItemButton>
-              <CustomListItemText>Claude</CustomListItemText>
-            </CustomListItemButton>
+            {LLM.filter(
+              (elem) => elem.provider_id !== selectedLlm.provider_id
+            ).map((item) => (
+              <CustomListItemButton
+                key={item.provider_id}
+                onClick={() => {
+                  dispatch(updateSelectedLlm(item));
+                  handleClick();
+                }}
+              >
+                <CustomListItemText>{item.provider_name}</CustomListItemText>
+              </CustomListItemButton>
+            ))}
           </Stack>
         </Collapse>
       </List>
-      <VersionCard item={"Chat GPT 4.0"} />
-      <VersionCard item={"Chat GPT 4.1"} />
-      <VersionCard item={"Chat GPT 4.2"} />
+      <VersionCard item={selectedLlm.model_name} />
     </Stack>
   );
 }
 
 function VersionCard({ item }: { item: string }) {
   const theme = useTheme();
-  const [active, setActive] = useState("Chat GPT 4.1");
   return (
     <ListItemButton
-      selected={item == active}
+      selected={true}
       sx={{
         padding: 0,
         borderRadius: 20,
@@ -122,10 +133,8 @@ function VersionCard({ item }: { item: string }) {
         },
       }}
     >
-      <CustomListItemText
-        sx={{ color: active == item ? "background.default" : "text.primary" }}
-      >
-        {item}
+      <CustomListItemText>
+        <Typography color={"#ffffff"}>{item}</Typography>
       </CustomListItemText>
     </ListItemButton>
   );

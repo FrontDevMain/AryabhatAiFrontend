@@ -6,6 +6,7 @@ import {
   List,
   ListItemText,
   Modal,
+  Pagination,
   Popover,
   Stack,
   styled,
@@ -19,13 +20,18 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, memo } from "react";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import { fetchTags, updateTags } from "src/redux/actions/tags/TagsActions";
+import { tagType } from "src/redux/actions/tags/TagsActionTypes";
+import { RootState } from "src/redux/reducers";
 import { formatDate } from "src/utils/utility";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
@@ -63,21 +69,12 @@ const style = {
   p: 3,
 };
 
-type tagListTypes = {
-  _id: string;
-  tag_name: string;
-  user_id: string;
-  created_at: string;
-  modified_at: string;
-  modified_by: string;
-  username: string;
-  modified_by_username: string;
-};
-
 function Tags() {
+  const dispatch = useDispatch();
   const { user } = useAuthContext();
-  const [tags, setTags] = useState<tagListTypes[]>([]);
+  const { TAG } = useSelector((state: RootState) => state.tag);
   const [tagName, setTagName] = useState("");
+  const [page, setPage] = useState(1);
 
   //modal
   const [openModal, setOpenModal] = useState(false);
@@ -85,19 +82,8 @@ function Tags() {
   const handleCloseModal = () => setOpenModal(false);
 
   useEffect(() => {
-    getAllTags();
-  }, []);
-
-  const getAllTags = async () => {
-    try {
-      const Response = await fetcher.get(END_POINTS.ADMIN.TAGS.GET_TAGS);
-      if (Response.status == 200) {
-        setTags(Response.data);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    dispatch(fetchTags(page, 10, ""));
+  }, [page]);
 
   const createTag = useCallback(async () => {
     try {
@@ -110,7 +96,7 @@ function Tags() {
         body
       );
       if (Response.status == 200) {
-        setTags([...tags, Response.data]);
+        dispatch(updateTags([Response.data, ...TAG.tags]));
         setTagName("");
         handleCloseModal();
       }
@@ -121,10 +107,12 @@ function Tags() {
 
   const updateTagList = (method: string, data: any) => {
     if (method == "delete") {
-      setTags(tags.filter((item) => item._id !== data));
+      dispatch(updateTags(TAG.tags.filter((item) => item._id !== data)));
     }
     if (method == "rename") {
-      setTags([...tags.map((item) => (item._id == data._id ? data : item))]);
+      dispatch(
+        updateTags(TAG.tags.map((item) => (item._id == data._id ? data : item)))
+      );
     }
   };
 
@@ -160,7 +148,7 @@ function Tags() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tags.map((item) => (
+            {TAG?.tags?.map((item) => (
               <TagsRow
                 key={item._id}
                 item={item}
@@ -170,6 +158,23 @@ function Tags() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Stack
+        sx={{ position: "relative", bottom: -10, right: 10, width: "100%" }}
+        alignItems={"end"}
+      >
+        {TAG.total_pages && (
+          <Pagination
+            count={TAG.total_pages}
+            page={page}
+            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+              setPage(value);
+            }}
+            // variant="outlined"
+            color="primary"
+            size="small"
+          />
+        )}
+      </Stack>
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -204,7 +209,7 @@ function TagsRow({
   item,
   updateTagList,
 }: {
-  item: tagListTypes;
+  item: tagType;
   updateTagList: (method: string, data: any) => void;
 }) {
   const theme = useTheme();
@@ -368,4 +373,4 @@ function TagsRow({
   );
 }
 
-export default Tags;
+export default memo(Tags);

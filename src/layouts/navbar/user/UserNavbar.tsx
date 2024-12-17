@@ -37,6 +37,7 @@ import {
   fetchNotebookListSuccess,
 } from "src/redux/actions/Notebook/NotebookActions";
 import { LoadingButton } from "@mui/lab";
+import { fetchChat } from "src/redux/actions/chat/ChatActions";
 
 const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Rounded corners
@@ -362,6 +363,7 @@ const SubNotebook = ({
           sx={{ pl: 4 }}
           onClick={() => {
             handleActive(item.title, child.chat_id);
+            dispatch(fetchChat(user.user_id, child.chat_id));
           }}
           selected={
             active.item == item.title && active.subItem == child.chat_id

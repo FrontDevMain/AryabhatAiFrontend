@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 import { fetchLicense } from "src/redux/actions/license/LicenseActions";
+import { fetchLlm } from "src/redux/actions/llm/LlmActions";
 import { fetchNotebookList } from "src/redux/actions/Notebook/NotebookActions";
 import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
 
@@ -70,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const Response = await fetcher.get(END_POINTS.AUTH.USER_DETAILS);
         if (Response.status == 200) {
           await reduxDispatch(fetchLicense());
+          reduxDispatch(fetchLlm());
           reduxDispatch(
             fetchTheme({
               user_id: Response.data.user_id,

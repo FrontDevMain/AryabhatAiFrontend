@@ -18,10 +18,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { END_POINTS } from "src/api/EndPoints";
-import fetcher from "src/api/fetcher";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Plus } from "src/assets/icons/Plus";
+import { RootState } from "src/redux/reducers";
 
 const Android12Switch = styled(Switch)(({ theme }) => ({
   padding: 8,
@@ -59,26 +59,11 @@ type llmProviderTypes = {
 
 export default function LLM() {
   const [open, setOpen] = useState<number | null>();
+  const { LLM } = useSelector((state: RootState) => state.llm);
   const [value, setValue] = useState<string[] | undefined>();
   const [isShowKey, setIsShowKey] = useState<string | null>();
 
   const [inputValue, setInputValue] = useState("");
-  const [llmProviders, setLlmProviders] = useState<llmProviderTypes[]>();
-
-  useEffect(() => {
-    getLlmDetails();
-  }, []);
-
-  const getLlmDetails = async () => {
-    try {
-      const Response = await fetcher.get(END_POINTS.ADMIN.LLM.GET_LLM_DETAILS);
-      if (Response.status == 200) {
-        setLlmProviders(Response.data);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   return (
     <>
@@ -95,7 +80,7 @@ export default function LLM() {
           </Button>
         </Stack>
       </Stack>
-      {llmProviders?.map((item, index) => {
+      {LLM.map((item, index) => {
         return (
           <List
             sx={{

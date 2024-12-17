@@ -90,15 +90,23 @@ function Users() {
 
   const getAllUsers = async () => {
     try {
-      const Response = await fetcher.get(
-        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USER_DETAILS
+      const body = {
+        usernames: [""],
+        emails: [""],
+        roles: [""],
+        license: null,
+      };
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USER_DETAILS,
+        body
       );
+      console.log(Response);
       if (Response.status == 200) {
-        const array = [];
-        for (let keys in Response.data) {
-          array.push(Response.data[keys]);
-        }
-        setUsers(array);
+        // const array = [];
+        // for (let keys in Response.data) {
+        //   array.push(Response.data[keys]);
+        // }
+        // setUsers(array);
       }
     } catch (err) {
       console.log(err);

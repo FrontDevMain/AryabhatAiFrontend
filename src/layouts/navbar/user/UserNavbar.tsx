@@ -39,7 +39,10 @@ import {
 } from "src/redux/actions/Notebook/NotebookActions";
 import { LoadingButton } from "@mui/lab";
 import { fetchChat } from "src/redux/actions/chat/ChatActions";
-import { CustomListItemButton } from "src/theme/globalStyles";
+import {
+  CustomListItemButton,
+  CustomListItemText,
+} from "src/theme/globalStyles";
 
 const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Rounded corners
@@ -50,25 +53,10 @@ const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
   },
   "&.Mui-selected": {
     color: theme.palette.primary.main, // Selected text color
+    fontWeight: 700,
     "&:hover": {
       color: theme.palette.primary.main, // Darker on hover when selected
     },
-  },
-}));
-
-const CustomList = styled(List)(({ theme }) => ({
-  padding: theme.spacing(1),
-}));
-
-const CustomListItemText = styled(ListItemText)(({ theme }) => ({
-  padding: "15px 10px",
-  width: 200,
-  borderRadius: 5,
-  color: "text.secondary",
-  cursor: "pointer",
-  "&:hover": {
-    color: theme.palette.background.default,
-    backgroundColor: theme.palette.secondary.light, // Selected text color
   },
 }));
 
@@ -106,9 +94,7 @@ export default function UserNavbar() {
         segment: "notebook",
         title: "Notebook",
         icon: <LibraryBooksOutlined />,
-        children: notebookList
-          .filter((item) => !item.is_archieved)
-          .sort((a, b) => a.is_pin),
+        children: notebookList.filter((item) => !item.is_archieved),
       },
       {
         segment: "archive",
@@ -118,8 +104,6 @@ export default function UserNavbar() {
       },
     ]);
   }, [notebookList]);
-
-  const handleActive = (item: string) => {};
 
   const createNewNotebook = async (userId: string) => {
     try {
@@ -169,12 +153,7 @@ export default function UserNavbar() {
               </CustomListItemButton>
               <Collapse in={active == item.title} timeout="auto" unmountOnExit>
                 {item.children.map((child: NotebookList) => (
-                  <SubNotebook
-                    child={child}
-                    active={active}
-                    handleActive={handleActive}
-                    item={item}
-                  />
+                  <SubNotebook child={child} />
                 ))}
               </Collapse>
             </>
@@ -185,22 +164,13 @@ export default function UserNavbar() {
   );
 }
 
-const SubNotebook = ({
-  child,
-  active,
-  handleActive,
-  item,
-}: {
-  child: NotebookList;
-  active: any;
-  handleActive: any;
-  item: any;
-}) => {
+const SubNotebook = ({ child }: { child: NotebookList }) => {
   const dispatch = useDispatch();
   const { user } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const [headerName, setHeaderName] = useState("");
+  const { CHAT } = useSelector((state: RootState) => state.chat);
   const { notebookList } = useSelector((state: RootState) => state.notebook);
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -249,55 +219,42 @@ const SubNotebook = ({
     }
   };
 
-  const onDeleteNotebook = async () => {
-    try {
-      setIsLoading(true);
-      const Response = await fetcher.delete(
-        END_POINTS.USER.QUERY.DELETE_NOTEBOOK(child.chat_id)
-      );
-      if (Response.status == 200) {
-        dispatch(
-          fetchNotebookListSuccess(
-            notebookList.filter((item) => item.chat_id != child.chat_id)
-          )
-        );
-      }
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <List component="div" disablePadding key={child.chat_id}>
       <Stack
         direction={"row"}
         justifyContent={"space-between"}
         alignItems={"center"}
-        gap={1}
       >
         <CustomListSubItemButton
-          sx={{ pl: 4 }}
-          onClick={() => {
-            handleActive(item.title, child.chat_id);
-            dispatch(fetchChat(user.user_id, child.chat_id));
-          }}
-          selected={
-            active.item == item.title && active.subItem == child.chat_id
-          }
+          sx={{ pl: 2 }}
+          onClick={() => dispatch(fetchChat(user.user_id, child.chat_id))}
+          selected={CHAT.chat_id == child.chat_id}
         >
-          <ListItemText primary={child.chat_header} />
+          <Typography sx={{ flex: "1 1 0", fontWeight: "inherit" }}>
+            {child.chat_header}
+          </Typography>
+          {child.is_pin ? (
+            <PushPinOutlined
+              sx={{
+                transform: "rotate(45deg)",
+                color: "primary.main",
+                fontSize: 20,
+              }}
+            />
+          ) : null}
+          <IconButton
+            aria-describedby={id}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenPopover(e);
+            }}
+          >
+            <Icon>
+              <MoreVertIcon />
+            </Icon>
+          </IconButton>
         </CustomListSubItemButton>
-        {child.is_pin ? (
-          <PushPinOutlined
-            sx={{ transform: "rotate(45deg)", color: "primary.main" }}
-          />
-        ) : null}
-        <IconButton aria-describedby={id} onClick={handleOpenPopover}>
-          <Icon>
-            <MoreVertIcon />
-          </Icon>
-        </IconButton>
         <Popover
           id={id}
           anchorEl={anchorEl}
@@ -312,41 +269,40 @@ const SubNotebook = ({
             horizontal: "left",
           }}
         >
-          <CustomList disablePadding key={child.chat_id}>
+          <List
+            disablePadding
+            key={child.chat_id}
+            sx={{ padding: 1 }}
+            onClick={handleClosePopover}
+          >
             <CustomListItemText
-              onClick={() => {
-                dispatch(toggleNotebookPin(user.user_id, child.chat_id));
-                handleClosePopover();
-              }}
+              onClick={() =>
+                dispatch(toggleNotebookPin(user.user_id, child.chat_id))
+              }
             >
               {child.is_pin ? "Unpin Chat from Top" : "Pin Chat on Top"}
             </CustomListItemText>
             <CustomListItemText
-              onClick={() => {
-                dispatch(toggleNotebookArchive(user.user_id, child.chat_id));
-                handleClosePopover();
-              }}
+              onClick={() =>
+                dispatch(toggleNotebookArchive(user.user_id, child.chat_id))
+              }
             >
               {child.is_archieved ? "Unarchive" : "Archive"}
             </CustomListItemText>
             <CustomListItemText
-              onClick={() => {
-                handleClosePopover();
-                dispatch(onNotebookDelete(child.chat_id));
-              }}
+              onClick={() => dispatch(onNotebookDelete(child.chat_id))}
             >
               Delete
             </CustomListItemText>
             <CustomListItemText
               onClick={() => {
                 setHeaderName(child.chat_header);
-                handleClosePopover();
                 handleOpenModal();
               }}
             >
               Rename
             </CustomListItemText>
-          </CustomList>
+          </List>
         </Popover>
       </Stack>
       <Modal

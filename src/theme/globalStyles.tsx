@@ -1,6 +1,7 @@
 // @mui
 import {
   ListItemButton,
+  ListItemText,
   GlobalStyles as MUIGlobalStyles,
   styled,
 } from "@mui/material";
@@ -85,5 +86,17 @@ export const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
       backgroundColor: theme.palette.primary.dark, // Darker on hover when selected
       color: theme.palette.background.default, // Selected text color
     },
+  },
+}));
+
+export const CustomListItemText = styled(ListItemText)(({ theme }) => ({
+  padding: "15px 10px",
+  width: 200,
+  borderRadius: 5,
+  color: "text.secondary",
+  cursor: "pointer",
+  "&:hover": {
+    color: theme.palette.background.default,
+    backgroundColor: theme.palette.secondary.light, // Selected text color
   },
 }));

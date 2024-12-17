@@ -33,27 +33,12 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import { Avatar } from "src/components/avatar";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
 import { RootState } from "src/redux/reducers";
+import { CustomListItemText } from "src/theme/globalStyles";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   "&:not(:last-child)": {
     marginBottom: "16px", // Adds spacing between rows
-  },
-}));
-
-const CustomList = styled(List)(({ theme }) => ({
-  padding: theme.spacing(1),
-}));
-
-const CustomListItemText = styled(ListItemText)(({ theme }) => ({
-  padding: "15px 10px",
-  width: 200,
-  borderRadius: 5,
-  color: "text.secondary",
-  cursor: "pointer",
-  "&:hover": {
-    color: theme.palette.background.default,
-    backgroundColor: theme.palette.secondary.light, // Selected text color
   },
 }));
 
@@ -364,7 +349,7 @@ function UserDetail({
               horizontal: "right",
             }}
           >
-            <CustomList disablePadding>
+            <List disablePadding sx={{ p: 1 }}>
               <CustomListItemText onClick={handleOpenConfirm}>
                 {item.roles == "User" ? "Switch to Admin" : "Switch to User"}
               </CustomListItemText>
@@ -380,7 +365,7 @@ function UserDetail({
               )}
 
               <CustomListItemText>View</CustomListItemText>
-            </CustomList>
+            </List>
           </Popover>
         </TableCell>
       </CustomTableRow>

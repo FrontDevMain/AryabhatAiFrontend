@@ -128,12 +128,12 @@ export default function Settings() {
   };
 
   const LoginSchema = Yup.object().shape({
-    serverAddress: Yup.string().required("Password is required"),
-    port: Yup.string().required("Password is required"),
-    security: Yup.string().required("Password is required"),
-    SenderEmail: Yup.string().required("Password is required"),
-    username: Yup.string().required("Password is required"),
-    password: Yup.string().required("Password is required"),
+    serverAddress: Yup.string(),
+    port: Yup.string(),
+    security: Yup.string(),
+    SenderEmail: Yup.string(),
+    username: Yup.string(),
+    password: Yup.string(),
   });
 
   const defaultValues = {

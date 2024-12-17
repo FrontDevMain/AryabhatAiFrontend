@@ -20,6 +20,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { sentenceCase } from "change-case";
 import { useCallback, useEffect, useState, memo } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
@@ -32,28 +33,13 @@ import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal
 import { fetchTags, updateTags } from "src/redux/actions/tags/TagsActions";
 import { tagType } from "src/redux/actions/tags/TagsActionTypes";
 import { RootState } from "src/redux/reducers";
+import { CustomListItemText } from "src/theme/globalStyles";
 import { formatDate } from "src/utils/utility";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   "&:not(:last-child)": {
     marginBottom: "16px", // Adds spacing between rows
-  },
-}));
-
-const CustomList = styled(List)(({ theme }) => ({
-  padding: theme.spacing(1),
-}));
-
-const CustomListItemText = styled(ListItemText)(({ theme }) => ({
-  padding: "15px 10px",
-  width: 200,
-  borderRadius: 5,
-  color: "text.secondary",
-  cursor: "pointer",
-  "&:hover": {
-    color: theme.palette.background.default,
-    backgroundColor: theme.palette.secondary.light, // Selected text color
   },
 }));
 
@@ -275,7 +261,7 @@ function TagsRow({
       </TableRow>
       <CustomTableRow key={item._id}>
         <TableCell>
-          <Typography>{item.tag_name}</Typography>
+          <Typography>{sentenceCase(item.tag_name)}</Typography>
         </TableCell>
         <TableCell>
           <Typography>{item.username}</Typography>
@@ -312,7 +298,7 @@ function TagsRow({
               horizontal: "right",
             }}
           >
-            <CustomList disablePadding>
+            <List disablePadding sx={{ p: 1 }}>
               <CustomListItemText
                 onClick={() => {
                   handleClosePopover();
@@ -329,7 +315,7 @@ function TagsRow({
               >
                 Delete
               </CustomListItemText>
-            </CustomList>
+            </List>
           </Popover>
         </TableCell>
       </CustomTableRow>

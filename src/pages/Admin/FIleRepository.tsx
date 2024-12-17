@@ -38,28 +38,13 @@ import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal
 import Scrollbar from "src/components/scrollbar";
 import { PAGINATION_PER_PAGE_SIZE } from "src/config";
 import { RootState } from "src/redux/reducers";
+import { CustomListItemText } from "src/theme/globalStyles";
 import { formatDate } from "src/utils/utility";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   "&:not(:last-child)": {
     marginBottom: "16px", // Adds spacing between rows
-  },
-}));
-
-const CustomList = styled(List)(({ theme }) => ({
-  padding: theme.spacing(1),
-}));
-
-const CustomListItemText = styled(ListItemText)(({ theme }) => ({
-  padding: "15px 10px",
-  width: 200,
-  borderRadius: 5,
-  color: "text.secondary",
-  cursor: "pointer",
-  "&:hover": {
-    color: theme.palette.background.default,
-    backgroundColor: theme.palette.secondary.light, // Selected text color
   },
 }));
 
@@ -523,7 +508,7 @@ function UserDetail({
               horizontal: "right",
             }}
           >
-            <CustomList disablePadding>
+            <List disablePadding sx={{ p: 1 }}>
               <CustomListItemText onClick={() => previewFile(item._id)}>
                 Preview
               </CustomListItemText>
@@ -536,7 +521,7 @@ function UserDetail({
               <CustomListItemText onClick={handleOpenModal}>
                 Modify Tag
               </CustomListItemText>
-            </CustomList>
+            </List>
           </Popover>
         </TableCell>
       </CustomTableRow>

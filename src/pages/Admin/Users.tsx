@@ -8,6 +8,7 @@ import {
   List,
   ListItemText,
   Modal,
+  Pagination,
   Popover,
   Stack,
   styled,
@@ -76,7 +77,11 @@ type usersList = {
 };
 
 function Users() {
-  const [users, setUsers] = useState<usersList[]>([]);
+  const [users, setUsers] = useState({
+    usersList: [] as usersList[],
+    total_pages: 0,
+  });
+  const [page, setPage] = useState(1);
   const [inviteEmails, setInviteEmails] = useState("");
 
   //modal
@@ -85,28 +90,26 @@ function Users() {
   const handleCloseModal = () => setOpenModal(false);
 
   useEffect(() => {
-    getAllUsers();
+    getAllUsers(page);
   }, []);
 
-  const getAllUsers = async () => {
+  const getAllUsers = async (currentPage: number) => {
     try {
       const body = {
-        usernames: [""],
-        emails: [""],
-        roles: [""],
+        usernames: null,
+        emails: null,
+        roles: null,
         license: null,
       };
       const Response = await fetcher.post(
-        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USER_DETAILS,
+        END_POINTS.ADMIN.ADMIN_PRIVILEGES.USER_DETAILS(currentPage),
         body
       );
-      console.log(Response);
       if (Response.status == 200) {
-        // const array = [];
-        // for (let keys in Response.data) {
-        //   array.push(Response.data[keys]);
-        // }
-        // setUsers(array);
+        setUsers({
+          total_pages: Response.data.pages,
+          usersList: Response.data.items,
+        });
       }
     } catch (err) {
       console.log(err);
@@ -132,11 +135,12 @@ function Users() {
   };
 
   const changeRole = (username: string, role: string) => {
-    setUsers([
-      ...users.map((item) =>
+    setUsers({
+      ...users,
+      usersList: users.usersList.map((item) =>
         item.username == username ? { ...item, roles: role } : item
       ),
-    ]);
+    });
   };
 
   return (
@@ -172,12 +176,24 @@ function Users() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((item, index) => (
+            {users.usersList.map((item, index) => (
               <UserDetail key={index} item={item} changeRole={changeRole} />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      {users.total_pages && (
+        <Pagination
+          count={users.total_pages}
+          page={page}
+          onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+            setPage(value);
+          }}
+          // variant="outlined"
+          color="primary"
+          size="small"
+        />
+      )}
       <Modal
         open={openModal}
         onClose={handleCloseModal}

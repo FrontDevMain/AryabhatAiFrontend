@@ -12,6 +12,7 @@ import {
   ListItemText,
   MenuItem,
   Modal,
+  Pagination,
   Popover,
   Select,
   Stack,
@@ -26,6 +27,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 
@@ -34,6 +36,8 @@ import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
 import Scrollbar from "src/components/scrollbar";
+import { PAGINATION_PER_PAGE_SIZE } from "src/config";
+import { RootState } from "src/redux/reducers";
 import { formatDate } from "src/utils/utility";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
@@ -86,22 +90,14 @@ type filesType = {
   modified_by_username: string;
 };
 
-type tagListTypes = {
-  _id: string;
-  tag_name: string;
-  user_id: string;
-  created_at: string;
-  modified_at: string;
-  modified_by: string;
-  username: string;
-  modified_by_username: string;
-};
-
 export default function FileRepository() {
   const theme = useTheme();
   const { user } = useAuthContext();
-  const [files, setFiles] = useState<filesType[]>([]);
-  const [tags, setTags] = useState<tagListTypes[]>([]);
+  const [files, setFiles] = useState({
+    fileList: [] as filesType[],
+    total_pages: 0,
+  });
+  const [page, setPage] = useState(1);
 
   const [file, setFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -115,9 +111,8 @@ export default function FileRepository() {
   };
 
   useEffect(() => {
-    getAllFiles();
-    // getAllTags();
-  }, []);
+    getAllFiles(page);
+  }, [page]);
 
   const handleFileUpload = (event: any) => {
     const uploadedFile = event.target.files[0];
@@ -146,29 +141,25 @@ export default function FileRepository() {
     }
   };
 
-  const getAllFiles = useCallback(async () => {
-    try {
-      const Response = await fetcher.get(
-        END_POINTS.ADMIN.FILE_REPOSITORIES.GET_ALL_FILES
-      );
-      if (Response.status == 200) {
-        setFiles(Response.data);
+  const getAllFiles = useCallback(
+    async (currentPage: number) => {
+      try {
+        const Response = await fetcher.get(
+          END_POINTS.ADMIN.FILE_REPOSITORIES.GET_ALL_FILES(currentPage)
+        );
+        if (Response.status == 200) {
+          setFiles({
+            ...files,
+            fileList: Response.data.files,
+            total_pages: Response.data.total_pages,
+          });
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  // const getAllTags = useCallback(async () => {
-  //   try {
-  //     const Response = await fetcher.get(END_POINTS.ADMIN.TAGS.GET_TAGS);
-  //     if (Response.status == 200) {
-  //       setTags(Response.data);
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }, []);
+    },
+    [page]
+  );
 
   const onUploadFile = async () => {
     try {
@@ -182,7 +173,7 @@ export default function FileRepository() {
       );
       if (Response.status == 200) {
         handleClose();
-        setFiles([...files, Response.data]);
+        setFiles({ ...files, fileList: [...files.fileList, Response.data] });
       }
     } catch (err) {
       console.log(err);
@@ -194,10 +185,18 @@ export default function FileRepository() {
   const updateFileList = (method: string, data: any) => {
     console.log(method, data);
     if (method == "delete") {
-      setFiles(files.filter((item) => item._id !== data));
+      setFiles({
+        ...files,
+        fileList: files.fileList.filter((item) => item._id !== data),
+      });
     }
     if (method == "rename") {
-      setFiles([...files.map((item) => (item._id == data._id ? data : item))]);
+      setFiles({
+        ...files,
+        fileList: files.fileList.map((item) =>
+          item._id == data._id ? data : item
+        ),
+      });
     }
   };
 
@@ -237,17 +236,34 @@ export default function FileRepository() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {files.map((item, index) => (
+            {files.fileList.map((item, index) => (
               <UserDetail
                 key={item._id}
                 item={item}
-                tags={tags}
                 updateFileList={updateFileList}
               />
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Stack
+        sx={{ position: "relative", bottom: -10, right: 10, width: "100%" }}
+        alignItems={"end"}
+      >
+        {files.total_pages && (
+          <Pagination
+            count={files.total_pages}
+            page={page}
+            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+              setPage(value);
+            }}
+            // variant="outlined"
+            color="primary"
+            size="small"
+          />
+        )}
+      </Stack>
 
       <Modal
         open={open}
@@ -340,15 +356,14 @@ export default function FileRepository() {
 
 function UserDetail({
   item,
-  tags,
   updateFileList,
 }: {
   item: filesType;
-  tags: tagListTypes[];
   updateFileList: (method: string, data: any) => void;
 }) {
   const theme = useTheme();
   const { user } = useAuthContext();
+  const { TAG } = useSelector((state: RootState) => state.tag);
   const [tagName, setTagName] = useState(item.department_tag);
   const [htmlContent, setHtmlContent] = useState("");
 
@@ -553,7 +568,7 @@ function UserDetail({
               label="Tag Name"
               onChange={(e) => setTagName(e.target.value)}
             >
-              {tags.map((item) => (
+              {TAG?.tags?.map((item) => (
                 <MenuItem key={item._id} value={item.tag_name}>
                   {item.tag_name}
                 </MenuItem>

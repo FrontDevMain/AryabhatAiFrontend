@@ -1,3 +1,5 @@
+import { PAGINATION_PER_PAGE_SIZE } from "src/config";
+
 export const END_POINTS = {
   AUTH: {
     LOGIN: "auth/login",
@@ -19,26 +21,24 @@ export const END_POINTS = {
   ADMIN: {
     DASHBOARD: "app_settings/dashboard/analytics",
     ADMIN_PRIVILEGES: {
-      USER_DETAILS: "UserDetails",
+      USER_DETAILS: (page: number) =>
+        `UserDetails?page=${page}&page_size=${PAGINATION_PER_PAGE_SIZE}`,
       USERS_ROLE: "Users/Role",
       USERS_LICENSE: "Users/License",
       INVITE_USERS: "invite-users",
     },
     FILE_REPOSITORIES: {
       UPLOAD_FILE: "Files/Upload",
-      GET_ALL_FILES: "Files/GetFiles",
+      GET_ALL_FILES: (page: number) =>
+        `Files/GetFiles?page=${page}&page_size=${PAGINATION_PER_PAGE_SIZE}`,
       DOWNLOAD_FILES: (id: string) => `Files/DownloadFile/${id}`,
       DOWNLOAD_PREVIEW: (id: string) => `Files/Preview/${id}`,
       MODIFY_DEPARTMENT: `Files/ModifyDepartment`,
       DELETE_FILE: (id: string) => `Files/DeleteFile?file_id=${id}`,
     },
     TAGS: {
-      GET_TAGS: (
-        page: number,
-        page_size: number,
-        created_date: null | string
-      ) =>
-        `Tags/GetTags?page=${page}&page_size=${page_size}&created_date=${created_date}`,
+      GET_TAGS: (page: number, created_date: null | string) =>
+        `Tags/GetTags?page=${page}&page_size=${PAGINATION_PER_PAGE_SIZE}&created_date=${created_date}`,
       CREATE_TAGS: "Tags/CreateTag",
       RENAME_TAGS: "Tags/RenameTag",
       DELETE_TAGS: (id: string) => `Tags/DeleteTag?tag_id=${id}`,

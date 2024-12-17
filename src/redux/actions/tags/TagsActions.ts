@@ -28,16 +28,12 @@ export const updateTags = (tagList: tagType[]) => ({
   payload: tagList,
 });
 // Thunk action
-export const fetchTags = (
-  page: number,
-  page_size: number,
-  created_date: string | null
-): any => {
+export const fetchTags = (page: number, created_date: string | null): any => {
   return async (dispatch: any) => {
     dispatch(fetchTagsRequest());
     try {
       const Response = await fetcher.get(
-        END_POINTS.ADMIN.TAGS.GET_TAGS(page, page_size, created_date)
+        END_POINTS.ADMIN.TAGS.GET_TAGS(page, created_date)
       );
       dispatch(fetchTagsSuccess(Response.data));
     } catch (error) {

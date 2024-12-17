@@ -82,7 +82,7 @@ function Tags() {
   const handleCloseModal = () => setOpenModal(false);
 
   useEffect(() => {
-    dispatch(fetchTags(page, 10, ""));
+    dispatch(fetchTags(page, ""));
   }, [page]);
 
   const createTag = useCallback(async () => {
@@ -233,7 +233,7 @@ function TagsRow({
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  const renameTags = async () => {
+  const renameTags = useCallback(async () => {
     try {
       const body = {
         tag_id: item._id,
@@ -252,9 +252,9 @@ function TagsRow({
     } catch (err) {
       console.log(err);
     }
-  };
+  }, []);
 
-  const deleteTag = async () => {
+  const deleteTag = useCallback(async () => {
     try {
       const Response = await fetcher.delete(
         END_POINTS.ADMIN.TAGS.DELETE_TAGS(item._id)
@@ -266,7 +266,7 @@ function TagsRow({
     } catch (err) {
       console.log(err);
     }
-  };
+  }, []);
 
   return (
     <>

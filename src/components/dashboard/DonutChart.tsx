@@ -15,7 +15,7 @@ function DonutChart({
   const [state, setState] = useState({
     options: {
       chart: {
-        width: 380,
+        width: 300,
         type: "donut",
       },
       labels: series?.map((item) => item._id?.toUpperCase()),

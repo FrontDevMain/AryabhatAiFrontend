@@ -3,6 +3,14 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, { RHFTextField } from "../../components/hook-form";
 import { Button, InputAdornment, useTheme } from "@mui/material";
+import fetcher from "src/api/fetcher";
+import { END_POINTS } from "src/api/EndPoints";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
+import { useAuthContext } from "src/auth/useAuthContext";
+import { LoadingButton } from "@mui/lab";
+import { fetchChatSuccess } from "src/redux/actions/chat/ChatActions";
+import { useDispatch } from "react-redux";
 
 type FormValuesProps = {
   search: string;
@@ -10,6 +18,11 @@ type FormValuesProps = {
 
 function SearchBar() {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const { user } = useAuthContext();
+  const { selectedTag } = useSelector((state: RootState) => state.tag);
+  const { selectedLlm } = useSelector((state: RootState) => state.llm);
+  const { CHAT } = useSelector((state: RootState) => state.chat);
   const LoginSchema = Yup.object().shape({
     search: Yup.string(),
   });
@@ -27,32 +40,51 @@ function SearchBar() {
     reset,
     setError,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors, isSubmitting, isValid },
   } = methods;
 
-  const onSubmit = (data: FormValuesProps) => {
-    // return async (dispatch: any) => {
-    //   dispatch(fetchChatRequest());
-    //   try {
-    //     let body = {
-    //       user_id: userId,
-    //       chat_id: chatId,
-    //     };
-    //     const Response = await fetcher.post(
-    //       END_POINTS.USER.QUERY.SHOW_HISTORY,
-    //       body
-    //     );
-    //     dispatch(fetchChatSuccess(JSON.parse(Response.data.chat_list)));
-    //     return Response.data;
-    //   } catch (error) {
-    //     dispatch(fetchChatFailure());
-    //   }
-    // };
+  const onSubmit = async (data: FormValuesProps) => {
+    try {
+      let body = {
+        Model_id: selectedLlm.model_id,
+        Provider_id: selectedLlm.provider_id,
+        chat_id: CHAT.chat_id,
+        user_input: data.search,
+        user_id: user.user_id,
+        Department_tag: selectedTag.tag_name,
+      };
+      const Response = await fetcher.post(
+        END_POINTS.USER.QUERY.QUERY_NOTEBOOK,
+        body
+      );
+
+      console.log(Response.data);
+    } catch (error) {
+    } finally {
+      dispatch(
+        fetchChatSuccess({
+          ...CHAT,
+          messages: [
+            ...CHAT.messages,
+            {
+              type: "user",
+              context: data.search,
+              is_Liked: 0,
+              message_id: "0tgwsfknzcmvbpo79q235r4x",
+              model_id: selectedLlm.model_id,
+              provider_id: selectedLlm.provider_id,
+              tag: selectedTag.tag_name,
+            },
+          ],
+        })
+      );
+    }
   };
+
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <RHFTextField
-        name="password"
+        name="search"
         placeholder="Message Gen Ai"
         size="medium"
         sx={{
@@ -66,9 +98,12 @@ function SearchBar() {
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <Button
+              <LoadingButton
                 variant="contained"
                 size="large"
+                disabled={!isValid}
+                type="submit"
+                loading={isSubmitting}
                 sx={{ p: 2, right: -12 }}
               >
                 Send{" "}
@@ -88,7 +123,7 @@ function SearchBar() {
                     d="m6 12l-3 9l18-9L3 3zm0 0h6"
                   ></path>
                 </svg>
-              </Button>
+              </LoadingButton>
             </InputAdornment>
           ),
         }}

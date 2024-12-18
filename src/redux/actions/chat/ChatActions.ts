@@ -12,9 +12,9 @@ const fetchChatRequest = () => ({
   type: FETCH_CHAT_REQUEST,
 });
 
-export const fetchChatSuccess = (Llm: Chat[]) => ({
+export const fetchChatSuccess = (Chat: Chat) => ({
   type: FETCH_CHAT_SUCCESS,
-  payload: Llm,
+  payload: Chat,
 });
 
 const fetchChatFailure = () => ({
@@ -35,7 +35,6 @@ export const fetchChat = (userId: string, chatId: string): any => {
         body
       );
       dispatch(fetchChatSuccess(JSON.parse(Response.data.chat_list)));
-      return Response.data;
     } catch (error) {
       dispatch(fetchChatFailure());
     }

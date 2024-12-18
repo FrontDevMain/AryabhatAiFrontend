@@ -7,6 +7,9 @@ export type messageType = {
   is_Liked: number;
   message_id: string;
   type: string;
+  model_id: string;
+  provider_id: string;
+  tag: string;
 };
 
 // User model

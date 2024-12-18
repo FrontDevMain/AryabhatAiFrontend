@@ -44,6 +44,7 @@ import {
   CustomListItemButton,
   CustomListItemText,
 } from "src/theme/globalStyles";
+import { Loading } from "src/assets/icons/loading";
 
 const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Rounded corners
@@ -152,11 +153,25 @@ export default function UserNavbar() {
                   </Icon>
                 </Tooltip>
               </CustomListItemButton>
-              <Collapse in={active == item.title} timeout="auto" unmountOnExit>
-                {item.children.map((child: NotebookList) => (
-                  <SubNotebook child={child} />
-                ))}
-              </Collapse>
+              {item.children.length ? (
+                <Collapse
+                  in={active == item.title}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  {item.children.map((child: NotebookList) => (
+                    <SubNotebook child={child} />
+                  ))}
+                </Collapse>
+              ) : (
+                <Collapse
+                  in={active == item.title}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <Loading />
+                </Collapse>
+              )}
             </>
           );
         })}
@@ -191,37 +206,6 @@ const SubNotebook = ({ child }: { child: NotebookList }) => {
     setHeaderName("");
   };
 
-  const onChangeHeaderName = async (chatId: string) => {
-    try {
-      setIsLoading(true);
-      const body = {
-        user_id: user.user_id,
-        chat_id: chatId,
-        header: headerName,
-      };
-      const Response = await fetcher.put(
-        END_POINTS.USER.QUERY.RENAME_NOTEBOOK,
-        body
-      );
-      if (Response.status == 200) {
-        dispatch(
-          fetchNotebookListSuccess(
-            notebookList.map((item) =>
-              item.chat_id == chatId
-                ? { ...item, chat_header: headerName }
-                : { ...item }
-            )
-          )
-        );
-        handleCloseModal();
-        setHeaderName("");
-      }
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <List component="div" disablePadding key={child.chat_id}>
       <Stack
@@ -231,7 +215,10 @@ const SubNotebook = ({ child }: { child: NotebookList }) => {
       >
         <CustomListSubItemButton
           sx={{ pl: 2 }}
-          onClick={() => dispatch(fetchChat(user.user_id, child.chat_id))}
+          onClick={() =>
+            child.chat_id !== CHAT.chat_id &&
+            dispatch(fetchChat(user.user_id, child.chat_id))
+          }
           selected={CHAT.chat_id == child.chat_id}
         >
           <Typography sx={{ flex: "1 1 0", fontWeight: "inherit" }}>

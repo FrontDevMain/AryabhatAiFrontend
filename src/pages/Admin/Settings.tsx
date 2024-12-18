@@ -12,7 +12,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 import { preset } from "src/components/settings/presets";

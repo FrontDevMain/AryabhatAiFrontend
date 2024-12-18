@@ -60,6 +60,7 @@ export const END_POINTS = {
       ACTIVATE_LICENSE: "License/activate-license",
     },
     LLM: {
+      CREATE_LLM: "Llms/LlmDetails",
       GET_LLM_DETAILS: "Llms/GetLlmDetails",
       LLM_PROVIDER: "Llms/LlmProvider",
     },

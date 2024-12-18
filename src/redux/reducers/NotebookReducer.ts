@@ -12,6 +12,9 @@ import {
   NOTEBOOK_DELETE_REQUEST,
   NOTEBOOK_DELETE_SUCCESS,
   NOTEBOOK_DELETE_FAILURE,
+  NOTEBOOK_CHANGE_HEADERNAME_REQUEST,
+  NOTEBOOK_CHANGE_HEADERNAME_SUCCESS,
+  NOTEBOOK_CHANGE_HEADERNAME_FAILURE,
 } from "../actions/Notebook/NotebookActionTypes";
 
 interface UserState {
@@ -86,6 +89,21 @@ const licenseReducer = (
         updateLoading: false,
       };
     case NOTEBOOK_DELETE_FAILURE:
+      return { ...state, updateLoading: false };
+      return { ...state, updateLoading: false };
+    case NOTEBOOK_CHANGE_HEADERNAME_REQUEST:
+      return { ...state, updateLoading: true };
+    case NOTEBOOK_CHANGE_HEADERNAME_SUCCESS:
+      return {
+        ...state,
+        notebookList: state.notebookList.map((item) =>
+          item.chat_id == action.payload.chatid
+            ? { ...item, chat_header: action.payload.headerName }
+            : { ...item }
+        ),
+        updateLoading: false,
+      };
+    case NOTEBOOK_CHANGE_HEADERNAME_FAILURE:
       return { ...state, updateLoading: false };
     default:
       return state;

@@ -128,6 +128,15 @@ function Users() {
     });
   };
 
+  const updateUserlicense = (username: string) => {
+    setUsers({
+      ...users,
+      usersList: users.usersList.map((item) =>
+        item.username == username ? { ...item, license: !item.license } : item
+      ),
+    });
+  };
+
   return (
     <>
       <Stack
@@ -162,7 +171,12 @@ function Users() {
           </TableHead>
           <TableBody>
             {users.usersList.map((item, index) => (
-              <UserDetail key={index} item={item} changeRole={changeRole} />
+              <UserDetail
+                key={index}
+                item={item}
+                changeRole={changeRole}
+                updateUserlicense={updateUserlicense}
+              />
             ))}
           </TableBody>
         </Table>
@@ -214,9 +228,11 @@ function Users() {
 function UserDetail({
   item,
   changeRole,
+  updateUserlicense,
 }: {
   item: usersList;
   changeRole: (username: string, role: string) => void;
+  updateUserlicense: (username: string) => void;
 }) {
   const { license } = useSelector((state: RootState) => state.license);
   const theme = useTheme();
@@ -245,6 +261,7 @@ function UserDetail({
       const body = {
         signed_license_key: license.signed_license_key,
         username: item.username,
+        [item.license ? "revoked_by_id" : "issued_by_id"]: user.user_id,
       };
       const Response = await fetcher.post(
         item.license
@@ -253,7 +270,8 @@ function UserDetail({
         body
       );
       if (Response.status == 200) {
-        console.log(Response);
+        updateUserlicense(item.username);
+        handleClosePopover();
       }
     } catch (err) {
       console.log(err);

@@ -29,7 +29,6 @@ const tagReducer = (
     payload: tag | any;
   }
 ): UserState => {
-  console.log(action.payload);
   switch (action.type) {
     case FETCH_TAGS_REQUEST:
       return { ...state, loading: true, error: null };

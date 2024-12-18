@@ -12,11 +12,14 @@ import {
   NOTEBOOK_DELETE_REQUEST,
   NOTEBOOK_DELETE_SUCCESS,
   NOTEBOOK_DELETE_FAILURE,
+  NOTEBOOK_CHANGE_HEADERNAME_REQUEST,
+  NOTEBOOK_CHANGE_HEADERNAME_SUCCESS,
+  NOTEBOOK_CHANGE_HEADERNAME_FAILURE,
 } from "./NotebookActionTypes";
 import fetcher from "src/api/fetcher";
 import { END_POINTS } from "src/api/EndPoints";
 
-// Action creators
+// Action creators GET notebook list
 const fetchNotebookListRequest = () => ({
   type: FETCH_NOTEBOOK_LIST_REQUEST,
 });
@@ -50,7 +53,7 @@ export const fetchNotebookList = (userId: string): any => {
   };
 };
 
-// action craetors
+// action craetors Toggle notebook pin
 const toggleNotebookPinRequest = () => ({
   type: TOGGLE_NOTEBOOK_PIN_REQUEST,
 });
@@ -85,7 +88,7 @@ export const toggleNotebookPin = (userId: string, chatId: string): any => {
   };
 };
 
-// action craetors
+// action craetors Toggle archive
 const toggleNotebookArchiveRequest = () => ({
   type: TOGGLE_NOTEBOOK_ARCHIVE_REQUEST,
 });
@@ -120,7 +123,7 @@ export const toggleNotebookArchive = (userId: string, chatId: string): any => {
   };
 };
 
-// action craetors
+// action craetors Delete notebook
 const notebookDeleteRequest = () => ({
   type: NOTEBOOK_DELETE_REQUEST,
 });
@@ -146,6 +149,49 @@ export const onNotebookDelete = (chatId: string): any => {
       }
     } catch (error) {
       dispatch(notebookDeletefailure());
+    }
+  };
+};
+
+// action craetors change notebook header name
+const changeNotebookHeaderNameRequest = () => ({
+  type: NOTEBOOK_CHANGE_HEADERNAME_REQUEST,
+});
+
+const changeNotebookHeaderNameSuccess = (
+  chatid: string,
+  headerName: string
+) => ({
+  type: NOTEBOOK_CHANGE_HEADERNAME_SUCCESS,
+  payload: { chatid, headerName },
+});
+
+const changeNotebookHeaderNamefailure = () => ({
+  type: NOTEBOOK_CHANGE_HEADERNAME_FAILURE,
+});
+
+export const onChangeNotebookHeaderName = (
+  userId: string,
+  chatId: string,
+  headerName: string
+): any => {
+  return async (dispatch: any) => {
+    dispatch(changeNotebookHeaderNameRequest());
+    try {
+      const body = {
+        user_id: userId,
+        chat_id: chatId,
+        header: headerName,
+      };
+      const Response = await fetcher.put(
+        END_POINTS.USER.QUERY.RENAME_NOTEBOOK,
+        body
+      );
+      if (Response.status == 200) {
+        dispatch(changeNotebookHeaderNameSuccess(chatId, headerName));
+      }
+    } catch (error) {
+      dispatch(changeNotebookHeaderNamefailure());
     }
   };
 };

@@ -168,7 +168,6 @@ export default function FileRepository() {
   };
 
   const updateFileList = (method: string, data: any) => {
-    console.log(method, data);
     if (method == "delete") {
       setFiles({
         ...files,

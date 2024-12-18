@@ -33,6 +33,7 @@ import { useDispatch } from "react-redux";
 import {
   fetchNotebookList,
   fetchNotebookListSuccess,
+  onChangeNotebookHeaderName,
   onNotebookDelete,
   toggleNotebookArchive,
   toggleNotebookPin,
@@ -171,7 +172,9 @@ const SubNotebook = ({ child }: { child: NotebookList }) => {
 
   const [headerName, setHeaderName] = useState("");
   const { CHAT } = useSelector((state: RootState) => state.chat);
-  const { notebookList } = useSelector((state: RootState) => state.notebook);
+  const { updateLoading, notebookList } = useSelector(
+    (state: RootState) => state.notebook
+  );
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>
@@ -333,8 +336,17 @@ const SubNotebook = ({ child }: { child: NotebookList }) => {
             <LoadingButton
               variant="contained"
               fullWidth
-              loading={isLoading}
-              onClick={() => onChangeHeaderName(child.chat_id)}
+              loading={updateLoading}
+              onClick={() => {
+                dispatch(
+                  onChangeNotebookHeaderName(
+                    child.user_id,
+                    child.chat_id,
+                    headerName
+                  )
+                );
+                handleCloseModal();
+              }}
             >
               Submit
             </LoadingButton>

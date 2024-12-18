@@ -83,7 +83,6 @@ function AuthSignUpDetails() {
   } = methods;
 
   useEffect(() => {
-    console.log(state);
     if (!state?.email) navigate(PATH_AUTH.login);
   }, []);
 

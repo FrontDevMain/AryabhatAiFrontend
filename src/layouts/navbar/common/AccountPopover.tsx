@@ -162,7 +162,7 @@ function AccountPopover() {
             horizontal: "left",
           }}
         >
-          <CustomList disablePadding>
+          <CustomList disablePadding onClick={handleClosePopover}>
             {user?.user_accountType !== "User" && (
               <CustomListItemText
                 onClick={() => {

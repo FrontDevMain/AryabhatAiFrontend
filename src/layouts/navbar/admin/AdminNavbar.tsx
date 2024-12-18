@@ -1,5 +1,5 @@
 import { Box, List, ListItemText, useTheme } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowForwardIosRounded,
   ArrowForwardIosSharp,
@@ -14,6 +14,10 @@ export default function AdminNavbar() {
   const theme = useTheme();
   const { pathname } = useLocation();
   const [active, setActive] = useState(pathname);
+
+  useEffect(() => {
+    setActive(pathname);
+  }, [pathname]);
 
   return (
     <Box

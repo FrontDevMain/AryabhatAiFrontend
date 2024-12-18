@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab";
 import {
   alpha,
   Button,
@@ -20,6 +21,8 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
+import { useAuthContext } from "src/auth/useAuthContext";
+import { fetchLicenseSuccess } from "src/redux/actions/license/LicenseActions";
 import { RootState } from "src/redux/reducers";
 import { formatDate } from "src/utils/utility";
 
@@ -44,11 +47,13 @@ type licenseOverviewTypes = {
 
 export default function License() {
   const theme = useTheme();
+  const { user } = useAuthContext();
   const { license } = useSelector((state: RootState) => state.license);
   const [licenseDetail, setLicenseDetail] = useState(license as licenseTypes);
   const [licenseOverviewDetail, setLicenseOverviewDetail] = useState(
     {} as licenseOverviewTypes
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     getLicenseoverView();
@@ -67,6 +72,27 @@ export default function License() {
     }
   };
 
+  const onUpdateLicense = async () => {
+    try {
+      setIsLoading(true);
+      const body = {
+        signed_license_key: licenseDetail.signed_license_key,
+        user_id: user.user_id,
+      };
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.LICENSE.ACTIVATE_LICENSE,
+        body
+      );
+      if (Response.status == 200) {
+        fetchLicenseSuccess(Response.data);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Stack
@@ -75,14 +101,14 @@ export default function License() {
         alignItems={"center"}
       >
         <Typography>Site License</Typography>
-
-        <Button
+        <LoadingButton
           variant="contained"
           sx={{ borderRadius: 12 }}
-          // onClick={handleOpenModal}
+          loading={isLoading}
+          onClick={onUpdateLicense}
         >
           Update License
-        </Button>
+        </LoadingButton>
       </Stack>
 
       <Card sx={{ p: 2, boxShadow: "none", borderRadius: 3, mt: 2 }}>
@@ -135,7 +161,7 @@ export default function License() {
                 overflow: "scroll",
               }}
             >
-              {Object.entries(licenseDetail).map((item, index) => {
+              {Object.entries(license).map((item, index) => {
                 return [
                   `license_number`,
                   `signed_license_key`,
@@ -162,7 +188,7 @@ export default function License() {
                 mt: 0.5,
               }}
             >
-              License expiry : {formatDate(licenseDetail.expiry_date)}
+              License expiry : {formatDate(license.expiry_date)}
             </Typography>
           </Grid>
         </Grid>
@@ -176,8 +202,7 @@ export default function License() {
             <TextField
               fullWidth
               disabled
-              value={formatDate(licenseDetail.created_at)}
-              // onChange={(e) => setInviteEmails(e.target.value)}
+              value={formatDate(license.created_at)}
             />
           </Grid>
         </Grid>

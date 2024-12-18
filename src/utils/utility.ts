@@ -46,3 +46,11 @@ export function formatDate(dateStr: string) {
   // Format the date as DD-MMM-YYYY
   return `${String(day).padStart(2, "0")}-${monthNames[month - 1]}-${year}`;
 }
+
+export function fIndianCurrency(number: number) {
+  const format = number ? number : "";
+  return format.toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+    currency: "INR",
+  });
+}

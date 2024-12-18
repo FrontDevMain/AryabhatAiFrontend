@@ -15,7 +15,6 @@ function DonutChart({
   const [state, setState] = useState({
     options: {
       chart: {
-        width: 300,
         type: "donut",
       },
       labels: series?.map((item) => item._id?.toUpperCase()),
@@ -28,11 +27,18 @@ function DonutChart({
               total: {
                 show: true,
                 label: "Total",
+                fontSize: theme.typography.fontSize,
+                color: theme.palette.text.primary,
                 formatter: () =>
                   `${series.reduce(
                     (acc, elem) => (acc += elem.file_count),
                     0
                   )}`,
+                style: {
+                  fontSize: "24px", // Font size for total text
+                  fontWeight: "bold", // Font weight for total text
+                  colors: ["#FF5733"], // Total text color (you can change this color)
+                },
               },
             },
           },
@@ -42,11 +48,16 @@ function DonutChart({
         enabled: false,
       },
       fill: {
-        // type: "gradient",
+        type: "gradient",
       },
       legend: {
-        show: false,
+        show: true,
+        position: "bottom",
         horizontalAlign: "center",
+        labels: {
+          fontSize: theme.typography.fontSize,
+          colors: theme.palette.text.primary,
+        },
         formatter: function (val: any, opts: any) {
           return (
             series[opts.seriesIndex]?._id?.toUpperCase() +
@@ -62,13 +73,17 @@ function DonutChart({
       },
       title: {
         text: "File Types",
+        style: {
+          fontSize: theme.typography.fontSize,
+          color: theme.palette.text.primary,
+        },
       },
       responsive: [
         {
           breakpoint: 480,
           options: {
             chart: {
-              width: 200,
+              width: 300,
             },
             legend: {
               position: "bottom",
@@ -90,7 +105,7 @@ function DonutChart({
       options={state.options as any}
       series={series?.map((item) => item.file_count)}
       type="donut"
-      width={380}
+      height={300}
     />
   );
 }

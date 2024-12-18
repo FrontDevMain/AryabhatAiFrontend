@@ -31,7 +31,7 @@ export const fetchTheme = (body: any): any => {
         END_POINTS.ADMIN.SETTINGS.GET_CONFIG,
         body
       );
-      dispatch(fetchThemeSuccess(Response.data[0]));
+      Response.data.length && dispatch(fetchThemeSuccess(Response.data[0]));
     } catch (error) {
       dispatch(fetchThemeFailure());
     }

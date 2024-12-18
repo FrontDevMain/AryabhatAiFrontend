@@ -32,7 +32,6 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import { useDispatch } from "react-redux";
 import {
   fetchNotebookList,
-  fetchNotebookListSuccess,
   onChangeNotebookHeaderName,
   onNotebookDelete,
   toggleNotebookArchive,
@@ -79,7 +78,9 @@ export default function UserNavbar() {
   const dispatch = useDispatch();
   const { user } = useAuthContext();
   const [active, setActive] = useState("Notebook");
-  const { notebookList } = useSelector((state: RootState) => state.notebook);
+  const { loading, notebookList } = useSelector(
+    (state: RootState) => state.notebook
+  );
 
   const [navbarList, setNavbarList] = useState<
     {
@@ -118,6 +119,7 @@ export default function UserNavbar() {
       );
       if (Response.status == 200) {
         dispatch(fetchNotebookList(userId));
+        dispatch(fetchChat(user.user_id, Response.data.Notebook_id));
       }
     } catch (error) {}
   };
@@ -153,7 +155,7 @@ export default function UserNavbar() {
                   </Icon>
                 </Tooltip>
               </CustomListItemButton>
-              {item.children.length ? (
+              {!loading ? (
                 <Collapse
                   in={active == item.title}
                   timeout="auto"
@@ -183,13 +185,10 @@ export default function UserNavbar() {
 const SubNotebook = ({ child }: { child: NotebookList }) => {
   const dispatch = useDispatch();
   const { user } = useAuthContext();
-  const [isLoading, setIsLoading] = useState(false);
 
   const [headerName, setHeaderName] = useState("");
   const { CHAT } = useSelector((state: RootState) => state.chat);
-  const { updateLoading, notebookList } = useSelector(
-    (state: RootState) => state.notebook
-  );
+  const { updateLoading } = useSelector((state: RootState) => state.notebook);
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>

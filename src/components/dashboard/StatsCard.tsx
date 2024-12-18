@@ -8,7 +8,7 @@ const CustomCard = styled(Card)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: theme.spacing(2),
   boxShadow: "none",
-  backgroundColor: alpha(theme.palette.primary.main, 0.2),
+  backgroundColor: alpha(theme.palette.primary.main, 0.1),
 }));
 
 function StatsCard({ data }: { data: { title: string; count: number } }) {

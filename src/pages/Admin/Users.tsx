@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
@@ -246,10 +247,6 @@ function UserDetail({
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-  const [openConfirm, setOpenConfirm] = useState(false);
-  const handleOpenConfirm = () => setOpenConfirm(true);
-  const handleCloseConfirm = () => setOpenConfirm(false);
-
   //modal
   const [openModal, setOpenModal] = useState(false);
   const handleOpenModal = () => setOpenModal(true);
@@ -280,20 +277,19 @@ function UserDetail({
     }
   };
 
-  const onChangeRole = async () => {
+  const onChangeRole = async (role: string) => {
     try {
       setIsLoading(true);
       const body = {
         user_username: item.username,
-        roles: item.roles == "User" ? "Admin" : "User",
+        roles: role,
       };
       const Response = await fetcher.put(
         END_POINTS.ADMIN.ADMIN_PRIVILEGES.USERS_ROLE,
         body
       );
       if (Response.status == 200) {
-        handleCloseConfirm();
-        handleClosePopover();
+        handleCloseModal();
         changeRole(item.username, body.roles);
       }
     } catch (err) {
@@ -340,7 +336,7 @@ function UserDetail({
         <TableCell
           sx={{ borderTopRightRadius: 20, borderBottomRightRadius: 20 }}
         >
-          {item.roles != "SuperAdmin" && (
+          {item.username != user.user_username && (
             <IconButton aria-describedby={id} onClick={handleOpenPopover}>
               <Icon
                 icon="mynaui:dots-solid"
@@ -367,9 +363,9 @@ function UserDetail({
               horizontal: "right",
             }}
           >
-            <List disablePadding sx={{ p: 1 }}>
-              <CustomListItemText onClick={handleOpenConfirm}>
-                {item.roles == "User" ? "Switch to Admin" : "Switch to User"}
+            <List disablePadding sx={{ p: 1 }} onClick={handleClosePopover}>
+              <CustomListItemText onClick={handleOpenModal}>
+                Switch
               </CustomListItemText>
               {!item.license && (
                 <CustomListItemText onClick={toggleLicense}>
@@ -388,17 +384,6 @@ function UserDetail({
         </TableCell>
       </CustomTableRow>
 
-      <ConfirmationModal
-        open={openConfirm}
-        handleClose={handleCloseConfirm}
-        onConfirm={onChangeRole}
-        loading={isloading}
-        title={"Delete Confirmation"}
-        content={`Are you sure you want to change the role from ${
-          item.roles == "User" ? "User to Admin" : "Admin To User"
-        } ?`}
-      />
-
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -407,18 +392,28 @@ function UserDetail({
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h4">
-            Edit Role
+            Change Role to
           </Typography>
-          <Typography id="modal-modal-description" color="text.disabled">
-            Are you sure you want to change the role of ByeWind from User to
-            Admin?
-          </Typography>
-          <Stack direction={"row"} gap={2} mt={3}>
-            <Button variant="outlined" fullWidth>
-              No
-            </Button>
-            <Button variant="contained" fullWidth>
-              Yes
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"space-evenly"}
+            gap={1}
+            my={3}
+          >
+            {["User", "Admin", "SuperAdmin"].map((row) => (
+              <LoadingButton
+                variant="contained"
+                disabled={item.roles == row || isloading}
+                key={row}
+                onClick={() => onChangeRole(row)}
+              >
+                {row}
+              </LoadingButton>
+            ))}
+          </Stack>
+          <Stack direction={"row"} justifyContent="end" gap={2} mt={3}>
+            <Button variant="outlined" onClick={handleCloseModal}>
+              Cancel
             </Button>
           </Stack>
         </Box>

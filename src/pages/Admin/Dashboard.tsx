@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
+import BarChart from "src/components/dashboard/BarChart";
+import ColumnChart from "src/components/dashboard/ColumnChart";
 import DonutChart from "src/components/dashboard/DonutChart";
 import LineChart from "src/components/dashboard/LineChart";
 import StatsCard from "src/components/dashboard/StatsCard";
@@ -99,9 +101,39 @@ function Dashboard() {
           />
         </Grid>
       </Grid>
-      <Grid container mt={2}>
-        <Grid item xs={6}>
-          {/* <LineChart series={[]} /> */}
+      <Grid container mt={2} spacing={3}>
+        <Grid item xs={8}>
+          <Box
+            sx={{
+              backgroundColor: (theme) => theme.palette.background.default,
+              borderRadius: 3,
+              padding: 3,
+            }}
+          >
+            {dashboardData?.Top_queried_files?.length && (
+              <LineChart
+                series={[
+                  {
+                    name: "active",
+                    data: [10, 20, 15, 8, 6, 12, 2, 3, 6, 12, 8, 10],
+                  },
+                ]}
+              />
+            )}
+          </Box>
+        </Grid>
+        <Grid item xs={4}>
+          <Box
+            sx={{
+              backgroundColor: (theme) => theme.palette.background.default,
+              borderRadius: 3,
+              padding: 3,
+            }}
+          >
+            {dashboardData?.Top_queried_files?.length && (
+              <BarChart series={dashboardData?.Top_queried_files} />
+            )}
+          </Box>
         </Grid>
         <Grid item xs={6}>
           <Box
@@ -111,40 +143,31 @@ function Dashboard() {
               padding: 3,
             }}
           >
-            <Grid container>
-              <Grid item xs={6}>
-                {dashboardData.files_by_type?.length && (
-                  <DonutChart series={dashboardData.files_by_type} />
-                )}
-              </Grid>
-              <Grid item xs={6}>
-                <Stack
-                  gap={3}
-                  sx={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "100%",
-                  }}
-                >
-                  {dashboardData?.files_by_type?.map((item, index) => (
-                    <Stack flexDirection={"row"} gap={2}>
-                      <span
-                        style={{
-                          height: 10,
-                          width: 10,
-                          backgroundColor: colors[index],
-                          borderRadius: "50%",
-                        }}
-                      ></span>
-                      <Typography>{item?._id?.toUpperCase()}</Typography> -
-                      <Typography>
-                        {((item.file_count / totalFiles) * 100).toFixed(2)}%
-                      </Typography>
-                    </Stack>
-                  ))}
-                </Stack>
-              </Grid>
-            </Grid>
+            {dashboardData?.files_by_type?.length && (
+              <ColumnChart
+                series={[
+                  { name: "User1", session_time: 12 },
+                  { name: "User2", session_time: 21 },
+                  { name: "User3", session_time: 24 },
+                  { name: "User4", session_time: 15 },
+                  { name: "User5", session_time: 20 },
+                  { name: "User6", session_time: 10 },
+                ]}
+              />
+            )}
+          </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <Box
+            sx={{
+              backgroundColor: (theme) => theme.palette.background.default,
+              borderRadius: 3,
+              padding: 3,
+            }}
+          >
+            {dashboardData?.files_by_type?.length && (
+              <DonutChart series={dashboardData.files_by_type} />
+            )}
           </Box>
         </Grid>
       </Grid>

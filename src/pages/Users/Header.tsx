@@ -90,7 +90,8 @@ function HeaderDashboard() {
       <Stack direction={"row"} justifyContent={"start"} gap={2}>
         <List
           sx={{
-            width: 120,
+            width: 160,
+            minWidth: "fit-content",
             padding: 0,
           }}
           aria-labelledby="nested-list-subheader"

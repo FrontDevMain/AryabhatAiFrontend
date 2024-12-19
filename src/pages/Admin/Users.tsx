@@ -4,13 +4,14 @@ import {
   Box,
   Button,
   Chip,
-  Divider,
+  FormControlLabel,
   IconButton,
   List,
-  ListItemText,
   Modal,
   Pagination,
   Popover,
+  Radio,
+  RadioGroup,
   Stack,
   styled,
   Table,
@@ -23,6 +24,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { sentenceCase } from "change-case";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
@@ -32,7 +34,11 @@ import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { Avatar } from "src/components/avatar";
-import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import {
+  MaskControl,
+  StyledCard,
+  StyledWrap,
+} from "src/layouts/navbar/common/styles";
 import { RootState } from "src/redux/reducers";
 import { CustomListItemText } from "src/theme/globalStyles";
 
@@ -62,6 +68,13 @@ type usersList = {
   license: boolean;
 };
 
+type filterTypes = {
+  usernames: string;
+  emails: string;
+  roles: string;
+  license: string | null;
+};
+
 function Users() {
   const [users, setUsers] = useState({
     usersList: [] as usersList[],
@@ -70,22 +83,40 @@ function Users() {
   const [page, setPage] = useState(1);
   const [inviteEmails, setInviteEmails] = useState("");
 
+  //filter
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>
+    setAnchorEl(event.currentTarget);
+  const handleClosePopover = () => setAnchorEl(null);
+  const openPopover = Boolean(anchorEl);
+  const id = openPopover ? "simple-popover" : undefined;
+
+  const [selectedFilerTab, setSelectedFilterTab] = useState("usernames");
+  const [filter, setFilter] = useState<filterTypes>({
+    usernames: "",
+    emails: "",
+    roles: "",
+    license: null,
+  });
+
   //modal
   const [openModal, setOpenModal] = useState(false);
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
   useEffect(() => {
-    getAllUsers(page);
-  }, []);
+    getAllUsers(page, filter);
+  }, [page]);
 
-  const getAllUsers = async (currentPage: number) => {
+  const getAllUsers = async (
+    currentPage: number,
+    filters: filterTypes | {}
+  ) => {
     try {
       const body = {
-        usernames: null,
-        emails: null,
-        roles: null,
-        license: null,
+        ...Object.entries(filters)
+          .filter((item) => item[1])
+          ?.map((item) => ({ [item[0]]: item[1] }))[0],
       };
       const Response = await fetcher.post(
         END_POINTS.ADMIN.ADMIN_PRIVILEGES.USER_DETAILS(currentPage),
@@ -138,6 +169,10 @@ function Users() {
     });
   };
 
+  const resetFilters = () => {
+    setFilter({ usernames: "", emails: "", roles: "", license: null });
+  };
+
   return (
     <>
       <Stack
@@ -147,9 +182,125 @@ function Users() {
       >
         <Typography>User List</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
-          <IconButton>
+          <IconButton onClick={handleOpenPopover}>
             <Filters />
           </IconButton>
+          <Popover
+            id={id}
+            anchorEl={anchorEl}
+            open={openPopover}
+            onClose={handleClosePopover}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            <RadioGroup
+              name="themeMode"
+              value={selectedFilerTab}
+              onChange={(e) => {
+                setSelectedFilterTab(e.target.value);
+                resetFilters();
+              }}
+            >
+              <StyledWrap>
+                {Object.keys(filter).map((mode) => (
+                  <StyledCard key={mode} selected={selectedFilerTab == mode}>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography
+                        color="text.primary"
+                        sx={{ whiteSpace: "nowrap", p: 2 }}
+                      >
+                        {sentenceCase(mode)}
+                      </Typography>
+                    </Stack>
+                    <MaskControl value={mode} />
+                  </StyledCard>
+                ))}
+              </StyledWrap>
+            </RadioGroup>
+            <Box sx={{ p: 2 }}>
+              {(selectedFilerTab == "usernames" ||
+                selectedFilerTab == "emails") && (
+                <TextField
+                  fullWidth
+                  label={sentenceCase(selectedFilerTab)}
+                  value={filter[selectedFilerTab]}
+                  onChange={(event: any) =>
+                    setFilter({
+                      ...filter,
+                      [selectedFilerTab]: event.target.value,
+                    })
+                  }
+                />
+              )}
+
+              {selectedFilerTab == "license" && (
+                <RadioGroup
+                  value={filter.license}
+                  onChange={(e) =>
+                    setFilter({ ...filter, license: e.target.value })
+                  }
+                >
+                  {["Yes", "No"].map((item) => (
+                    <FormControlLabel
+                      label={item}
+                      value={item}
+                      control={<Radio />}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+
+              {selectedFilerTab == "roles" && (
+                <RadioGroup
+                  value={filter.roles}
+                  onChange={(e) =>
+                    setFilter({ ...filter, roles: e.target.value })
+                  }
+                >
+                  {["User", "Admin", "SuperAdmin"].map((item) => (
+                    <FormControlLabel
+                      label={item}
+                      value={item}
+                      control={<Radio />}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+              <Stack
+                flexDirection={"row"}
+                justifyContent={"end"}
+                gap={1}
+                my={2}
+              >
+                <LoadingButton
+                  variant="outlined"
+                  onClick={() => {
+                    resetFilters();
+                    handleClosePopover();
+                    getAllUsers(1, {});
+                  }}
+                >
+                  Reset
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => {
+                    getAllUsers(1, filter);
+                    setPage(1);
+                    handleClosePopover();
+                  }}
+                >
+                  Apply
+                </LoadingButton>
+              </Stack>
+            </Box>
+          </Popover>
           <Button
             variant="contained"
             sx={{ borderRadius: 12 }}
@@ -182,18 +333,23 @@ function Users() {
           </TableBody>
         </Table>
       </TableContainer>
-      {users.total_pages && (
-        <Pagination
-          count={users.total_pages}
-          page={page}
-          onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-            setPage(value);
-          }}
-          // variant="outlined"
-          color="primary"
-          size="small"
-        />
-      )}
+      <Stack
+        sx={{ position: "relative", bottom: -10, right: 10, width: "100%" }}
+        alignItems={"end"}
+      >
+        {users.total_pages && (
+          <Pagination
+            count={users.total_pages}
+            page={page}
+            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+              setPage(value);
+            }}
+            // variant="outlined"
+            color="primary"
+            size="small"
+          />
+        )}
+      </Stack>
       <Modal
         open={openModal}
         onClose={handleCloseModal}

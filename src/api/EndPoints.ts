@@ -22,7 +22,7 @@ export const END_POINTS = {
     DASHBOARD: "app_settings/dashboard/analytics",
     ADMIN_PRIVILEGES: {
       USER_DETAILS: (page: number) =>
-        `UserDetails?page=${page}&page_size=${PAGINATION_PER_PAGE_SIZE}`,
+        `UserDetails?page=${page}&size=${PAGINATION_PER_PAGE_SIZE}`,
       USERS_ROLE: "Users/Role",
       USERS_LICENSE: "Users/License",
       INVITE_USERS: "invite-users",

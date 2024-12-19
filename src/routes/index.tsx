@@ -1,6 +1,7 @@
 import { Navigate, useRoutes } from "react-router-dom";
 import DashboardLayout from "src/layouts/DashboardLayout";
 import {
+  Connectors,
   Dashboard,
   FIleRepository,
   ForgotPassword,
@@ -58,6 +59,7 @@ export default function Router() {
         { path: "otherStorageDevices", element: <OtherStorageDevices /> },
         { path: "users", element: <Users /> },
         { path: "tags", element: <Tags /> },
+        { path: "connectors", element: <Connectors /> },
         { path: "settings", element: <Settings /> },
       ],
     },

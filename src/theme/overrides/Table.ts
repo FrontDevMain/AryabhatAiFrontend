@@ -37,7 +37,7 @@ export default function Table(theme: Theme) {
           backgroundColor: "transparent",
         },
         stickyHeader: {
-          backgroundColor: "tranparent",
+          backgroundColor: theme.palette.background.neutral,
           // backgroundImage: `linear-gradient(to bottom, ${theme.palette.background.neutral} 0%, ${theme.palette.background.neutral} 100%)`,
         },
         paddingCheckbox: {

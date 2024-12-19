@@ -196,7 +196,14 @@ export default function FileRepository() {
             currentPage,
             Object.entries(filters)
               .filter((item) => item[1])
-              .map((item) => `&${item[0]}=${item[1]}`)
+              .map(
+                (item) =>
+                  `&${item[0]}=${
+                    item[0] == "upload_date"
+                      ? dayjs(item[1]).format("DD-MM-YYYY")
+                      : item[1]
+                  }`
+              )
               .join("")
           )
         );

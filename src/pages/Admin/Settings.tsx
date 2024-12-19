@@ -2,9 +2,14 @@ import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Card,
+  Collapse,
   Divider,
   Grid,
   IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Modal,
   Slider,
   Stack,
@@ -13,8 +18,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { END_POINTS } from "src/api/EndPoints";
-import fetcher from "src/api/fetcher";
 import { preset } from "src/components/settings/presets";
 
 //form
@@ -25,15 +28,13 @@ import FormProvider, {
   RHFRadioGroup,
   RHFTextField,
 } from "../../components/hook-form";
-import { Close } from "@mui/icons-material";
+import { Close, StarBorder } from "@mui/icons-material";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/reducers";
 import { useDispatch } from "react-redux";
-import {
-  fetchTheme,
-  fetchThemeSuccess,
-} from "src/redux/actions/theme/ThemeActions";
+import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
+import { CustomListItemButton } from "src/theme/globalStyles";
 
 const PrettoSlider = styled(Slider)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -103,6 +104,7 @@ export default function Settings() {
     (state: RootState) => state.theme
   );
 
+  const [collapse, setCollapse] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   //modal
@@ -161,50 +163,66 @@ export default function Settings() {
     setThemeDefaultKeys(themeSetting);
   }, [themeSetting]);
 
-  const applySetting = async (method: string) => {
+  const applySetting = async () => {
     try {
       setIsLoading(true);
       let body = {
         ...themeDefaultKeys,
         user_id: user.user_id,
-        intend: method,
+        intend: "set",
       };
-      const Response = await fetcher.post(
-        END_POINTS.ADMIN.SETTINGS.GET_CONFIG,
-        body
+      await dispatch(fetchTheme(body));
+      await dispatch(
+        fetchTheme({
+          ...themeDefaultKeys,
+          user_id: user.user_id,
+          intend: "get",
+        })
       );
-      if (Response.status == 200) {
-        if (method == "set") dispatch(fetchThemeSuccess(body));
-        if (method == "reset")
-          dispatch(
-            fetchTheme({
-              user_id: user.user_id,
-              Theme_logo: "",
-              Theme_theme: "",
-              Theme_font_size: 0,
-              Theme_primary_colour: "",
-              Theme_neutral_colour: "",
-              Setting_archive_record: 0,
-              SMTP_server_address: "",
-              SMTP_server_port: 0,
-              SMTP_server_sequrity: "",
-              SMTP_email_address: "",
-              SMTP_username: "",
-              SMTP_password: "",
-              intend: "get",
-            })
-          );
-      }
     } catch (error) {
     } finally {
       setIsLoading(false);
     }
   };
 
-  const onSubmit = () => {};
+  const resetTheme = async () => {
+    await dispatch(
+      fetchTheme({
+        ...themeDefaultKeys,
+        user_id: user.user_id,
+        intend: "reset",
+      })
+    );
+    await dispatch(
+      fetchTheme({
+        ...themeDefaultKeys,
+        user_id: user.user_id,
+        intend: "get",
+      })
+    );
+  };
+
+  const setAchiveDefaultDays = async (days: number) => {
+    await dispatch(
+      fetchTheme({
+        ...themeDefaultKeys,
+        user_id: user.user_id,
+        Setting_archive_record: days,
+        intend: "set",
+      })
+    );
+    await dispatch(
+      fetchTheme({
+        ...themeDefaultKeys,
+        user_id: user.user_id,
+        intend: "get",
+      })
+    );
+    setCollapse(!collapse);
+  };
 
   return (
-    <>
+    <Box onClick={() => setCollapse(false)}>
       <Stack
         direction={"row"}
         alignItems={"center"}
@@ -213,7 +231,7 @@ export default function Settings() {
         <Typography>Themes Setting</Typography>
         <LoadingButton
           variant="contained"
-          onClick={() => applySetting("set")}
+          onClick={applySetting}
           loading={isLoading}
         >
           Apply Theme
@@ -301,7 +319,7 @@ export default function Settings() {
           </Stack>
         </Stack>
         <Divider />
-        <Stack
+        {/* <Stack
           direction={"row"}
           justifyContent={"space-between"}
           alignItems={"center"}
@@ -338,7 +356,7 @@ export default function Settings() {
             ))}
           </Stack>
         </Stack>
-        <Divider />
+        <Divider /> */}
       </Card>
 
       <Stack direction={"row"} alignItems={"center"} mt={3}>
@@ -364,10 +382,7 @@ export default function Settings() {
           alignItems={"center"}
         >
           <Typography>Reset All Settings</Typography>
-          <LoadingButton
-            variant="contained"
-            onClick={() => applySetting("reset")}
-          >
+          <LoadingButton variant="contained" onClick={resetTheme}>
             Reset Now
           </LoadingButton>
         </Stack>
@@ -388,6 +403,7 @@ export default function Settings() {
           flexDirection: "column",
           bgcolor: theme.palette.background.default,
           gap: 2,
+          overflow: "visible",
         }}
       >
         <Stack
@@ -396,7 +412,57 @@ export default function Settings() {
           alignItems={"center"}
         >
           <Typography>Archived Chat Retention Period</Typography>
-          <LoadingButton variant="contained">30 Days (Default)</LoadingButton>
+          <List
+            sx={{
+              minWidth: "fit-content",
+              padding: 0,
+              position: "relative",
+            }}
+            aria-labelledby="nested-list-subheader"
+          >
+            <LoadingButton
+              variant="contained"
+              onClick={() => setCollapse(!collapse)}
+            >
+              {themeDefaultKeys.Setting_archive_record} Days (Default)
+            </LoadingButton>
+            <Collapse
+              in={collapse}
+              timeout="auto"
+              unmountOnExit
+              sx={{
+                position: "absolute",
+                width: "100%",
+              }}
+            >
+              <List
+                component="div"
+                disablePadding
+                sx={{
+                  background: theme.palette.background.neutral,
+                  zIndex: 9,
+                  borderBottomLeftRadius: 10,
+                  borderBottomRightRadius: 10,
+                }}
+              >
+                {[30, 45, 60]
+                  .filter(
+                    (item) => item !== themeDefaultKeys.Setting_archive_record
+                  )
+                  .map((item) => (
+                    <CustomListItemButton
+                      sx={{ pl: 2 }}
+                      onClick={() => setAchiveDefaultDays(item)}
+                    >
+                      <ListItemText
+                        primary={item + " days"}
+                        sx={{ color: "text.primary" }}
+                      />
+                    </CustomListItemButton>
+                  ))}
+              </List>
+            </Collapse>
+          </List>
         </Stack>
       </Card>
 
@@ -441,7 +507,7 @@ export default function Settings() {
             </IconButton>
           </Stack>
           <Divider sx={{ my: 1 }} />
-          <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+          <FormProvider methods={methods}>
             <Grid container sx={{ alignItems: "center" }}>
               <Grid item xs={4}>
                 Server Address (SMTP)
@@ -558,16 +624,23 @@ export default function Settings() {
             </Grid>
             <Divider sx={{ my: 2 }} />
             <Stack flexDirection={"row"} justifyContent={"flex-end"} gap={2}>
-              <LoadingButton variant="contained" disabled>
+              <LoadingButton variant="contained" disabled onClick={handleClose}>
                 Send Test Email
               </LoadingButton>
-              <LoadingButton variant="contained" onClick={handleClose}>
+              <LoadingButton
+                variant="contained"
+                loading={isLoading}
+                onClick={() => {
+                  applySetting();
+                  handleClose();
+                }}
+              >
                 Save
               </LoadingButton>
             </Stack>
           </FormProvider>
         </Box>
       </Modal>
-    </>
+    </Box>
   );
 }

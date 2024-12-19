@@ -135,7 +135,7 @@ export default function palette(
       secondary: "#4A4A4A",
       disabled: "#979797",
     },
-    background: { default: "#FFFFFF", neutral: neutralColor, paper: "#FFFFFF" },
+    background: { default: "#FFFFFF", neutral: "#F0F4F8", paper: "#FFFFFF" },
     action: {
       ...COMMON.action,
       active: GREY[600],
@@ -158,7 +158,7 @@ export default function palette(
       secondary: "#FFFFFF",
       disabled: "#979797",
     },
-    background: { default: "#0D0D0D", neutral: neutralColor, paper: "#0D0D0D" },
+    background: { default: "#0D0D0D", neutral: "#23262A", paper: "#0D0D0D" },
     action: {
       ...COMMON.action,
       active: GREY[500],

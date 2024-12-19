@@ -42,6 +42,9 @@ export const OtherStorageDevices = Loadable(
 );
 export const Users = Loadable(lazy(() => import("../pages/Admin/Users")));
 export const Tags = Loadable(lazy(() => import("../pages/Admin/Tags")));
+export const Connectors = Loadable(
+  lazy(() => import("../pages/Admin/Connectors"))
+);
 export const Settings = Loadable(lazy(() => import("../pages/Admin/Settings")));
 
 //USER PAGES

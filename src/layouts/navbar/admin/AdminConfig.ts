@@ -36,6 +36,10 @@ const AdminNavConfig = [
         path: PATH_ADMIN_DASHBOARD.tags,
       },
       {
+        title: "Connectors",
+        path: PATH_ADMIN_DASHBOARD.connectors,
+      },
+      {
         title: "Settings",
         path: PATH_ADMIN_DASHBOARD.settings,
       },

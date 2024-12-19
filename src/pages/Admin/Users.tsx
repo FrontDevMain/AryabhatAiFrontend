@@ -116,7 +116,9 @@ function Users() {
       const body = {
         ...Object.entries(filters)
           .filter((item) => item[1])
-          ?.map((item) => ({ [item[0]]: item[1] }))[0],
+          ?.map((item) => ({
+            [item[0]]: item[0] == "license" ? item[1] : [item[1]],
+          }))[0],
       };
       const Response = await fetcher.post(
         END_POINTS.ADMIN.ADMIN_PRIVILEGES.USER_DETAILS(currentPage),

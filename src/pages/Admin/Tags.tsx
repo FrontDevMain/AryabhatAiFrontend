@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
@@ -8,6 +9,7 @@ import {
   Modal,
   Pagination,
   Popover,
+  RadioGroup,
   Stack,
   styled,
   Table,
@@ -30,11 +32,22 @@ import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import {
+  MaskControl,
+  StyledCard,
+  StyledWrap,
+} from "src/layouts/navbar/common/styles";
 import { fetchTags, updateTags } from "src/redux/actions/tags/TagsActions";
 import { tagType } from "src/redux/actions/tags/TagsActionTypes";
 import { RootState } from "src/redux/reducers";
 import { CustomListItemText } from "src/theme/globalStyles";
 import { formatDate } from "src/utils/utility";
+
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -55,6 +68,12 @@ const style = {
   p: 3,
 };
 
+type filterTypes = {
+  created_date: Date | null;
+  tag_name: null | string;
+  username: null | string;
+};
+
 function Tags() {
   const dispatch = useDispatch();
   const { user } = useAuthContext();
@@ -62,13 +81,28 @@ function Tags() {
   const [tagName, setTagName] = useState("");
   const [page, setPage] = useState(1);
 
+  //filter
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>
+    setAnchorEl(event.currentTarget);
+  const handleClosePopover = () => setAnchorEl(null);
+  const openPopover = Boolean(anchorEl);
+  const id = openPopover ? "simple-popover" : undefined;
+
+  const [selectedFilerTab, setSelectedFilterTab] = useState("created_date");
+  const [filter, setFilter] = useState<filterTypes>({
+    created_date: null,
+    tag_name: "",
+    username: "",
+  });
+
   //modal
   const [openModal, setOpenModal] = useState(false);
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
   useEffect(() => {
-    dispatch(fetchTags(page, 100, ""));
+    dispatch(fetchTags(page, 10, filter));
   }, [page]);
 
   const createTag = useCallback(async () => {
@@ -102,6 +136,10 @@ function Tags() {
     }
   };
 
+  const resetFilters = () => {
+    setFilter({ ...filter, created_date: null, tag_name: "", username: "" });
+  };
+
   return (
     <>
       <Stack
@@ -111,9 +149,127 @@ function Tags() {
       >
         <Typography>Tags List</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
-          <IconButton>
+          <IconButton onClick={handleOpenPopover}>
             <Filters />
           </IconButton>
+          <Popover
+            id={id}
+            anchorEl={anchorEl}
+            open={openPopover}
+            onClose={handleClosePopover}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            <RadioGroup
+              name="themeMode"
+              value={selectedFilerTab}
+              onChange={(e) => {
+                setSelectedFilterTab(e.target.value);
+                resetFilters();
+              }}
+            >
+              <StyledWrap>
+                {Object.keys(filter).map((mode) => (
+                  <StyledCard key={mode} selected={selectedFilerTab == mode}>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography
+                        color="text.primary"
+                        sx={{ whiteSpace: "nowrap", p: 2 }}
+                      >
+                        {sentenceCase(mode)}
+                      </Typography>
+                    </Stack>
+                    <MaskControl value={mode} />
+                  </StyledCard>
+                ))}
+              </StyledWrap>
+            </RadioGroup>
+            <Box sx={{ px: 2 }}>
+              {selectedFilerTab == "created_date" && (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={["DatePicker"]}>
+                    <DatePicker
+                      sx={{ width: "100%" }}
+                      label="Date"
+                      value={dayjs(filter.created_date)}
+                      maxDate={dayjs(new Date())}
+                      onChange={(newValue: any) =>
+                        setFilter({
+                          ...filter,
+                          created_date: newValue,
+                          tag_name: "",
+                          username: "",
+                        })
+                      }
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+              )}
+              {selectedFilerTab == "tag_name" && (
+                <TextField
+                  fullWidth
+                  label="Tag Name"
+                  value={filter.tag_name}
+                  onChange={(event: any) =>
+                    setFilter({
+                      ...filter,
+                      created_date: null,
+                      tag_name: event.target.value,
+                      username: "",
+                    })
+                  }
+                />
+              )}
+              {selectedFilerTab == "username" && (
+                <TextField
+                  fullWidth
+                  label="User Name"
+                  value={filter.username}
+                  onChange={(event: any) =>
+                    setFilter({
+                      ...filter,
+                      created_date: null,
+                      tag_name: "",
+                      username: event.target.value,
+                    })
+                  }
+                />
+              )}
+              <Stack
+                flexDirection={"row"}
+                justifyContent={"end"}
+                gap={1}
+                my={2}
+              >
+                <LoadingButton
+                  variant="outlined"
+                  onClick={() => {
+                    resetFilters();
+                    handleClosePopover();
+                    dispatch(fetchTags(1, 10, ""));
+                  }}
+                >
+                  Reset
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => {
+                    dispatch(fetchTags(1, 10, filter));
+                    setPage(1);
+                    handleClosePopover();
+                  }}
+                >
+                  Apply
+                </LoadingButton>
+              </Stack>
+            </Box>
+          </Popover>
           <Button
             variant="contained"
             sx={{ borderRadius: 12 }}

@@ -38,13 +38,21 @@ export const updateSelectedTag = (tag: tagType) => ({
 export const fetchTags = (
   page: number,
   page_size: number,
-  created_date: string | null
+  filterValue: any
 ): any => {
+  console.log();
   return async (dispatch: any) => {
     dispatch(fetchTagsRequest());
     try {
       const Response = await fetcher.get(
-        END_POINTS.ADMIN.TAGS.GET_TAGS(page, page_size, created_date)
+        END_POINTS.ADMIN.TAGS.GET_TAGS(
+          page,
+          page_size,
+          Object.entries(filterValue)
+            .filter((item) => item[1])
+            .map((item) => `&${item[0]}=${item[1]}`)
+            .join("")
+        )
       );
       dispatch(fetchTagsSuccess(Response.data));
     } catch (error) {

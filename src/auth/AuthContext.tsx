@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (Response.status == 200) {
           await reduxDispatch(fetchLicense());
           reduxDispatch(fetchLlm());
-          reduxDispatch(fetchTags(1, 100, ""));
+          reduxDispatch(fetchTags(1, 10, ""));
           reduxDispatch(
             fetchTheme({
               user_id: Response.data.user_id,

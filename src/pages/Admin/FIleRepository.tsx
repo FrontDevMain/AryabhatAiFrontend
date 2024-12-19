@@ -6,6 +6,7 @@ import {
   Button,
   Divider,
   FormControl,
+  FormControlLabel,
   IconButton,
   InputLabel,
   List,
@@ -14,6 +15,8 @@ import {
   Modal,
   Pagination,
   Popover,
+  Radio,
+  RadioGroup,
   Select,
   Stack,
   styled,
@@ -23,10 +26,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
@@ -35,11 +39,21 @@ import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
-import Scrollbar from "src/components/scrollbar";
-import { PAGINATION_PER_PAGE_SIZE } from "src/config";
+import {
+  MaskControl,
+  StyledCard,
+  StyledWrap,
+} from "src/layouts/navbar/common/styles";
 import { RootState } from "src/redux/reducers";
 import { CustomListItemText } from "src/theme/globalStyles";
 import { formatDate } from "src/utils/utility";
+
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { sentenceCase } from "change-case";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -75,6 +89,15 @@ type filesType = {
   modified_by_username: string;
 };
 
+type filterTypes = {
+  upload_date: Date | null;
+  file_types: null | string;
+  department_tags: null | string;
+  file_statuses: null | string;
+  sort_by: null | string;
+  sort_order: null | string;
+};
+
 export default function FileRepository() {
   const theme = useTheme();
   const { user } = useAuthContext();
@@ -87,6 +110,24 @@ export default function FileRepository() {
   const [file, setFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  //filter
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const handleOpenPopover = (event: React.MouseEvent<HTMLButtonElement>) =>
+    setAnchorEl(event.currentTarget);
+  const handleClosePopover = () => setAnchorEl(null);
+  const openPopover = Boolean(anchorEl);
+  const id = openPopover ? "simple-popover" : undefined;
+
+  const [selectedFilerTab, setSelectedFilterTab] = useState("upload_date");
+  const [filter, setFilter] = useState<filterTypes>({
+    upload_date: null,
+    file_types: "",
+    department_tags: "",
+    file_statuses: "",
+    sort_by: "",
+    sort_order: "",
+  });
+
   //modal
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -96,7 +137,7 @@ export default function FileRepository() {
   };
 
   useEffect(() => {
-    getAllFiles(page);
+    getAllFiles(page, filter);
   }, [page]);
 
   const handleFileUpload = (event: any) => {
@@ -126,26 +167,6 @@ export default function FileRepository() {
     }
   };
 
-  const getAllFiles = useCallback(
-    async (currentPage: number) => {
-      try {
-        const Response = await fetcher.get(
-          END_POINTS.ADMIN.FILE_REPOSITORIES.GET_ALL_FILES(currentPage)
-        );
-        if (Response.status == 200) {
-          setFiles({
-            ...files,
-            fileList: Response.data.files,
-            total_pages: Response.data.total_pages,
-          });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [page]
-  );
-
   const onUploadFile = async () => {
     try {
       setIsLoading(true);
@@ -167,6 +188,32 @@ export default function FileRepository() {
     }
   };
 
+  const getAllFiles = useCallback(
+    async (currentPage: number, filters: filterTypes | string) => {
+      try {
+        const Response = await fetcher.get(
+          END_POINTS.ADMIN.FILE_REPOSITORIES.GET_ALL_FILES(
+            currentPage,
+            Object.entries(filters)
+              .filter((item) => item[1])
+              .map((item) => `&${item[0]}=${item[1]}`)
+              .join("")
+          )
+        );
+        if (Response.status == 200) {
+          setFiles({
+            ...files,
+            fileList: Response.data.files,
+            total_pages: Response.data.total_pages,
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [page]
+  );
+
   const updateFileList = (method: string, data: any) => {
     if (method == "delete") {
       setFiles({
@@ -184,6 +231,17 @@ export default function FileRepository() {
     }
   };
 
+  const resetFilters = () => {
+    setFilter({
+      upload_date: null,
+      file_types: "",
+      department_tags: "",
+      file_statuses: "",
+      sort_by: "",
+      sort_order: "",
+    });
+  };
+
   return (
     <>
       <Stack
@@ -193,9 +251,153 @@ export default function FileRepository() {
       >
         <Typography>File Repository</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
-          <IconButton>
+          <IconButton onClick={handleOpenPopover}>
             <Filters />
           </IconButton>
+          <Popover
+            id={id}
+            anchorEl={anchorEl}
+            open={openPopover}
+            onClose={handleClosePopover}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            <RadioGroup
+              name="themeMode"
+              value={selectedFilerTab}
+              onChange={(e) => {
+                setSelectedFilterTab(e.target.value);
+                resetFilters();
+              }}
+            >
+              <StyledWrap>
+                {Object.keys(filter)
+                  .filter((item) => item !== "sort_by")
+                  .map((mode) => (
+                    <StyledCard key={mode} selected={selectedFilerTab == mode}>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography
+                          color="text.primary"
+                          sx={{ whiteSpace: "nowrap", p: 2 }}
+                        >
+                          {sentenceCase(mode)}
+                        </Typography>
+                      </Stack>
+                      <MaskControl value={mode} />
+                    </StyledCard>
+                  ))}
+              </StyledWrap>
+            </RadioGroup>
+            <Box sx={{ px: 2 }}>
+              {selectedFilerTab == "upload_date" && (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={["DatePicker"]}>
+                    <DatePicker
+                      sx={{ width: "100%" }}
+                      label="Date"
+                      value={dayjs(filter.upload_date)}
+                      maxDate={dayjs(new Date())}
+                      onChange={(newValue: any) =>
+                        setFilter({ ...filter, upload_date: newValue })
+                      }
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+              )}
+              {(selectedFilerTab == "department_tags" ||
+                selectedFilerTab == "file_statuses" ||
+                selectedFilerTab == "file_types") && (
+                <TextField
+                  fullWidth
+                  label={sentenceCase(selectedFilerTab)}
+                  value={filter[selectedFilerTab]}
+                  onChange={(event: any) =>
+                    setFilter({
+                      ...filter,
+                      [selectedFilerTab]: event.target.value,
+                    })
+                  }
+                />
+              )}
+              {selectedFilerTab == "sort_order" && (
+                <>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">
+                      Sort By
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={filter.sort_by}
+                      label="Sort By"
+                      onChange={(e) =>
+                        setFilter({
+                          ...filter,
+                          sort_by: e.target.value,
+                        })
+                      }
+                    >
+                      {Object.keys(filter).map((elem) => (
+                        <MenuItem value={elem}>{sentenceCase(elem)}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <RadioGroup
+                    name="sort"
+                    value={filter.sort_order}
+                    onChange={(e) =>
+                      setFilter({
+                        ...filter,
+                        [selectedFilerTab]: e.target.value,
+                      })
+                    }
+                  >
+                    {["", "desc"].map((item) => (
+                      <FormControlLabel
+                        label={item == "desc" ? "Descending" : "Ascending"}
+                        value={item}
+                        control={<Radio />}
+                      />
+                    ))}
+                  </RadioGroup>
+                </>
+              )}
+
+              <Stack
+                flexDirection={"row"}
+                justifyContent={"end"}
+                gap={1}
+                my={2}
+              >
+                <LoadingButton
+                  variant="outlined"
+                  onClick={() => {
+                    resetFilters();
+                    handleClosePopover();
+                    getAllFiles(1, "");
+                  }}
+                >
+                  Reset
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => {
+                    getAllFiles(1, filter);
+                    setPage(1);
+                    handleClosePopover();
+                  }}
+                >
+                  Apply
+                </LoadingButton>
+              </Stack>
+            </Box>
+          </Popover>
           <Button
             variant="contained"
             sx={{ borderRadius: 12 }}

@@ -451,13 +451,16 @@ export default function Settings() {
                   )
                   .map((item) => (
                     <CustomListItemButton
-                      sx={{ pl: 2 }}
+                      sx={{
+                        pl: 2,
+                        color: "text.primary",
+                        "& :hover": {
+                          color: "background.default",
+                        },
+                      }}
                       onClick={() => setAchiveDefaultDays(item)}
                     >
-                      <ListItemText
-                        primary={item + " days"}
-                        sx={{ color: "text.primary" }}
-                      />
+                      <ListItemText primary={item + " days"} />
                     </CustomListItemButton>
                   ))}
               </List>

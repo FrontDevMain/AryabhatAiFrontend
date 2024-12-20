@@ -394,7 +394,7 @@ function TagsRow({
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [tagName]);
 
   const deleteTag = useCallback(async () => {
     try {

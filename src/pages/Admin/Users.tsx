@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import { LoadingButton } from "@mui/lab";
 import {
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -82,6 +83,9 @@ function Users() {
   });
   const [page, setPage] = useState(1);
   const [inviteEmails, setInviteEmails] = useState("");
+
+  const [value, setValue] = useState<string[] | undefined>();
+  const [inputValue, setInputValue] = useState("");
 
   //filter
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -362,13 +366,39 @@ function Users() {
           <Typography id="modal-modal-title" variant="h4" mb={3}>
             Invite Users
           </Typography>
-          <TextField
-            fullWidth
-            multiline
-            maxRows={6}
-            label="Enter Emails"
-            value={inviteEmails}
-            onChange={(e) => setInviteEmails(e.target.value)}
+          <Autocomplete
+            value={value}
+            onChange={(event, newValue) => setValue(newValue)}
+            multiple
+            freeSolo
+            size="small"
+            inputValue={inviteEmails}
+            onInputChange={(event, newInputValue) =>
+              setInviteEmails(newInputValue)
+            }
+            onKeyDown={(event) => {
+              console.log(event);
+              if (event.key === " ") {
+                if (inviteEmails.trim()) {
+                  setValue((prevState: any) => [
+                    ...prevState,
+                    inviteEmails.trim(),
+                  ]);
+                  setInviteEmails("");
+                }
+              }
+            }}
+            options={[]}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="medium"
+                label="Enter Email"
+                variant="outlined"
+                sx={{ minWidth: 200 }}
+                autoComplete="off"
+              />
+            )}
           />
           <Stack direction={"row"} gap={2} mt={3}>
             <Button variant="outlined" fullWidth onClick={handleCloseModal}>

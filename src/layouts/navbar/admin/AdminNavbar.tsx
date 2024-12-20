@@ -1,10 +1,6 @@
-import { Box, List, ListItemText, useTheme } from "@mui/material";
+import { Box, List, ListItemText, Stack, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
-import {
-  ArrowForwardIosRounded,
-  ArrowForwardIosSharp,
-  ArrowRight,
-} from "@mui/icons-material";
+import { ArrowForwardIosSharp, Dashboard } from "@mui/icons-material";
 import AdminNavConfig from "./AdminConfig";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CustomListItemButton } from "src/theme/globalStyles";
@@ -24,10 +20,14 @@ export default function AdminNavbar() {
       sx={{
         overflow: "auto",
         backgroundColor: theme.palette.background.default,
+        alignSelf: "start",
       }}
     >
       <List
-        sx={{ maxWidth: 360, bgcolor: theme.palette.background.default }}
+        sx={{
+          maxWidth: 360,
+          bgcolor: theme.palette.background.default,
+        }}
         component="nav"
         aria-labelledby="nested-list-subheader"
       >
@@ -41,6 +41,20 @@ export default function AdminNavbar() {
               }}
               selected={active == item.path}
             >
+              <Box
+                component="span"
+                className="svg-color"
+                sx={{
+                  width: 24,
+                  height: 24,
+                  mr: 1,
+                  display: "inline-block",
+                  bgcolor: "currentColor",
+                  mask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
+                  WebkitMask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
+                }}
+              />
+
               <ListItemText primary={item.title} />
               <ArrowForwardIosSharp sx={{ fontSize: 15 }} />
             </CustomListItemButton>

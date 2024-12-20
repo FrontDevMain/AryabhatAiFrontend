@@ -1,5 +1,5 @@
 import axios from "axios";
-import { isLoggedin, getToken, redirectToLogin } from "../utils/authGuard";
+import { isLoggedin } from "../utils/authGuard";
 
 const apiClient = axios.create({
   // Can set any default configurations here, such as base URL, headers, etc.
@@ -12,7 +12,6 @@ apiClient.interceptors.response.use(
     return response;
   },
   function (error) {
-    console.log(error);
     if (error.response) {
       switch (error.response.status) {
         case 322:
@@ -22,11 +21,11 @@ apiClient.interceptors.response.use(
           console.error("Bad request");
           break;
         case 401:
-          console.error(error.response.data.detail);
+          console.log(error.response.data.detail);
           window.location.reload();
           break;
         case 403:
-          console.error("Forbidden");
+          console.error("Forbidden", error.response.status);
           break;
         case 404:
           console.error(error.response.data.detail);

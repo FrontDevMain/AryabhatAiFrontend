@@ -35,6 +35,7 @@ type AuthContextTypes = {
 export const AuthContext = createContext<AuthContextTypes | null>(null);
 
 const initialState = {
+  isLicensed: true,
   isInitialize: false,
   isAuthenticated: false,
   user: null,
@@ -44,17 +45,25 @@ function reducer(state: any, action: any) {
   if (action.type == "login") {
     return {
       ...state,
+      isLicensed: true,
       isInitialize: true,
       isAuthenticated: true,
-      isLicensed: true,
       user: action.payload,
     };
   } else if (action.type == "logout") {
     return {
       ...state,
+      isLicensed: true,
       isInitialize: true,
       isAuthenticated: false,
+      user: null,
+    };
+  } else if (action.type == "license_not_found") {
+    return {
+      ...state,
       isLicensed: false,
+      isInitialize: true,
+      isAuthenticated: false,
       user: null,
     };
   }
@@ -66,15 +75,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const reduxDispatch = useDispatch();
 
   const initialize = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("auth");
-      if (token) {
+    const token = localStorage.getItem("auth");
+    if (token) {
+      try {
         const Response = await fetcher.get(END_POINTS.AUTH.USER_DETAILS);
         if (Response.status == 200) {
           await reduxDispatch(fetchLicense());
-          reduxDispatch(fetchLlm());
-          reduxDispatch(fetchTags(1, 10, ""));
-          reduxDispatch(
+          await reduxDispatch(fetchLlm());
+          await reduxDispatch(fetchTags(1, 10, ""));
+          await reduxDispatch(
             fetchTheme({
               user_id: Response.data.user_id,
               Theme_logo: "",
@@ -102,10 +111,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           throw new Error();
         }
-      } else {
-        throw new Error();
+      } catch (err) {
+        console.log("found err", err);
+        dispatch({ type: "license_not_found" });
       }
-    } catch (err) {
+    } else {
       logout();
     }
   }, []);

@@ -6,6 +6,8 @@ import {
   Drawer,
   Stack,
   useTheme,
+  Menu,
+  IconButton,
 } from "@mui/material";
 import Logo from "src/components/logo";
 import AdminNavbar from "./navbar/admin/AdminNavbar";
@@ -15,6 +17,7 @@ import { Outlet } from "react-router-dom";
 import UserNavbar from "./navbar/user/UserNavbar";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar";
+import { MenuOpen } from "@mui/icons-material";
 
 const DashboardLayout = () => {
   const { user } = useAuthContext();
@@ -37,6 +40,14 @@ const DashboardLayout = () => {
           },
         }}
       >
+        <Stack
+          flexDirection={"row"}
+          alignItems={"center"}
+          justifyContent={"space-between"}
+          gap={1}
+        >
+          <Logo />
+        </Stack>
         <Box sx={{ width: "85%", height: "inherit", margin: "0px auto" }}>
           <Stack
             flexDirection={"column"}
@@ -44,13 +55,13 @@ const DashboardLayout = () => {
             sx={{ height: "inherit" }}
           >
             <Box>
-              <Logo />
               {user?.tempAccountType == "User" ? (
                 <UserNavbar />
               ) : (
                 <AdminNavbar />
               )}
             </Box>
+
             <Box>
               <AccountPopover />
               <ChangeMode />
@@ -92,7 +103,8 @@ const DashboardLayout = () => {
 
         <Box
           sx={{
-            ml: 37,
+            marginLeft: 37,
+            // ml: 37,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             backgroundColor: theme.palette.background.neutral,

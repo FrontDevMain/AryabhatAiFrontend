@@ -222,7 +222,7 @@ export default function Settings() {
   };
 
   return (
-    <Box onClick={() => setCollapse(false)}>
+    <Box onClick={() => collapse && setCollapse(false)}>
       <Stack
         direction={"row"}
         alignItems={"center"}

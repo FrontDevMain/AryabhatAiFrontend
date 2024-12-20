@@ -70,6 +70,8 @@ function AuthLoginForm() {
       const Response = await fetcher.post(END_POINTS.AUTH.LOGIN, body);
       if (Response.status == 200) {
         localStorage.setItem("auth", Response.data.access_token);
+        localStorage.setItem("auth_session_token", Response.data.session_token);
+        document.cookie = `refresh_token=${Response.data.refresh_token}`;
         login();
       }
     } catch (err) {

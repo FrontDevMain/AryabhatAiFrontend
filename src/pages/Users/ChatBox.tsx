@@ -41,7 +41,7 @@ function ChatBox() {
       ref={elementRef}
     >
       {CHAT?.messages.map((item) => (
-        <ChatCard item={item} loading={false} />
+        <ChatCard item={item} loading={false} key={item.message_id} />
       ))}
       {queryLoading && (
         <ChatCard

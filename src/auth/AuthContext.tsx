@@ -142,8 +142,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateUserType = async (val: string) => {
     if (val == "User") {
       await reduxDispatch(fetchNotebookList(state.user.user_id));
-      const { user_id, chat_id } = notebookList[0];
-      await reduxDispatch(fetchChat(user_id, chat_id));
     }
     dispatch({
       type: "login",

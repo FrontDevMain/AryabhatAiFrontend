@@ -21,8 +21,9 @@ function ChatCard({ item, loading }: { item: messageType; loading: boolean }) {
     <Stack
       sx={{
         alignItems: item.type == "aryabhat" ? "start" : "flex-end",
-        my: 2,
+        mt: 2,
       }}
+      key={item.message_id}
     >
       <Card sx={{ p: 2, maxWidth: "60%", boxShadow: "none" }}>
         <Typography>{item.context}</Typography>

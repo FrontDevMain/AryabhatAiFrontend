@@ -61,13 +61,6 @@ function Dashboard() {
       console.log(err);
     }
   };
-
-  const colors = ["#008080", "#F5B700", "#1B75BC"];
-  const totalFiles = dashboardData?.files_by_type?.reduce(
-    (acc, elem) => (acc += elem.file_count),
-    0
-  );
-
   return (
     <Box>
       <Grid container>
@@ -114,8 +107,12 @@ function Dashboard() {
               <LineChart
                 series={[
                   {
-                    name: "active",
+                    name: "monthly",
                     data: [10, 20, 15, 8, 6, 12, 2, 3, 6, 12, 8, 10],
+                  },
+                  {
+                    name: "Yearly",
+                    data: [15, 21, 5, 5, 12, 5, 14, 13, 16, 5, 10, 13],
                   },
                 ]}
               />

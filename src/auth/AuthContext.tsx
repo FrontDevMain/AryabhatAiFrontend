@@ -1,12 +1,15 @@
 import { createContext, useCallback, useEffect, useReducer } from "react";
+import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
+import { fetchChat } from "src/redux/actions/chat/ChatActions";
 import { fetchLicense } from "src/redux/actions/license/LicenseActions";
 import { fetchLlm } from "src/redux/actions/llm/LlmActions";
 import { fetchNotebookList } from "src/redux/actions/Notebook/NotebookActions";
 import { fetchTags } from "src/redux/actions/tags/TagsActions";
 import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
+import { RootState } from "src/redux/reducers";
 
 type AuthContextTypes = {
   isInitialize: boolean;
@@ -73,6 +76,7 @@ function reducer(state: any, action: any) {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const reduxDispatch = useDispatch();
+  const { notebookList } = useSelector((state: RootState) => state.notebook);
 
   const initialize = useCallback(async () => {
     const token = localStorage.getItem("auth");
@@ -135,9 +139,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const updateUserType = (val: string) => {
+  const updateUserType = async (val: string) => {
     if (val == "User") {
-      reduxDispatch(fetchNotebookList(state.user.user_id));
+      await reduxDispatch(fetchNotebookList(state.user.user_id));
+      const { user_id, chat_id } = notebookList[0];
+      await reduxDispatch(fetchChat(user_id, chat_id));
     }
     dispatch({
       type: "login",

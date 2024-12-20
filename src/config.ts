@@ -1,4 +1,3 @@
 export const PATH_AFTER_ADMIN_LOGIN = "/admin/dashboard";
 export const PATH_AFTER_USER_LOGIN = "/user/dashboard";
-export const PAGINATION_PER_PAGE_SIZE = 20;
-export const MODAL_ANIMATION_TIMEOUT = 500;
+export const PAGINATION_PER_PAGE_SIZE = 10;

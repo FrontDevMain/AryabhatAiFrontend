@@ -7,7 +7,7 @@ import { RootState } from "src/redux/reducers";
 
 function ChatBox() {
   const elementRef = useRef();
-  const { loading, CHAT, error } = useSelector(
+  const { loading, CHAT, queryLoading } = useSelector(
     (state: RootState) => state.chat
   );
 
@@ -41,8 +41,22 @@ function ChatBox() {
       ref={elementRef}
     >
       {CHAT?.messages.map((item) => (
-        <ChatCard item={item} />
+        <ChatCard item={item} loading={false} />
       ))}
+      {queryLoading && (
+        <ChatCard
+          item={{
+            context: "",
+            is_Liked: 0,
+            message_id: "",
+            type: "aryabhat",
+            model_id: "",
+            provider_id: "",
+            tag: "",
+          }}
+          loading={queryLoading}
+        />
+      )}
     </Box>
   );
 }

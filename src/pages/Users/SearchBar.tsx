@@ -9,7 +9,11 @@ import { useSelector } from "react-redux";
 import { RootState } from "src/redux/reducers";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LoadingButton } from "@mui/lab";
-import { fetchChatSuccess } from "src/redux/actions/chat/ChatActions";
+import {
+  fetchChat,
+  fetchChatSuccess,
+  fetchQuery,
+} from "src/redux/actions/chat/ChatActions";
 import { useDispatch } from "react-redux";
 
 type FormValuesProps = {
@@ -46,21 +50,13 @@ function SearchBar() {
   const onSubmit = async (data: FormValuesProps) => {
     try {
       let body = {
+        user_input: data.search,
         Model_id: selectedLlm.model_id,
         Provider_id: selectedLlm.provider_id,
         chat_id: CHAT.chat_id,
-        user_input: data.search,
         user_id: user.user_id,
         Department_tag: selectedTag.tag_name,
       };
-      const Response = await fetcher.post(
-        END_POINTS.USER.QUERY.QUERY_NOTEBOOK,
-        body
-      );
-
-      console.log(Response.data);
-    } catch (error) {
-    } finally {
       dispatch(
         fetchChatSuccess({
           ...CHAT,
@@ -68,8 +64,8 @@ function SearchBar() {
             ...CHAT.messages,
             {
               type: "user",
-              context: data.search,
               is_Liked: 0,
+              context: data.search,
               message_id: "0tgwsfknzcmvbpo79q235r4x",
               model_id: selectedLlm.model_id,
               provider_id: selectedLlm.provider_id,
@@ -78,7 +74,9 @@ function SearchBar() {
           ],
         })
       );
-    }
+      reset(defaultValues);
+      await dispatch(fetchQuery(body));
+    } catch (error) {}
   };
 
   return (
@@ -101,9 +99,8 @@ function SearchBar() {
               <LoadingButton
                 variant="contained"
                 size="large"
-                disabled={!isValid}
+                disabled={!isValid || isSubmitting}
                 type="submit"
-                loading={isSubmitting}
                 sx={{ p: 2, right: -12 }}
               >
                 Send{" "}

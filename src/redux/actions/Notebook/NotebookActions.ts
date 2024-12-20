@@ -47,6 +47,7 @@ export const fetchNotebookList = (userId: string): any => {
         body
       );
       dispatch(fetchNotebookListSuccess(Response.data.chat_list));
+      return Response.data.chat_list[0];
     } catch (error) {
       dispatch(fetchNotebookListFailure());
     }

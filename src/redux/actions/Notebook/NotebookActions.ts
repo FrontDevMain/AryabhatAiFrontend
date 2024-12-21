@@ -46,7 +46,19 @@ export const fetchNotebookList = (userId: string): any => {
         END_POINTS.USER.QUERY.LIST_NOTEBOOK,
         body
       );
-      dispatch(fetchNotebookListSuccess(Response.data.chat_list));
+      dispatch(
+        fetchNotebookListSuccess(
+          Response.data.chat_list.sort((a: any, b: any) => {
+            if (!!a.is_pin && !!!b.is_pin) {
+              return -1;
+            } else if (!!!a.is_pin && !!b.is_pin) {
+              return 1;
+            } else {
+              return 0;
+            }
+          })
+        )
+      );
       return Response.data.chat_list[0];
     } catch (error) {
       dispatch(fetchNotebookListFailure());

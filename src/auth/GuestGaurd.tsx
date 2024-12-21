@@ -19,8 +19,6 @@ function GuestGaurd({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, isInitialize, isLicensed, logout } =
     useAuthContext();
 
-  console.log("license not found", isLicensed);
-
   if (isAuthenticated) {
     return user.user_accountType == "User" ? (
       <Navigate to={PATH_AFTER_USER_LOGIN} />

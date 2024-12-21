@@ -10,6 +10,7 @@ import {
   LLM,
   LoginPage,
   NewPassword,
+  NotFoundPage,
   OtherStorageDevices,
   Settings,
   SignUp,
@@ -43,6 +44,7 @@ export default function Router() {
         { path: "signup-details", element: <SignUpRegistration /> },
       ],
     },
+    { path: "*", element: <NotFoundPage /> },
     {
       path: "/admin",
       element: (
@@ -61,6 +63,7 @@ export default function Router() {
         { path: "tags", element: <Tags /> },
         { path: "connectors", element: <Connectors /> },
         { path: "settings", element: <Settings /> },
+        { path: "*", element: <NotFoundPage /> },
       ],
     },
     {
@@ -73,7 +76,8 @@ export default function Router() {
       children: [
         { element: <Navigate to={"/user/dashboard"} replace />, index: true },
         { path: "dashboard", element: <UserDashboard /> },
-        { path: "dashboard/:id", element: <UserDashboard /> },
+        // { path: "dashboard/:id", element: <UserDashboard /> },
+        { path: "*", element: <NotFoundPage /> },
       ],
     },
   ]);

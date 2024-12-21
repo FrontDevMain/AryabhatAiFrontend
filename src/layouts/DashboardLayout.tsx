@@ -21,17 +21,6 @@ import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 const DashboardLayout = () => {
   const { user } = useAuthContext();
   const theme = useTheme();
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (
-      pathname.split("/").includes("user") &&
-      user.tempAccountType != "user"
-    ) {
-      navigate(PATH_AFTER_ADMIN_LOGIN);
-    }
-  }, []);
 
   return (
     <Box sx={{ pt: 8 }}>

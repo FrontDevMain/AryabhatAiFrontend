@@ -55,11 +55,21 @@ const licenseReducer = (
     case TOGGLE_NOTEBOOK_PIN_SUCCESS:
       return {
         ...state,
-        notebookList: state.notebookList.map((item) =>
-          item.chat_id == action.payload
-            ? { ...item, is_pin: item.is_pin == 1 ? 0 : 1 }
-            : { ...item }
-        ),
+        notebookList: state.notebookList
+          .map((item) =>
+            item.chat_id == action.payload
+              ? { ...item, is_pin: item.is_pin == 1 ? 0 : 1 }
+              : { ...item }
+          )
+          .sort((a: any, b: any) => {
+            if (!!a.is_pin && !!!b.is_pin) {
+              return -1;
+            } else if (!!!a.is_pin && !!b.is_pin) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }),
         updateLoading: false,
       };
     case TOGGLE_NOTEBOOK_PIN_FAILURE:
@@ -69,11 +79,21 @@ const licenseReducer = (
     case TOGGLE_NOTEBOOK_ARCHIVE_SUCCESS:
       return {
         ...state,
-        notebookList: state.notebookList.map((item) =>
-          item.chat_id == action.payload
-            ? { ...item, is_archieved: item.is_archieved == 1 ? 0 : 1 }
-            : { ...item }
-        ),
+        notebookList: state.notebookList
+          .map((item) =>
+            item.chat_id == action.payload
+              ? { ...item, is_archieved: item.is_archieved == 1 ? 0 : 1 }
+              : { ...item }
+          )
+          .sort((a: any, b: any) => {
+            if (!!a.is_archieved && !!!b.is_archieved) {
+              return -1;
+            } else if (!!!a.is_archieved && !!b.is_archieved) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }),
         updateLoading: false,
       };
     case TOGGLE_NOTEBOOK_ARCHIVE_FAILURE:
@@ -89,7 +109,6 @@ const licenseReducer = (
         updateLoading: false,
       };
     case NOTEBOOK_DELETE_FAILURE:
-      return { ...state, updateLoading: false };
       return { ...state, updateLoading: false };
     case NOTEBOOK_CHANGE_HEADERNAME_REQUEST:
       return { ...state, updateLoading: true };

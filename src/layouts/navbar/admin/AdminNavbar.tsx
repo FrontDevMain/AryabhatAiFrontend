@@ -31,7 +31,7 @@ export default function AdminNavbar() {
         component="nav"
         aria-labelledby="nested-list-subheader"
       >
-        {AdminNavConfig[0].items.map((item) => {
+        {AdminNavConfig.map((item) => {
           return (
             <CustomListItemButton
               key={item.path}

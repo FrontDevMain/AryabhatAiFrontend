@@ -16,6 +16,7 @@ import UserNavbar from "./navbar/user/UserNavbar";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { useEffect } from "react";
 import { PATH_AFTER_ADMIN_LOGIN } from "src/config";
+import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 
 const DashboardLayout = () => {
   const { user } = useAuthContext();
@@ -122,7 +123,9 @@ const DashboardLayout = () => {
             overflow: "scroll",
           }}
         >
-          <Outlet />
+          <RoleBasedGaurd>
+            <Outlet />
+          </RoleBasedGaurd>
         </Box>
       </Box>
     </Box>

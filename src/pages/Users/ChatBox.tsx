@@ -1,12 +1,17 @@
 import { Box, Card, Stack, Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import { END_POINTS } from "src/api/EndPoints";
+import fetcher from "src/api/fetcher";
 import { Loading } from "src/assets/icons/loading";
 import ChatCard from "src/components/CustomChatCard/ChatCard";
+import { fetchChatSuccess } from "src/redux/actions/chat/ChatActions";
 import { RootState } from "src/redux/reducers";
 
 function ChatBox() {
   const elementRef = useRef();
+  const dispatch = useDispatch();
   const { loading, CHAT, queryLoading } = useSelector(
     (state: RootState) => state.chat
   );

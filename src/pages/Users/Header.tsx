@@ -2,8 +2,8 @@ import { Icon } from "@iconify/react";
 import {
   ExpandLess,
   ExpandMore,
-  ImportExport,
-  IosShareOutlined,
+  MoreHoriz,
+  SystemUpdateAltOutlined,
 } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
@@ -22,10 +22,11 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { sentenceCase } from "change-case";
 import { useState, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAuthContext } from "src/auth/useAuthContext";
+import GeneratePdfDocument from "src/components/CustomComponents/GeneratePdfDocument";
 import { updateSelectedLlm } from "src/redux/actions/llm/LlmActions";
 import {
   onChangeNotebookHeaderName,
@@ -231,22 +232,32 @@ function HeaderDashboard() {
             </Stack>
           </Collapse>
         </List>
-        <IconButton sx={{ bgcolor: "#fff" }}>
-          <IosShareOutlined sx={{ width: "30px", height: "30px" }} />
-        </IconButton>
+
+        <PDFDownloadLink
+          document={
+            <GeneratePdfDocument
+              data={CHAT.messages}
+              llm={selectedLlm}
+              tag={selectedTag}
+            />
+          }
+          fileName={`${
+            notebookList.find((item) => item.chat_id == CHAT.chat_id)
+              ?.chat_header
+          }.pdf`}
+        >
+          <IconButton
+            sx={{ bgcolor: theme.palette.background.default, height: "100%" }}
+          >
+            <SystemUpdateAltOutlined />
+          </IconButton>
+        </PDFDownloadLink>
         <IconButton
-          sx={{ bgcolor: "#fff" }}
+          sx={{ bgcolor: theme.palette.background.default }}
           aria-describedby={id}
           onClick={handleOpenPopover}
         >
-          <Icon
-            icon="mynaui:dots-solid"
-            width="30px"
-            height="30px"
-            style={{
-              borderRadius: 20,
-            }}
-          />
+          <MoreHoriz />
         </IconButton>
         <Popover
           id={id}

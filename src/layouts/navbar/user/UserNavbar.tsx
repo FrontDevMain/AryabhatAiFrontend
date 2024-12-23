@@ -93,7 +93,9 @@ export default function UserNavbar() {
 
   useEffect(() => {
     if (notebookList?.length) {
-      const { user_id, chat_id } = notebookList[0];
+      const { user_id, chat_id } = notebookList.filter(
+        (chat) => !chat.is_archieved
+      )[0];
       dispatch(fetchChat(user_id, chat_id));
     }
     setNavbarList([

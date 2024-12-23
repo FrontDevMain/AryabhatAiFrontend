@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
-import { fetchChat } from "src/redux/actions/chat/ChatActions";
 import { fetchLicense } from "src/redux/actions/license/LicenseActions";
 import { fetchLlm } from "src/redux/actions/llm/LlmActions";
 import { fetchNotebookList } from "src/redux/actions/Notebook/NotebookActions";

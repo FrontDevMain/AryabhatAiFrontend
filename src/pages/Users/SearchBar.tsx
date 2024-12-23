@@ -2,15 +2,12 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, { RHFTextField } from "../../components/hook-form";
-import { Button, InputAdornment, useTheme } from "@mui/material";
-import fetcher from "src/api/fetcher";
-import { END_POINTS } from "src/api/EndPoints";
+import { InputAdornment, useTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/reducers";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LoadingButton } from "@mui/lab";
 import {
-  fetchChat,
   fetchChatSuccess,
   fetchQuery,
 } from "src/redux/actions/chat/ChatActions";

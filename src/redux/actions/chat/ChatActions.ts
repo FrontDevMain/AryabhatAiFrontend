@@ -67,7 +67,7 @@ export const fetchQuery = (data: any): any => {
         END_POINTS.USER.QUERY.QUERY_NOTEBOOK,
         body
       );
-      if (Response.data.status == "success") {
+      if (Response.status == 200) {
         await dispatch(fetchChat(data.user_id, data.chat_id));
         dispatch(fetchQuerySuccess());
       }

@@ -3,6 +3,7 @@ import {
   Container,
   Grid,
   Stack,
+  styled,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -15,6 +16,12 @@ import ColumnChart from "src/components/dashboard/ColumnChart";
 import DonutChart from "src/components/dashboard/DonutChart";
 import LineChart from "src/components/dashboard/LineChart";
 import StatsCard from "src/components/dashboard/StatsCard";
+
+const CustomBox = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  borderRadius: 3,
+  padding: 3,
+}));
 
 type dashboardDataTypes = {
   total_users: number;
@@ -96,13 +103,7 @@ function Dashboard() {
       </Grid>
       <Grid container mt={2} spacing={3}>
         <Grid item xs={8}>
-          <Box
-            sx={{
-              backgroundColor: (theme) => theme.palette.background.default,
-              borderRadius: 3,
-              padding: 3,
-            }}
-          >
+          <CustomBox>
             {dashboardData?.Top_queried_files?.length && (
               <LineChart
                 series={[
@@ -117,29 +118,17 @@ function Dashboard() {
                 ]}
               />
             )}
-          </Box>
+          </CustomBox>
         </Grid>
         <Grid item xs={4}>
-          <Box
-            sx={{
-              backgroundColor: (theme) => theme.palette.background.default,
-              borderRadius: 3,
-              padding: 3,
-            }}
-          >
+          <CustomBox>
             {dashboardData?.Top_queried_files?.length && (
               <BarChart series={dashboardData?.Top_queried_files} />
             )}
-          </Box>
+          </CustomBox>
         </Grid>
         <Grid item xs={6}>
-          <Box
-            sx={{
-              backgroundColor: (theme) => theme.palette.background.default,
-              borderRadius: 3,
-              padding: 3,
-            }}
-          >
+          <CustomBox>
             {dashboardData?.files_by_type?.length && (
               <ColumnChart
                 series={[
@@ -152,20 +141,14 @@ function Dashboard() {
                 ]}
               />
             )}
-          </Box>
+          </CustomBox>
         </Grid>
         <Grid item xs={6}>
-          <Box
-            sx={{
-              backgroundColor: (theme) => theme.palette.background.default,
-              borderRadius: 3,
-              padding: 3,
-            }}
-          >
+          <CustomBox>
             {dashboardData?.files_by_type?.length && (
               <DonutChart series={dashboardData.files_by_type} />
             )}
-          </Box>
+          </CustomBox>
         </Grid>
       </Grid>
     </Box>

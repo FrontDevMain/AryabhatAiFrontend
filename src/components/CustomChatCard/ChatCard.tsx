@@ -104,9 +104,9 @@ function ChatCard({ item, loading }: { item: messageType; loading: boolean }) {
         {item.type == "aryabhat" && (
           <Box sx={{ position: "absolute", bottom: -40, right: 0 }}>
             {isSpeaking ? (
-              <Chip label="Stop Aloud" onClick={handleStop} />
+              <Chip label="Stop" size="small" onClick={handleStop} />
             ) : (
-              <Chip label="Speak Aloud" onClick={handlePlay} />
+              <Chip label="Read Aloud" size="small" onClick={handlePlay} />
             )}
             <Tooltip
               placement="top"

@@ -26,6 +26,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { sentenceCase } from "change-case";
 import { useState, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useAuthContext } from "src/auth/useAuthContext";
 import GeneratePdfDocument from "src/components/CustomComponents/GeneratePdfDocument";
 import { updateSelectedLlm } from "src/redux/actions/llm/LlmActions";
 import {
@@ -59,6 +60,7 @@ const style = {
 };
 
 function HeaderDashboard() {
+  const { user } = useAuthContext();
   const theme = useTheme();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
@@ -102,9 +104,10 @@ function HeaderDashboard() {
             sx={{
               padding: 0,
               backgroundColor: theme.palette.background.default,
-              borderRadius: open ? "20px 20px 0 0" : 20,
+              borderRadius: 20,
               overflow: "clip",
               color: theme.palette.text.primary, // Hover background
+              zIndex: 9999,
               "&:hover": {
                 color: theme.palette.background.default, // Hover background
                 backgroundColor: theme.palette.secondary.main, // Hover background
@@ -112,7 +115,7 @@ function HeaderDashboard() {
             }}
           >
             <ListItemText
-              sx={{ padding: 1.5 }}
+              sx={{ padding: "8px 13px" }}
               primary={selectedLlm.provider_name}
             />
             {open ? (
@@ -127,6 +130,8 @@ function HeaderDashboard() {
             unmountOnExit
             sx={{
               position: "absolute",
+              top: 20,
+              zIndex: 9998,
               width: "100%",
             }}
           >
@@ -139,18 +144,21 @@ function HeaderDashboard() {
             >
               {LLM.filter(
                 (elem) => elem.provider_id !== selectedLlm.provider_id
-              ).map((item) => (
+              ).map((item, index) => (
                 <CustomListItemButton
                   key={item.provider_id}
+                  style={{ paddingTop: index == 0 ? 20 : 0 }}
                   onClick={() => {
-                    dispatch(updateSelectedLlm(item));
                     setOpen(!open);
+                    setTimeout(() => {
+                      dispatch(updateSelectedLlm(item));
+                    }, 300);
                   }}
                 >
                   <ListItemText
                     sx={{
                       margin: 0,
-                      padding: "12px",
+                      padding: "10px 13px",
                       color: theme.palette.text.primary, // Hover background
                       "&:hover": {
                         color: theme.palette.background.default,
@@ -188,8 +196,18 @@ function HeaderDashboard() {
               },
             }}
           >
+            {" "}
+            <span
+              style={{
+                height: 10,
+                width: 10,
+                marginLeft: 20,
+                backgroundColor: "#F5B700",
+                borderRadius: "50%",
+              }}
+            ></span>
             <ListItemText
-              sx={{ padding: 1.5 }}
+              sx={{ padding: "8px 13px" }}
               primary={sentenceCase(selectedTag.tag_name || "")}
             />
             {open1 ? (
@@ -204,6 +222,7 @@ function HeaderDashboard() {
             unmountOnExit
             sx={{
               position: "absolute",
+              zIndex: 9999,
               width: "100%",
             }}
           >
@@ -224,7 +243,7 @@ function HeaderDashboard() {
                       setOpen1(!open1);
                     }}
                   >
-                    <CustomListItemText>
+                    <CustomListItemText sx={{ margin: 0 }}>
                       {sentenceCase(item.tag_name || "")}
                     </CustomListItemText>
                   </CustomListItemButton>
@@ -239,6 +258,7 @@ function HeaderDashboard() {
               data={CHAT.messages}
               llm={selectedLlm}
               tag={selectedTag}
+              userName={user.user_firstname}
             />
           }
           fileName={`${
@@ -386,7 +406,7 @@ function VersionCard({ item }: { item: string }) {
       <ListItemText
         sx={{
           margin: 0,
-          padding: "12px",
+          padding: "8px 13px",
           color: theme.palette.text.primary, // Hover background
           "&:hover": {
             color: theme.palette.background.default,

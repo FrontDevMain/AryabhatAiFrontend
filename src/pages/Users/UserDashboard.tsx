@@ -2,8 +2,6 @@ import HeaderDashboard from "./Header";
 import SearchBar from "./SearchBar";
 import ChatBox from "./ChatBox";
 import { Divider } from "@mui/material";
-import { PDFViewer } from "@react-pdf/renderer";
-import GeneratePdfDocument from "src/components/CustomComponents/GeneratePdfDocument";
 
 function UserDashboard() {
   return (

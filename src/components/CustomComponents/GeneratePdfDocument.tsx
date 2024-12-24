@@ -6,43 +6,56 @@ import {
   Document,
   StyleSheet,
   Image,
+  Svg,
+  Font,
+  Link,
 } from "@react-pdf/renderer";
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux/reducers";
+import dayjs from "dayjs";
+import { useAuthContext } from "src/auth/useAuthContext";
+
+Font.register({
+  family: "Open Sans",
+  src: "https://fonts.gstatic.com/s/opensans/v27/mem8YaGs126MiZpBA-UFVZ0b.woff2", // URL to the font file
+});
 
 // Define styles
 const styles = StyleSheet.create({
-  page: {
-    padding: 30,
-    position: "absolute",
-  },
   section: {
     margin: 10,
     padding: 10,
   },
   Text: {
     fontSize: 10,
+    fontColor: "#494747",
   },
 });
 
 // Create PDF document
-const GeneratePdfDocument = ({ data, llm, tag }: any) => {
+const GeneratePdfDocument = ({ data, llm, tag, userName }: any) => {
   const theme = useTheme();
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" style={{ borderTop: "1px solid #dadada" }}>
         <View
-          style={{ margin: 10, padding: 10, borderBottom: "1px solid #dadada" }}
+          style={{
+            padding: "30px 15px 10px",
+            // borderBottom: "1px solid #dadada",
+            display: "flex",
+            flexDirection: "row",
+            gap: 1,
+          }}
         >
-          <Image source="/logo/PdfLogo.png" style={{ width: 100 }} />
+          <Image src={"/logo/logo.png"} style={{ width: 30 }} />{" "}
+          <Text style={{}}>Aryabhat</Text>
         </View>
         <View
           style={{
-            margin: "0 20px",
+            padding: 10,
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
+            borderBottom: "1px solid #dadada",
           }}
         >
           <View
@@ -57,7 +70,7 @@ const GeneratePdfDocument = ({ data, llm, tag }: any) => {
                 ...styles.Text,
                 border: `1px solid ${theme.palette.primary.main}`,
                 borderRadius: 20,
-                padding: 10,
+                padding: "5px 13px",
                 color: theme.palette.primary.main,
               }}
             >
@@ -68,7 +81,7 @@ const GeneratePdfDocument = ({ data, llm, tag }: any) => {
                 ...styles.Text,
                 border: `1px solid ${theme.palette.primary.main}`,
                 borderRadius: 20,
-                padding: 10,
+                padding: "5px 13px",
                 backgroundColor: theme.palette.primary.main,
                 color: "#ffffff",
               }}
@@ -76,20 +89,35 @@ const GeneratePdfDocument = ({ data, llm, tag }: any) => {
               {llm?.model_name}
             </Text>
           </View>
-
-          <Text
+          <View
             style={{
-              ...styles.Text,
               border: `1px solid #dadada`,
               borderRadius: 20,
-              padding: 10,
+              padding: "5px 13px",
+              display: "flex",
+              flexDirection: "row",
+              gap: 5,
             }}
           >
-            {tag?.tag_name}
-          </Text>
+            <Text
+              style={{
+                height: 10,
+                width: 10,
+                backgroundColor: "#F5B700",
+                borderRadius: "50%",
+              }}
+            ></Text>
+            <Text
+              style={{
+                ...styles.Text,
+              }}
+            >
+              {tag?.tag_name}
+            </Text>
+          </View>
         </View>
 
-        <View style={{ margin: 10, padding: 10 }}>
+        <View style={{ margin: "30px 10px" }}>
           {data?.map((item: any) => {
             return (
               <View
@@ -101,26 +129,58 @@ const GeneratePdfDocument = ({ data, llm, tag }: any) => {
                   backgroundColor:
                     item.type == "aryabhat"
                       ? "#F4F4F5"
-                      : alpha(theme.palette.primary.main, 0.08),
+                      : alpha(theme.palette.primary.main, 0.1),
                   alignSelf:
                     item.type == "aryabhat" ? "flex-start" : "flex-end",
                   maxWidth: "60%",
                 }}
               >
-                <Text
-                  style={{
-                    ...styles.Text,
-                    alignSelf: "flex-end",
-                    color: "#4A4A4A",
-                  }}
-                >
-                  {item.context}
-                </Text>
+                <Text style={styles.Text}>{item.context}</Text>
               </View>
             );
           })}
+          <Text style={{ textAlign: "center", fontSize: 20 }}>
+            **** End of the Document ****
+          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 20,
+            }}
+          >
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <Image source={"/logo/link.png"} style={{ width: 10 }} />{" "}
+              <Link href="https://www.Aryabhat.ai/" style={styles.Text}>
+                https://www.Aryabhat.ai/
+              </Link>
+            </View>
+
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              {" "}
+              <Image source={"/logo/mail.png"} style={{ width: 15 }} />{" "}
+              <Text style={styles.Text}>
+                Notebook Created by {userName} at{" "}
+                {dayjs(new Date()).format("DD-MM-YYYY hh:mm")}
+              </Text>
+            </View>
+          </View>
         </View>
-        <Image source={"/logo/pdfBG.png"} style={{ width: "100%" }} />
       </Page>
     </Document>
   );

@@ -52,52 +52,66 @@ type dashboardDataTypes = {
 };
 
 function Dashboard() {
+  const [dashboardData, setDashboardData] = useState({} as dashboardDataTypes);
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     getDashboardData();
   }, []);
 
-  const [dashboardData, setDashboardData] = useState({} as dashboardDataTypes);
-
   const getDashboardData = async () => {
     try {
+      setIsLoading(true);
       const Response = await fetcher.get(END_POINTS.ADMIN.DASHBOARD);
       if (Response.status == 200) {
         setDashboardData(Response.data);
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <p>...Loading</p>;
+  }
+
   return (
     <Box>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item lg={3} sm={6} xs={1}>
           <StatsCard
-            data={{ title: "Total Users", count: dashboardData.total_users }}
+            title="Total Users"
+            data={dashboardData?.monthly_user_activity?.map(
+              (item) => item.user_count
+            )}
+          />
+        </Grid>
+        {dashboardData.Monthly_notebook_count?.length && (
+          <Grid item lg={3} sm={6} xs={1}>
+            <StatsCard
+              title="Total Notebook"
+              data={dashboardData?.Monthly_notebook_count?.map(
+                (item) => item.notebook_count
+              )}
+            />
+          </Grid>
+        )}
+        <Grid item lg={3} sm={6} xs={1}>
+          <StatsCard
+            title="Total Files Uploaded"
+            data={dashboardData?.Monthly_notebook_count?.map(
+              (item) => item.notebook_count
+            )}
           />
         </Grid>
         <Grid item lg={3} sm={6} xs={1}>
           <StatsCard
-            data={{
-              title: "Total Notebook",
-              count: dashboardData.total_notebook,
-            }}
-          />
-        </Grid>
-        <Grid item lg={3} sm={6} xs={1}>
-          <StatsCard
-            data={{
-              title: "Total Files Uploaded",
-              count: dashboardData.total_files_uploaded,
-            }}
-          />
-        </Grid>
-        <Grid item lg={3} sm={6} xs={1}>
-          <StatsCard
-            data={{
-              title: "Average Session Time",
-              count: 0,
-            }}
+            title="Average Session Time"
+            data={dashboardData?.Monthly_notebook_count?.map(
+              (item) => item.notebook_count
+            )}
           />
         </Grid>
       </Grid>

@@ -220,7 +220,7 @@ function Tags() {
                     setFilter({
                       ...filter,
                       created_date: null,
-                      tag_name: event.target.value,
+                      tag_name: event.target.value?.toLowerCase(),
                       username: "",
                     })
                   }
@@ -236,7 +236,7 @@ function Tags() {
                       ...filter,
                       created_date: null,
                       tag_name: "",
-                      username: event.target.value,
+                      username: event.target.value?.toLowerCase(),
                     })
                   }
                 />

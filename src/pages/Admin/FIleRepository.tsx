@@ -201,7 +201,7 @@ export default function FileRepository() {
                   `&${item[0]}=${
                     item[0] == "upload_date"
                       ? dayjs(item[1]).format("DD-MM-YYYY")
-                      : item[1]
+                      : (item[1] + "")?.toLowerCase()
                   }`
               )
               .join("")
@@ -444,7 +444,7 @@ export default function FileRepository() {
         sx={{ position: "relative", bottom: -10, right: 10, width: "100%" }}
         alignItems={"end"}
       >
-        {files.total_pages && (
+        {files.total_pages > 0 && (
           <Pagination
             count={files.total_pages}
             page={page}

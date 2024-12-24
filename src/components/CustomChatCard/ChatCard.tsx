@@ -28,14 +28,26 @@ import useCopyToClipboard from "../hooks/useCopyToClipboard";
 import useTextToSpeech from "../hooks/useTextToSpeech";
 
 function ChatCard({ item, loading }: { item: messageType; loading: boolean }) {
-  const theme = useTheme();
   const { isCopied, copyToClipboard } = useCopyToClipboard();
   const { user } = useAuthContext();
   const dispatch = useDispatch();
   const { CHAT } = useSelector((state: RootState) => state.chat);
+  console.log(item);
 
-  const { isSpeaking, handlePlay, handlePause, handleStop, isPaused } =
-    useTextToSpeech(item.context + "");
+  const { isSpeaking, handlePlay, handleStop } = useTextToSpeech(
+    item.context + ""
+  );
+  // const handleClick = (filename: string) => {
+  //   alert(filename);
+  // };
+
+  // const updatedText = (item.context + "").replace(
+  //   /{(.*?)}/g, // Regex to find the metadata part
+  //   (match: any) => {
+  //     const filename = match.match(/'filename': '([^']+)'/)[1];
+  //     return `<a href="#" onClick="alert('${filename}')">Click to view</a>`;
+  //   }
+  // );
 
   //toggle like
   const toggleIsLike = async (msgId: string) => {
@@ -89,7 +101,7 @@ function ChatCard({ item, loading }: { item: messageType; loading: boolean }) {
     >
       <Card
         sx={{
-          p: 2,
+          px: 2,
           maxWidth: { xs: "80%", lg: "60%" },
           boxShadow: "none",
           overflow: "visible",
@@ -100,7 +112,18 @@ function ChatCard({ item, loading }: { item: messageType; loading: boolean }) {
           //     : alpha(theme.palette.primary.main, 0.1),
         }}
       >
-        <Typography>{item.context}</Typography>
+        <Typography>
+          {" "}
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              fontFamily: "Open Sans, sans-serif",
+            }}
+          >
+            {item.context}
+          </pre>
+        </Typography>
         {item.type == "aryabhat" && (
           <Box sx={{ position: "absolute", bottom: -40, right: 0 }}>
             {isSpeaking ? (

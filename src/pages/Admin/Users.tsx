@@ -1,10 +1,12 @@
 import { Icon } from "@iconify/react";
+import { Close } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
   Box,
   Button,
   Chip,
+  Divider,
   FormControlLabel,
   IconButton,
   List,
@@ -67,6 +69,13 @@ type usersList = {
   email: string;
   roles: string;
   license: boolean;
+  user_profile_picture: string;
+  firstname: string;
+  lastname: string;
+  gender: string;
+  city: string;
+  state: string;
+  country: string;
 };
 
 type filterTypes = {
@@ -121,7 +130,8 @@ function Users() {
         ...Object.entries(filters)
           .filter((item) => item[1])
           ?.map((item) => ({
-            [item[0]]: item[0] == "license" ? item[1] : [item[1]],
+            [item[0]]:
+              item[0] == "license" ? item[1] : [item[1]?.toLowerCase()],
           }))[0],
       };
       const Response = await fetcher.post(
@@ -343,7 +353,7 @@ function Users() {
         sx={{ position: "relative", bottom: -10, right: 10, width: "100%" }}
         alignItems={"end"}
       >
-        {users.total_pages && (
+        {users.total_pages > 0 && (
           <Pagination
             count={users.total_pages}
             page={page}
@@ -440,6 +450,11 @@ function UserDetail({
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
+  //modal
+  const [openModal1, setOpenModal1] = useState(false);
+  const handleOpenModal1 = () => setOpenModal1(true);
+  const handleCloseModal1 = () => setOpenModal1(false);
+
   const toggleLicense = async () => {
     setIsLoading(true);
     try {
@@ -485,6 +500,18 @@ function UserDetail({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const customStack = (key: string, value: string) => {
+    return (
+      <>
+        <Stack flexDirection={"row"} justifyContent={"space-between"} mt={1}>
+          <Typography>{key}</Typography>
+          <Typography>{value}</Typography>
+        </Stack>
+        <Divider />
+      </>
+    );
   };
 
   return (
@@ -566,7 +593,9 @@ function UserDetail({
                 </CustomListItemText>
               )}
 
-              <CustomListItemText>View</CustomListItemText>
+              <CustomListItemText onClick={handleOpenModal1}>
+                View
+              </CustomListItemText>
             </List>
           </Popover>
         </TableCell>
@@ -602,6 +631,49 @@ function UserDetail({
           <Stack direction={"row"} justifyContent="end" gap={2} mt={3}>
             <Button variant="outlined" onClick={handleCloseModal}>
               Cancel
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
+
+      <Modal
+        open={openModal1}
+        onClose={handleCloseModal1}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography variant="h4">User Detail</Typography>
+            <IconButton onClick={handleCloseModal1}>
+              <Close />
+            </IconButton>
+          </Stack>
+          <Stack>
+            <img
+              src={`data:image/png;base64,${item?.user_profile_picture}`}
+              style={{
+                height: 150,
+                width: 150,
+                borderRadius: "50%",
+                margin: "auto",
+              }}
+            />
+            {customStack("First Name", sentenceCase(item.firstname || ""))}
+            {customStack("Last Name", sentenceCase(item.lastname || ""))}
+            {customStack("Gender", sentenceCase(item.gender || ""))}
+            {customStack("Email", item.email)}
+            {customStack("Country", sentenceCase(item.country || ""))}
+            {customStack("State", sentenceCase(item.state || ""))}
+            {customStack("City", sentenceCase(item.city || ""))}
+          </Stack>
+          <Stack direction={"row"} justifyContent="end" gap={2} mt={3}>
+            <Button variant="outlined" onClick={handleCloseModal1}>
+              Close
             </Button>
           </Stack>
         </Box>

@@ -35,6 +35,7 @@ import { RootState } from "src/redux/reducers";
 import { useDispatch } from "react-redux";
 import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
 import { CustomListItemButton } from "src/theme/globalStyles";
+import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 
 const PrettoSlider = styled(Slider)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -222,104 +223,105 @@ export default function Settings() {
   };
 
   return (
-    <Box onClick={() => collapse && setCollapse(false)}>
-      <Stack
-        direction={"row"}
-        alignItems={"center"}
-        justifyContent={"space-between"}
-      >
-        <Typography>Themes Setting</Typography>
-        <LoadingButton
-          variant="contained"
-          onClick={applySetting}
-          loading={isLoading}
-        >
-          Apply Theme
-        </LoadingButton>
-      </Stack>
-
-      <Card
-        sx={{
-          p: 2,
-          boxShadow: "none",
-          borderRadius: 2,
-          mt: 2,
-          display: "flex",
-          flexDirection: "column",
-          bgcolor: theme.palette.background.default,
-          gap: 2,
-        }}
-      >
+    <RoleBasedGaurd roles={["Admin", "SuperAdmin"]}>
+      <Box onClick={() => collapse && setCollapse(false)}>
         <Stack
           direction={"row"}
-          justifyContent={"space-between"}
           alignItems={"center"}
+          justifyContent={"space-between"}
         >
-          <Typography>Logo</Typography>
-          <img src={`data:image/png;base64,${themeData.Theme_logo}`} />
+          <Typography>Themes Setting</Typography>
+          <LoadingButton
+            variant="contained"
+            onClick={applySetting}
+            loading={isLoading}
+          >
+            Apply Theme
+          </LoadingButton>
         </Stack>
-        <Divider />
 
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
+        <Card
+          sx={{
+            p: 2,
+            boxShadow: "none",
+            borderRadius: 2,
+            mt: 2,
+            display: "flex",
+            flexDirection: "column",
+            bgcolor: theme.palette.background.default,
+            gap: 2,
+          }}
         >
-          <Typography>Font Size</Typography>
-          <Stack sx={{ width: 300 }}>
-            <PrettoSlider
-              valueLabelDisplay="auto"
-              aria-label="pretto slider"
-              min={10}
-              max={24}
-              value={themeDefaultKeys.Theme_font_size}
-              onChange={(e: any) =>
-                setThemeDefaultKeys({
-                  ...themeDefaultKeys,
-                  Theme_font_size: Number(e.target.value),
-                })
-              }
-            />
-            <Stack flexDirection={"row"} justifyContent={"space-between"}>
-              <Typography fontSize={12}>A</Typography>
-              <Typography fontSize={15}>Normal</Typography>
-              <Typography fontSize={18}>A</Typography>
-            </Stack>
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography>Logo</Typography>
+            <img src={`data:image/png;base64,${themeData.Theme_logo}`} />
           </Stack>
-        </Stack>
-        <Divider />
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-        >
-          <Typography>Primary Colors</Typography>
-          <Stack flexDirection={"row"} gap={1}>
-            {preset.map((item) => (
-              <span
-                style={{
-                  height: 30,
-                  width: 30,
-                  borderRadius: "50%",
-                  backgroundColor: item.main,
-                  cursor: "pointer",
-                  border:
-                    themeDefaultKeys.Theme_primary_colour == item.main
-                      ? `3px solid ${theme.palette.text.primary}`
-                      : "none",
-                }}
-                onClick={() =>
+          <Divider />
+
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography>Font Size</Typography>
+            <Stack sx={{ width: 300 }}>
+              <PrettoSlider
+                valueLabelDisplay="auto"
+                aria-label="pretto slider"
+                min={10}
+                max={24}
+                value={themeDefaultKeys.Theme_font_size}
+                onChange={(e: any) =>
                   setThemeDefaultKeys({
                     ...themeDefaultKeys,
-                    Theme_primary_colour: item.main,
+                    Theme_font_size: Number(e.target.value),
                   })
                 }
-              ></span>
-            ))}
+              />
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography fontSize={12}>A</Typography>
+                <Typography fontSize={15}>Normal</Typography>
+                <Typography fontSize={18}>A</Typography>
+              </Stack>
+            </Stack>
           </Stack>
-        </Stack>
-        <Divider />
-        {/* <Stack
+          <Divider />
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography>Primary Colors</Typography>
+            <Stack flexDirection={"row"} gap={1}>
+              {preset.map((item) => (
+                <span
+                  style={{
+                    height: 30,
+                    width: 30,
+                    borderRadius: "50%",
+                    backgroundColor: item.main,
+                    cursor: "pointer",
+                    border:
+                      themeDefaultKeys.Theme_primary_colour == item.main
+                        ? `3px solid ${theme.palette.text.primary}`
+                        : "none",
+                  }}
+                  onClick={() =>
+                    setThemeDefaultKeys({
+                      ...themeDefaultKeys,
+                      Theme_primary_colour: item.main,
+                    })
+                  }
+                ></span>
+              ))}
+            </Stack>
+          </Stack>
+          <Divider />
+          {/* <Stack
           direction={"row"}
           justifyContent={"space-between"}
           alignItems={"center"}
@@ -357,293 +359,298 @@ export default function Settings() {
           </Stack>
         </Stack>
         <Divider /> */}
-      </Card>
+        </Card>
 
-      <Stack direction={"row"} alignItems={"center"} mt={3}>
-        <Typography>System Setting</Typography>
-      </Stack>
-
-      {/* System Setting */}
-      <Card
-        sx={{
-          p: 2,
-          boxShadow: "none",
-          borderRadius: 2,
-          mt: 2,
-          display: "flex",
-          flexDirection: "column",
-          bgcolor: theme.palette.background.default,
-          gap: 2,
-        }}
-      >
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-        >
-          <Typography>Reset All Settings</Typography>
-          <LoadingButton variant="contained" onClick={resetTheme}>
-            Reset Now
-          </LoadingButton>
+        <Stack direction={"row"} alignItems={"center"} mt={3}>
+          <Typography>System Setting</Typography>
         </Stack>
-      </Card>
 
-      <Stack direction={"row"} alignItems={"center"} mt={3}>
-        <Typography>Chat Setting</Typography>
-      </Stack>
-
-      {/* System Setting */}
-      <Card
-        sx={{
-          p: 2,
-          boxShadow: "none",
-          borderRadius: 2,
-          mt: 2,
-          display: "flex",
-          flexDirection: "column",
-          bgcolor: theme.palette.background.default,
-          gap: 2,
-          overflow: "visible",
-        }}
-      >
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
+        {/* System Setting */}
+        <Card
+          sx={{
+            p: 2,
+            boxShadow: "none",
+            borderRadius: 2,
+            mt: 2,
+            display: "flex",
+            flexDirection: "column",
+            bgcolor: theme.palette.background.default,
+            gap: 2,
+          }}
         >
-          <Typography>Archived Chat Retention Period</Typography>
-          <List
-            sx={{
-              minWidth: "fit-content",
-              padding: 0,
-              position: "relative",
-            }}
-            aria-labelledby="nested-list-subheader"
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
           >
-            <LoadingButton
-              variant="contained"
-              onClick={() => setCollapse(!collapse)}
-            >
-              {themeDefaultKeys.Setting_archive_record} Days (Default)
+            <Typography>Reset All Settings</Typography>
+            <LoadingButton variant="contained" onClick={resetTheme}>
+              Reset Now
             </LoadingButton>
-            <Collapse
-              in={collapse}
-              timeout="auto"
-              unmountOnExit
+          </Stack>
+        </Card>
+
+        <Stack direction={"row"} alignItems={"center"} mt={3}>
+          <Typography>Chat Setting</Typography>
+        </Stack>
+
+        {/* System Setting */}
+        <Card
+          sx={{
+            p: 2,
+            boxShadow: "none",
+            borderRadius: 2,
+            mt: 2,
+            display: "flex",
+            flexDirection: "column",
+            bgcolor: theme.palette.background.default,
+            gap: 2,
+            overflow: "visible",
+          }}
+        >
+          <Stack
+            direction={"row"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+          >
+            <Typography>Archived Chat Retention Period</Typography>
+            <List
               sx={{
-                position: "absolute",
-                width: "100%",
+                minWidth: "fit-content",
+                padding: 0,
+                position: "relative",
               }}
+              aria-labelledby="nested-list-subheader"
             >
-              <List
-                component="div"
-                disablePadding
+              <LoadingButton
+                variant="contained"
+                onClick={() => setCollapse(!collapse)}
+              >
+                {themeDefaultKeys.Setting_archive_record} Days (Default)
+              </LoadingButton>
+              <Collapse
+                in={collapse}
+                timeout="auto"
+                unmountOnExit
                 sx={{
-                  background: theme.palette.background.neutral,
-                  zIndex: 9,
-                  borderBottomLeftRadius: 10,
-                  borderBottomRightRadius: 10,
+                  position: "absolute",
+                  width: "100%",
                 }}
               >
-                {[30, 45, 60]
-                  .filter(
-                    (item) => item !== themeDefaultKeys.Setting_archive_record
-                  )
-                  .map((item) => (
-                    <CustomListItemButton
-                      sx={{
-                        pl: 2,
-                        color: "text.primary",
-                        "& :hover": {
-                          color: "background.default",
-                        },
-                      }}
-                      onClick={() => setAchiveDefaultDays(item)}
-                    >
-                      <ListItemText primary={item + " days"} />
-                    </CustomListItemButton>
-                  ))}
-              </List>
-            </Collapse>
-          </List>
-        </Stack>
-      </Card>
+                <List
+                  component="div"
+                  disablePadding
+                  sx={{
+                    background: theme.palette.background.neutral,
+                    zIndex: 9,
+                    borderBottomLeftRadius: 10,
+                    borderBottomRightRadius: 10,
+                  }}
+                >
+                  {[30, 45, 60]
+                    .filter(
+                      (item) => item !== themeDefaultKeys.Setting_archive_record
+                    )
+                    .map((item) => (
+                      <CustomListItemButton
+                        sx={{
+                          pl: 2,
+                          color: "text.primary",
+                          "& :hover": {
+                            color: "background.default",
+                          },
+                        }}
+                        onClick={() => setAchiveDefaultDays(item)}
+                      >
+                        <ListItemText primary={item + " days"} />
+                      </CustomListItemButton>
+                    ))}
+                </List>
+              </Collapse>
+            </List>
+          </Stack>
+        </Card>
 
-      <Card
-        sx={{
-          p: 2,
-          boxShadow: "none",
-          borderRadius: 2,
-          mt: 2,
-          display: "flex",
-          flexDirection: "column",
-          bgcolor: theme.palette.background.default,
-          gap: 2,
-        }}
-      >
-        <Stack
-          direction={"row"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
+        <Card
+          sx={{
+            p: 2,
+            boxShadow: "none",
+            borderRadius: 2,
+            mt: 2,
+            display: "flex",
+            flexDirection: "column",
+            bgcolor: theme.palette.background.default,
+            gap: 2,
+          }}
         >
-          <Typography>SMTP Details</Typography>
-          <LoadingButton variant="contained" onClick={handleOpen}>
-            Configure
-          </LoadingButton>
-        </Stack>
-      </Card>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
           <Stack
-            flexDirection={"row"}
+            direction={"row"}
             justifyContent={"space-between"}
             alignItems={"center"}
           >
             <Typography>SMTP Details</Typography>
-            <IconButton onClick={handleClose}>
-              <Close />
-            </IconButton>
+            <LoadingButton variant="contained" onClick={handleOpen}>
+              Configure
+            </LoadingButton>
           </Stack>
-          <Divider sx={{ my: 1 }} />
-          <FormProvider methods={methods}>
-            <Grid container sx={{ alignItems: "center" }}>
-              <Grid item xs={4}>
-                Server Address (SMTP)
-              </Grid>
-              <Grid item xs={8}>
-                <RHFTextField
-                  name="serverAddress"
-                  value={themeDefaultKeys.SMTP_server_address}
-                  onChange={(e) => {
-                    setThemeDefaultKeys({
-                      ...themeDefaultKeys,
-                      SMTP_server_address: e.target.value,
-                    });
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Divider sx={{ my: 2 }} />
-            <Grid container sx={{ alignItems: "center" }}>
-              <Grid item xs={4}>
-                Port
-              </Grid>
-              <Grid item xs={8}>
-                <RHFTextField
-                  name="port"
-                  type=""
-                  value={themeDefaultKeys.SMTP_server_port}
-                  onChange={(e) => {
-                    setThemeDefaultKeys({
-                      ...themeDefaultKeys,
-                      SMTP_server_port: Number(e.target.value),
-                    });
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Divider sx={{ my: 2 }} />
-            <Grid container sx={{ alignItems: "center" }}>
-              <Grid item xs={4}>
-                Security
-              </Grid>
-              <Grid item xs={8}>
-                <RHFRadioGroup
-                  name="security"
-                  options={[
-                    { label: "StartTLS", value: "StartTLS" },
-                    { label: "SSL/TLS", value: "SSL/TLS" },
-                    { label: "None", value: "None" },
-                  ]}
-                  value={themeDefaultKeys.SMTP_server_sequrity}
-                  onChange={(e) => {
-                    setThemeDefaultKeys({
-                      ...themeDefaultKeys,
-                      SMTP_server_sequrity: e.target.value,
-                    });
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Divider sx={{ my: 2 }} />
-            <Grid container sx={{ alignItems: "center" }}>
-              <Grid item xs={4}>
-                Sender Email Address
-              </Grid>
-              <Grid item xs={8}>
-                <RHFTextField
-                  name="senderEmail"
-                  value={themeDefaultKeys.SMTP_email_address}
-                  onChange={(e) => {
-                    setThemeDefaultKeys({
-                      ...themeDefaultKeys,
-                      SMTP_email_address: e.target.value,
-                    });
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Divider sx={{ my: 2 }} />
-            <Grid container sx={{ alignItems: "center" }}>
-              <Grid item xs={4}>
-                Username
-              </Grid>
-              <Grid item xs={8}>
-                <RHFTextField
-                  name="username"
-                  value={themeDefaultKeys.SMTP_username}
-                  onChange={(e) => {
-                    setThemeDefaultKeys({
-                      ...themeDefaultKeys,
-                      SMTP_username: e.target.value,
-                    });
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Divider sx={{ my: 2 }} />
-            <Grid container sx={{ alignItems: "center" }}>
-              <Grid item xs={4}>
-                Password
-              </Grid>
-              <Grid item xs={8}>
-                <RHFTextField
-                  name="password"
-                  type="password"
-                  value={themeDefaultKeys.SMTP_password}
-                  onChange={(e) => {
-                    setThemeDefaultKeys({
-                      ...themeDefaultKeys,
-                      SMTP_password: e.target.value,
-                    });
-                  }}
-                />
-              </Grid>
-            </Grid>
-            <Divider sx={{ my: 2 }} />
-            <Stack flexDirection={"row"} justifyContent={"flex-end"} gap={2}>
-              <LoadingButton variant="contained" disabled onClick={handleClose}>
-                Send Test Email
-              </LoadingButton>
-              <LoadingButton
-                variant="contained"
-                loading={isLoading}
-                onClick={() => {
-                  applySetting();
-                  handleClose();
-                }}
-              >
-                Save
-              </LoadingButton>
+        </Card>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Stack
+              flexDirection={"row"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+            >
+              <Typography>SMTP Details</Typography>
+              <IconButton onClick={handleClose}>
+                <Close />
+              </IconButton>
             </Stack>
-          </FormProvider>
-        </Box>
-      </Modal>
-    </Box>
+            <Divider sx={{ my: 1 }} />
+            <FormProvider methods={methods}>
+              <Grid container sx={{ alignItems: "center" }}>
+                <Grid item xs={4}>
+                  Server Address (SMTP)
+                </Grid>
+                <Grid item xs={8}>
+                  <RHFTextField
+                    name="serverAddress"
+                    value={themeDefaultKeys.SMTP_server_address}
+                    onChange={(e) => {
+                      setThemeDefaultKeys({
+                        ...themeDefaultKeys,
+                        SMTP_server_address: e.target.value,
+                      });
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Grid container sx={{ alignItems: "center" }}>
+                <Grid item xs={4}>
+                  Port
+                </Grid>
+                <Grid item xs={8}>
+                  <RHFTextField
+                    name="port"
+                    type=""
+                    value={themeDefaultKeys.SMTP_server_port}
+                    onChange={(e) => {
+                      setThemeDefaultKeys({
+                        ...themeDefaultKeys,
+                        SMTP_server_port: Number(e.target.value),
+                      });
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Grid container sx={{ alignItems: "center" }}>
+                <Grid item xs={4}>
+                  Security
+                </Grid>
+                <Grid item xs={8}>
+                  <RHFRadioGroup
+                    name="security"
+                    options={[
+                      { label: "StartTLS", value: "StartTLS" },
+                      { label: "SSL/TLS", value: "SSL/TLS" },
+                      { label: "None", value: "None" },
+                    ]}
+                    value={themeDefaultKeys.SMTP_server_sequrity}
+                    onChange={(e) => {
+                      setThemeDefaultKeys({
+                        ...themeDefaultKeys,
+                        SMTP_server_sequrity: e.target.value,
+                      });
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Grid container sx={{ alignItems: "center" }}>
+                <Grid item xs={4}>
+                  Sender Email Address
+                </Grid>
+                <Grid item xs={8}>
+                  <RHFTextField
+                    name="senderEmail"
+                    value={themeDefaultKeys.SMTP_email_address}
+                    onChange={(e) => {
+                      setThemeDefaultKeys({
+                        ...themeDefaultKeys,
+                        SMTP_email_address: e.target.value,
+                      });
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Grid container sx={{ alignItems: "center" }}>
+                <Grid item xs={4}>
+                  Username
+                </Grid>
+                <Grid item xs={8}>
+                  <RHFTextField
+                    name="username"
+                    value={themeDefaultKeys.SMTP_username}
+                    onChange={(e) => {
+                      setThemeDefaultKeys({
+                        ...themeDefaultKeys,
+                        SMTP_username: e.target.value,
+                      });
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Grid container sx={{ alignItems: "center" }}>
+                <Grid item xs={4}>
+                  Password
+                </Grid>
+                <Grid item xs={8}>
+                  <RHFTextField
+                    name="password"
+                    type="password"
+                    value={themeDefaultKeys.SMTP_password}
+                    onChange={(e) => {
+                      setThemeDefaultKeys({
+                        ...themeDefaultKeys,
+                        SMTP_password: e.target.value,
+                      });
+                    }}
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Stack flexDirection={"row"} justifyContent={"flex-end"} gap={2}>
+                <LoadingButton
+                  variant="contained"
+                  disabled
+                  onClick={handleClose}
+                >
+                  Send Test Email
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  loading={isLoading}
+                  onClick={() => {
+                    applySetting();
+                    handleClose();
+                  }}
+                >
+                  Save
+                </LoadingButton>
+              </Stack>
+            </FormProvider>
+          </Box>
+        </Modal>
+      </Box>
+    </RoleBasedGaurd>
   );
 }

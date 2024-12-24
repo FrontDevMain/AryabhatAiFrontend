@@ -35,6 +35,7 @@ import fetcher from "src/api/fetcher";
 
 import { Filters } from "src/assets/icons/filter";
 import { Plus } from "src/assets/icons/Plus";
+import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { Avatar } from "src/components/avatar";
 import {
@@ -190,7 +191,7 @@ function Users() {
   };
 
   return (
-    <>
+    <RoleBasedGaurd roles={["Admin", "SuperAdmin"]}>
       <Stack
         direction={"row"}
         justifyContent={"space-between"}
@@ -420,7 +421,7 @@ function Users() {
           </Stack>
         </Box>
       </Modal>
-    </>
+    </RoleBasedGaurd>
   );
 }
 

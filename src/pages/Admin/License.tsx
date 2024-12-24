@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
+import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fetchLicenseSuccess } from "src/redux/actions/license/LicenseActions";
 import { RootState } from "src/redux/reducers";
@@ -94,7 +95,7 @@ export default function License() {
   };
 
   return (
-    <>
+    <RoleBasedGaurd roles={["Admin", "SuperAdmin"]}>
       <Stack
         direction={"row"}
         justifyContent={"space-between"}
@@ -252,6 +253,6 @@ export default function License() {
           </Grid>
         </Grid>
       </Card>
-    </>
+    </RoleBasedGaurd>
   );
 }

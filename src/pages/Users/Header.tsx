@@ -104,7 +104,7 @@ function HeaderDashboard() {
             sx={{
               padding: 0,
               backgroundColor: theme.palette.background.default,
-              borderRadius: 20,
+              borderRadius: open ? "20px 20px 0 0" : 20,
               overflow: "clip",
               color: theme.palette.text.primary, // Hover background
               zIndex: 9999,

@@ -59,7 +59,6 @@ export const fetchNotebookList = (userId: string): any => {
           })
         )
       );
-      return Response.data.chat_list[0];
     } catch (error) {
       dispatch(fetchNotebookListFailure());
     }

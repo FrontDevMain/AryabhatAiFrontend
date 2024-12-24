@@ -11,12 +11,9 @@ import Logo from "src/components/logo";
 import AdminNavbar from "./navbar/admin/AdminNavbar";
 import ChangeMode from "./navbar/common/ChangeMode";
 import AccountPopover from "./navbar/common/AccountPopover";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import UserNavbar from "./navbar/user/UserNavbar";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { useEffect } from "react";
-import { PATH_AFTER_ADMIN_LOGIN } from "src/config";
-import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 
 const DashboardLayout = () => {
   const { user } = useAuthContext();
@@ -112,9 +109,7 @@ const DashboardLayout = () => {
             overflow: "scroll",
           }}
         >
-          <RoleBasedGaurd>
-            <Outlet />
-          </RoleBasedGaurd>
+          <Outlet />
         </Box>
       </Box>
     </Box>

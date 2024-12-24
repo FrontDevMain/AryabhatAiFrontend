@@ -39,6 +39,7 @@ import fetcher from "src/api/fetcher";
 import { END_POINTS } from "src/api/EndPoints";
 import { fetchLlmSuccess } from "src/redux/actions/llm/LlmActions";
 import { useDispatch } from "react-redux";
+import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 
 const Android12Switch = styled(Switch)(({ theme }) => ({
   padding: 8,
@@ -150,7 +151,7 @@ export default function LLM() {
   };
 
   return (
-    <>
+    <RoleBasedGaurd roles={["Admin", "SuperAdmin"]}>
       <Stack
         direction={"row"}
         justifyContent={"space-between"}
@@ -401,7 +402,7 @@ export default function LLM() {
           </Stack>
         </Box>
       </Modal>
-    </>
+    </RoleBasedGaurd>
   );
 }
 

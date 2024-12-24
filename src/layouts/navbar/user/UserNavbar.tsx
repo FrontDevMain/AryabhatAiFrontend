@@ -17,11 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import {
-  BookmarksSharp,
-  LibraryBooksOutlined,
-  PushPinOutlined,
-} from "@mui/icons-material";
+import { PushPinOutlined } from "@mui/icons-material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/reducers";
@@ -44,6 +40,8 @@ import {
   CustomListItemText,
 } from "src/theme/globalStyles";
 import { Loading } from "src/assets/icons/loading";
+import { PATH_USER_DASHBOARD } from "src/routes/path";
+import { useNavigate } from "react-router-dom";
 
 const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Rounded corners
@@ -73,6 +71,14 @@ const style = {
   p: 3,
 };
 
+type navbarType = {
+  title: string;
+  path: string | any;
+  icon: string;
+  roles: [string];
+  children: any[];
+};
+
 export default function UserNavbar() {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -82,33 +88,22 @@ export default function UserNavbar() {
     (state: RootState) => state.notebook
   );
 
-  const [navbarList, setNavbarList] = useState<
-    {
-      segment: string;
-      title: string;
-      icon: any;
-      children: any[];
-    }[]
-  >([]);
+  const [navbarList, setNavbarList] = useState([] as navbarType[]);
 
   useEffect(() => {
-    if (notebookList?.length) {
-      const { user_id, chat_id } = notebookList.filter(
-        (chat) => !chat.is_archieved
-      )[0];
-      dispatch(fetchChat(user_id, chat_id));
-    }
     setNavbarList([
       {
-        segment: "notebook",
         title: "Notebook",
-        icon: <LibraryBooksOutlined />,
+        path: PATH_USER_DASHBOARD.notebook,
+        icon: "dashboard",
+        roles: ["User"],
         children: notebookList.filter((item) => !item.is_archieved),
       },
       {
-        segment: "archive",
         title: "Archive",
-        icon: <BookmarksSharp />,
+        path: PATH_USER_DASHBOARD.dashboard,
+        icon: "users",
+        roles: ["User"],
         children: notebookList.filter((item) => item.is_archieved),
       },
     ]);
@@ -142,25 +137,35 @@ export default function UserNavbar() {
         component="nav"
         aria-labelledby="nested-list-subheader"
       >
-        {navbarList.map((item) => {
+        {navbarList?.map((item) => {
           return (
             <>
               <CustomListItemButton
                 onClick={() => setActive(item.title)}
                 selected={active == item.title}
               >
-                <ListItemText primary={item.title} />
                 <Tooltip title="New Chat" placement="top">
-                  <Icon
+                  <Box
+                    component="span"
+                    className="svg-color"
                     onClick={(e) => {
                       e.stopPropagation();
                       createNewNotebook(user.user_id);
                     }}
-                  >
-                    {item.icon}
-                  </Icon>
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      mr: 1,
+                      display: "inline-block",
+                      bgcolor: "currentColor",
+                      mask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
+                      WebkitMask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
+                    }}
+                  />
                 </Tooltip>
+                <ListItemText primary={item.title} />
               </CustomListItemButton>
+
               {!loading ? (
                 <Collapse
                   in={active == item.title}
@@ -190,6 +195,7 @@ export default function UserNavbar() {
 
 const SubNotebook = ({ child }: { child: NotebookList }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useAuthContext();
 
   const [headerName, setHeaderName] = useState("");
@@ -221,8 +227,11 @@ const SubNotebook = ({ child }: { child: NotebookList }) => {
         <CustomListSubItemButton
           sx={{ pl: 2 }}
           onClick={() =>
-            child.chat_id !== CHAT.chat_id &&
-            dispatch(fetchChat(user.user_id, child.chat_id))
+            navigate(
+              `/user/${child.is_archieved ? "archive" : "notebook"}/${
+                child.chat_id
+              }`
+            )
           }
           selected={CHAT.chat_id == child.chat_id}
         >

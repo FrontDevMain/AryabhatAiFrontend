@@ -51,6 +51,8 @@ export const Settings = Loadable(lazy(() => import("../pages/Admin/Settings")));
 export const UserDashboard = Loadable(
   lazy(() => import("../pages/Users/UserDashboard"))
 );
+export const Notebook = Loadable(lazy(() => import("../pages/Users/Notebook")));
+export const Archive = Loadable(lazy(() => import("../pages/Users/Archive")));
 export const NotFoundPage = Loadable(
   lazy(() => import("../pages/NotFoundPage"))
 );

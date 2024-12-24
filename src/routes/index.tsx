@@ -1,6 +1,7 @@
 import { Navigate, useRoutes } from "react-router-dom";
 import DashboardLayout from "src/layouts/DashboardLayout";
 import {
+  Archive,
   Connectors,
   Dashboard,
   FIleRepository,
@@ -10,6 +11,7 @@ import {
   LLM,
   LoginPage,
   NewPassword,
+  Notebook,
   NotFoundPage,
   OtherStorageDevices,
   Settings,
@@ -76,7 +78,8 @@ export default function Router() {
       children: [
         { element: <Navigate to={"/user/dashboard"} replace />, index: true },
         { path: "dashboard", element: <UserDashboard /> },
-        // { path: "dashboard/:id", element: <UserDashboard /> },
+        { path: "notebook/:id", element: <Notebook /> },
+        { path: "archive/:id", element: <Archive /> },
         { path: "*", element: <NotFoundPage /> },
       ],
     },

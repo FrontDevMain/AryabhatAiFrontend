@@ -33,5 +33,7 @@ export const PATH_ADMIN_DASHBOARD = {
 export const PATH_USER_DASHBOARD = {
   root: ROOTS_USER_DASHBOARD,
   dashboard: path(ROOTS_USER_DASHBOARD, `/dashboard`),
+  notebook: (id: string) => path(ROOTS_USER_DASHBOARD, `/notebook/${id}`),
+  archive: (id: string) => path(ROOTS_USER_DASHBOARD, `/archive/${id}`),
   chatDashboard: (id: string) => path(ROOTS_USER_DASHBOARD, `/dashboard/${id}`),
 };

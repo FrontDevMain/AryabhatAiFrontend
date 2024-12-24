@@ -54,6 +54,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { sentenceCase } from "change-case";
+import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -250,7 +251,7 @@ export default function FileRepository() {
   };
 
   return (
-    <>
+    <RoleBasedGaurd roles={["Admin", "SuperAdmin"]}>
       <Stack
         direction={"row"}
         justifyContent={"space-between"}
@@ -543,7 +544,7 @@ export default function FileRepository() {
           )}
         </Box>
       </Modal>
-    </>
+    </RoleBasedGaurd>
   );
 }
 

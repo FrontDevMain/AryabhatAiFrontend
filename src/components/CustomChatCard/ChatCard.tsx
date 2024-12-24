@@ -32,7 +32,6 @@ function ChatCard({ item, loading }: { item: messageType; loading: boolean }) {
   const { user } = useAuthContext();
   const dispatch = useDispatch();
   const { CHAT } = useSelector((state: RootState) => state.chat);
-  console.log(item);
 
   const { isSpeaking, handlePlay, handleStop } = useTextToSpeech(
     item.context + ""

@@ -1,16 +1,17 @@
-import { Box, Card, Stack, Typography } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import { Box, Stack } from "@mui/material";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { END_POINTS } from "src/api/EndPoints";
-import fetcher from "src/api/fetcher";
+import { Navigate } from "react-router-dom";
 import { Loading } from "src/assets/icons/loading";
+import { useAuthContext } from "src/auth/useAuthContext";
 import ChatCard from "src/components/CustomChatCard/ChatCard";
-import { fetchChatSuccess } from "src/redux/actions/chat/ChatActions";
+import { fetchChat } from "src/redux/actions/chat/ChatActions";
 import { RootState } from "src/redux/reducers";
 
-function ChatBox() {
+function ChatBox({ chatid }: { chatid: string | undefined }) {
   const elementRef = useRef();
+  const { user } = useAuthContext();
   const dispatch = useDispatch();
   const { loading, CHAT, queryLoading } = useSelector(
     (state: RootState) => state.chat
@@ -22,6 +23,12 @@ function ChatBox() {
       element.scrollTop = element.scrollHeight;
     }
   }, [CHAT?.messages?.length]);
+
+  useEffect(() => {
+    if (chatid) {
+      dispatch(fetchChat(user.user_id, chatid));
+    }
+  }, [chatid]);
 
   if (loading) {
     return (

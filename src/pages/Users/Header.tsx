@@ -38,6 +38,7 @@ import {
 import { updateSelectedTag } from "src/redux/actions/tags/TagsActions";
 import { RootState } from "src/redux/reducers";
 import { CustomListItemText } from "src/theme/globalStyles";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
 
 const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -251,34 +252,40 @@ function HeaderDashboard() {
             </Stack>
           </Collapse>
         </List>
-
-        <PDFDownloadLink
-          document={
-            <GeneratePdfDocument
-              data={CHAT.messages}
-              llm={selectedLlm}
-              tag={selectedTag}
-              userName={user.user_firstname}
-            />
-          }
-          fileName={`${
-            notebookList.find((item) => item.chat_id == CHAT.chat_id)
-              ?.chat_header
-          }.pdf`}
-        >
-          <IconButton
-            sx={{ bgcolor: theme.palette.background.default, height: "100%" }}
-          >
-            <SystemUpdateAltOutlined />
-          </IconButton>
-        </PDFDownloadLink>
-        <IconButton
-          sx={{ bgcolor: theme.palette.background.default }}
-          aria-describedby={id}
-          onClick={handleOpenPopover}
-        >
-          <MoreHoriz />
-        </IconButton>
+        {CHAT.chat_id && (
+          <>
+            <PDFDownloadLink
+              document={
+                <GeneratePdfDocument
+                  data={CHAT.messages}
+                  llm={selectedLlm}
+                  tag={selectedTag}
+                  userName={user.user_firstname}
+                />
+              }
+              fileName={`${
+                notebookList.find((item) => item.chat_id == CHAT.chat_id)
+                  ?.chat_header
+              }.pdf`}
+            >
+              <IconButton
+                sx={{
+                  bgcolor: theme.palette.background.default,
+                  height: "100%",
+                }}
+              >
+                <SystemUpdateAltOutlined />
+              </IconButton>
+            </PDFDownloadLink>
+            <IconButton
+              sx={{ bgcolor: theme.palette.background.default }}
+              aria-describedby={id}
+              onClick={handleOpenPopover}
+            >
+              <MoreHoriz />
+            </IconButton>
+          </>
+        )}
         <Popover
           id={id}
           anchorEl={anchorEl}

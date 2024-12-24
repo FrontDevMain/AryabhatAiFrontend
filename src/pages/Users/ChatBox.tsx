@@ -2,7 +2,6 @@ import { Box, Stack } from "@mui/material";
 import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
 import { Loading } from "src/assets/icons/loading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ChatCard from "src/components/CustomChatCard/ChatCard";
@@ -22,7 +21,7 @@ function ChatBox({ chatid }: { chatid: string | undefined }) {
     if (element) {
       element.scrollTop = element.scrollHeight;
     }
-  }, [CHAT?.messages?.length]);
+  }, [CHAT]);
 
   useEffect(() => {
     if (chatid) {

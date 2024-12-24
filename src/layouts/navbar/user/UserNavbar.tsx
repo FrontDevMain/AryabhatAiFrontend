@@ -17,7 +17,7 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { PushPinOutlined } from "@mui/icons-material";
+import { NoteAddOutlined, PushPinOutlined } from "@mui/icons-material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/reducers";
@@ -95,14 +95,14 @@ export default function UserNavbar() {
       {
         title: "Notebook",
         path: PATH_USER_DASHBOARD.notebook,
-        icon: "dashboard",
+        icon: "notebook",
         roles: ["User"],
         children: notebookList.filter((item) => !item.is_archieved),
       },
       {
         title: "Archive",
         path: PATH_USER_DASHBOARD.dashboard,
-        icon: "users",
+        icon: "archive",
         roles: ["User"],
         children: notebookList.filter((item) => item.is_archieved),
       },
@@ -144,26 +144,43 @@ export default function UserNavbar() {
                 onClick={() => setActive(item.title)}
                 selected={active == item.title}
               >
-                <Tooltip title="New Chat" placement="top">
-                  <Box
-                    component="span"
-                    className="svg-color"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      createNewNotebook(user.user_id);
-                    }}
-                    sx={{
-                      width: 24,
-                      height: 24,
-                      mr: 1,
-                      display: "inline-block",
-                      bgcolor: "currentColor",
-                      mask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
-                      WebkitMask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
-                    }}
-                  />
-                </Tooltip>
+                <Box
+                  component="span"
+                  className="svg-color"
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    mr: 1,
+                    display: "inline-block",
+                    bgcolor:
+                      active == item.title
+                        ? "#ffffff"
+                        : theme.palette.text.primary,
+                    mask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
+                    WebkitMask: `url(${`/assets/icons/userIcons/${item.icon}.svg`}) no-repeat center / contain`,
+                  }}
+                />
                 <ListItemText primary={item.title} />
+                {item.title == "Notebook" && (
+                  <Tooltip title="New Chat" placement="top">
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        createNewNotebook(user.user_id);
+                      }}
+                    >
+                      <NoteAddOutlined
+                        sx={{
+                          color:
+                            active == item.title
+                              ? "#fff"
+                              : theme.palette.text.primary,
+                        }}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </CustomListItemButton>
 
               {!loading ? (

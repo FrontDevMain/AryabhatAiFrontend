@@ -160,7 +160,12 @@ export default function UserNavbar() {
                   }}
                 />
                 {themeSetting.Theme_Layout == "vertical" && (
-                  <ListItemText primary={item.title} />
+                  <ListItemText
+                    primary={item.title}
+                    sx={{
+                      color: active == item.title ? "#fff" : "text.primary",
+                    }}
+                  />
                 )}
                 {themeSetting.Theme_Layout == "vertical" && (
                   <>

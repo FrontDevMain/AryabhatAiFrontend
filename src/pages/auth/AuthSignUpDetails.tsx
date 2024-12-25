@@ -5,6 +5,7 @@ import {
   IconButton,
   InputAdornment,
   Link,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -15,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFDatePicker,
+  RHFSelect,
   RHFTextField,
 } from "../../components/hook-form";
 import { useEffect, useState } from "react";
@@ -45,15 +47,49 @@ function AuthSignUpDetails() {
   const { state } = useLocation();
 
   const LoginSchema = Yup.object().shape({
-    username: Yup.string().required(),
-    fName: Yup.string().required(),
-    lName: Yup.string(),
-    // dob: Yup.string().required(),
-    gender: Yup.string().required(),
-    city: Yup.string(),
-    state: Yup.string(),
-    country: Yup.string().required(),
-    phone_no: Yup.string().required(),
+    username: Yup.string()
+      .min(4, "Username must be at least 4 characters long")
+      .required("Username is required"),
+
+    fName: Yup.string()
+      .matches(/^[A-Za-z]+$/, "First Name must only contain alphabets")
+      .required("First Name is required"),
+
+    lName: Yup.string().matches(
+      /^[A-Za-z]+$/,
+      "Last Name must only contain alphabets"
+    ),
+
+    gender: Yup.string()
+      .oneOf(
+        ["male", "female", "other"],
+        "Gender must be either male, female, or other"
+      )
+      .required("Gender is required"),
+
+    dob: Yup.date()
+      .nullable()
+      .typeError("Date of Birth must be a valid date")
+      .max(new Date(), "Date of Birth cannot be in the future")
+      .required("Date of Birth is required"),
+
+    city: Yup.string().required("City is required"),
+
+    state: Yup.string().required("State is required"),
+
+    country: Yup.string().required("Country is required"),
+
+    phone_no: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
+      .required("Phone number is required"),
+
+    profile_picture: Yup.mixed()
+      .nullable()
+      .test(
+        "fileType",
+        "Profile picture must be a valid file",
+        (value) => value === null || typeof value === "object"
+      ),
   });
 
   const defaultValues = {
@@ -102,7 +138,8 @@ function AuthSignUpDetails() {
       body.append("state", data.state);
       body.append("country", data.country);
       body.append("phone_no", data.phone_no);
-      body.append("profile_picture", data.profile_picture);
+      data.profile_picture &&
+        body.append("profile_picture", data.profile_picture);
       const Response = await fetcher.post(END_POINTS.AUTH.REGISTER, body);
       if (Response.status == 200) {
         localStorage.setItem("auth", Response.data.access_token);
@@ -143,7 +180,16 @@ function AuthSignUpDetails() {
           <Typography variant="body2" color="text.secondary">
             Gender
           </Typography>
-          <RHFTextField name="gender" />
+          <RHFSelect
+            name="gender"
+            SelectProps={{
+              native: false,
+            }}
+          >
+            <MenuItem value="male">Male</MenuItem>
+            <MenuItem value="female">Female</MenuItem>
+            <MenuItem value="other">Other</MenuItem>
+          </RHFSelect>
         </Stack>
         <Stack>
           <Typography variant="body2" color="text.secondary">
@@ -189,6 +235,7 @@ function AuthSignUpDetails() {
             onChange={(e: any) =>
               setValue("profile_picture", e.target.files[0])
             }
+            accept=".png, .jpeg, .avif"
           />
         </Stack>
 

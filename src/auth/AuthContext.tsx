@@ -10,6 +10,10 @@ import { fetchTags } from "src/redux/actions/tags/TagsActions";
 import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
 import { RootState } from "src/redux/reducers";
 
+//toast container
+import { ToastContainer, Zoom } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 type AuthContextTypes = {
   isInitialize: boolean;
   isAuthenticated: boolean;
@@ -75,7 +79,8 @@ function reducer(state: any, action: any) {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const reduxDispatch = useDispatch();
-  const { notebookList } = useSelector((state: RootState) => state.notebook);
+
+  const { theme } = useSelector((state: RootState) => state.theme);
 
   const initialize = useCallback(async () => {
     const token = localStorage.getItem("auth");
@@ -155,6 +160,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{ ...state, login, logout, initialize, updateUserType }}
     >
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar
+        newestOnTop={false}
+        // closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme.Theme_theme.toLowerCase()}
+        transition={Zoom}
+      />
       {children}
     </AuthContext.Provider>
   );

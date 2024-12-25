@@ -21,8 +21,8 @@ import fetcher from "src/api/fetcher";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { END_POINTS } from "src/api/EndPoints";
 import { PATH_AUTH } from "src/routes/path";
-import { fetchLicense } from "src/redux/actions/license/LicenseActions";
 import { useDispatch } from "react-redux";
+import { showToast } from "src/utils/Toast";
 
 type FormValuesProps = {
   email: string;
@@ -35,7 +35,6 @@ const IconStyle = {
 };
 
 function AuthLoginForm() {
-  const dispatch = useDispatch();
   const { login } = useAuthContext();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -73,6 +72,7 @@ function AuthLoginForm() {
         localStorage.setItem("auth_session_token", Response.data.session_token);
         document.cookie = `refresh_token=${Response.data.refresh_token}`;
         login();
+        showToast.success("Login successful!");
       }
     } catch (err) {
       if (err?.status == 400) {

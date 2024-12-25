@@ -1,10 +1,14 @@
 import React from "react";
 import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
+import { showToast } from "src/utils/Toast";
 
 function Connectors() {
   return (
     <RoleBasedGaurd roles={["Admin", "SuperAdmin"]}>
-      <div>Connectors</div>;
+      <div onClick={() => showToast.success("Login successful!")}>
+        Connectors
+      </div>
+      ;
     </RoleBasedGaurd>
   );
 }

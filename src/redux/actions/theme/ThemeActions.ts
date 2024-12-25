@@ -31,7 +31,11 @@ export const fetchTheme = (body: any): any => {
         END_POINTS.ADMIN.SETTINGS.GET_CONFIG,
         body
       );
-      Response.data.length && dispatch(fetchThemeSuccess(Response.data[0]));
+      const layout = localStorage.getItem("theme_layout") || "vertical";
+      Response.data.length &&
+        dispatch(
+          fetchThemeSuccess({ ...Response.data[0], Theme_Layout: layout })
+        );
     } catch (error) {
       dispatch(fetchThemeFailure());
     }

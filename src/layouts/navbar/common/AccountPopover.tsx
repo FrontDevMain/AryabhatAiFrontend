@@ -13,8 +13,10 @@ import {
   Stack,
   styled,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
@@ -22,6 +24,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import CustomAvatar from "src/components/avatar/Avatar";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
 import { PATH_AFTER_ADMIN_LOGIN, PATH_AFTER_USER_LOGIN } from "src/config";
+import { RootState } from "src/redux/reducers";
 
 const CustomList = styled(List)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -53,6 +56,11 @@ const style = {
 
 function AccountPopover() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const { theme: themeSetting } = useSelector(
+    (state: RootState) => state.theme
+  );
+  const isVertical = themeSetting.Theme_Layout == "vertical";
   const { user, logout, initialize, updateUserType } = useAuthContext();
 
   //openpopover
@@ -128,26 +136,36 @@ function AccountPopover() {
       justifyContent={"space-between"}
       alignItems={"center"}
       gap={1}
-      sx={{ mb: 2, px: 2 }}
+      sx={{
+        mb: 2,
+        px: isVertical ? 2 : 0.5,
+      }}
     >
-      <CustomAvatar
-        src={`data:image/png;base64,${user?.user_profile_picture}`}
-        name={user?.user_username}
-      />
-      <Box sx={{ maxWidth: 130 }}>
-        <Typography color="text.secondary" noWrap textOverflow={"ellipsis"}>
-          {user?.user_firstname}
-        </Typography>
-        <Typography color="text.disabled" noWrap textOverflow={"ellipsis"}>
-          {user?.user_email}
-        </Typography>
-      </Box>
+      <IconButton onClick={(e) => !isVertical && handleOpenPopover(e)}>
+        <CustomAvatar
+          src={`data:image/png;base64,${user?.user_profile_picture}`}
+          name={user?.user_username}
+          sx={{ border: `1px solid ${theme.palette.primary.main}` }}
+        />
+      </IconButton>
+      {isVertical && (
+        <Box sx={{ maxWidth: 130 }}>
+          <Typography color="text.secondary" noWrap textOverflow={"ellipsis"}>
+            {user?.user_firstname}
+          </Typography>
+          <Typography color="text.disabled" noWrap textOverflow={"ellipsis"}>
+            {user?.user_email}
+          </Typography>
+        </Box>
+      )}
       <div style={{ position: "relative" }}>
-        <IconButton aria-describedby={id} onClick={handleOpenPopover}>
-          <Icon>
-            <MoreVert />
-          </Icon>
-        </IconButton>
+        {isVertical && (
+          <IconButton aria-describedby={id} onClick={handleOpenPopover}>
+            <Icon>
+              <MoreVert />
+            </Icon>
+          </IconButton>
+        )}
         <Popover
           id={id}
           anchorEl={anchorEl}
@@ -193,6 +211,7 @@ function AccountPopover() {
           </CustomList>
         </Popover>
       </div>
+
       <ConfirmationModal
         open={openConfirm}
         handleClose={handleCloseConfirm}

@@ -87,6 +87,9 @@ export default function UserNavbar() {
   const { loading, notebookList } = useSelector(
     (state: RootState) => state.notebook
   );
+  const { theme: themeSetting } = useSelector(
+    (state: RootState) => state.theme
+  );
 
   const [navbarList, setNavbarList] = useState([] as navbarType[]);
 
@@ -132,11 +135,7 @@ export default function UserNavbar() {
         backgroundColor: theme.palette.background.default,
       }}
     >
-      <List
-        sx={{ maxWidth: 360, bgcolor: theme.palette.background.default }}
-        component="nav"
-        aria-labelledby="nested-list-subheader"
-      >
+      <List component="nav" aria-labelledby="nested-list-subheader">
         {navbarList?.map((item) => {
           return (
             <>
@@ -160,47 +159,56 @@ export default function UserNavbar() {
                     WebkitMask: `url(${`/assets/icons/userIcons/${item.icon}.svg`}) no-repeat center / contain`,
                   }}
                 />
-                <ListItemText primary={item.title} />
-                {item.title == "Notebook" && (
-                  <Tooltip title="New Chat" placement="top">
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        createNewNotebook(user.user_id);
-                      }}
-                    >
-                      <NoteAddOutlined
-                        sx={{
-                          color:
-                            active == item.title
-                              ? "#fff"
-                              : theme.palette.text.primary,
-                        }}
-                      />
-                    </IconButton>
-                  </Tooltip>
+                {themeSetting.Theme_Layout == "vertical" && (
+                  <ListItemText primary={item.title} />
+                )}
+                {themeSetting.Theme_Layout == "vertical" && (
+                  <>
+                    {item.title == "Notebook" && (
+                      <Tooltip title="New Chat" placement="top">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            createNewNotebook(user.user_id);
+                          }}
+                        >
+                          <NoteAddOutlined
+                            sx={{
+                              color:
+                                active == item.title
+                                  ? "#fff"
+                                  : theme.palette.text.primary,
+                            }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </>
                 )}
               </CustomListItemButton>
-
-              {!loading ? (
-                <Collapse
-                  in={active == item.title}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  {item.children.map((child: NotebookList) => (
-                    <SubNotebook child={child} />
-                  ))}
-                </Collapse>
-              ) : (
-                <Collapse
-                  in={active == item.title}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <Loading />
-                </Collapse>
+              {themeSetting.Theme_Layout == "vertical" && (
+                <>
+                  {!loading ? (
+                    <Collapse
+                      in={active == item.title}
+                      timeout="auto"
+                      unmountOnExit
+                    >
+                      {item.children.map((child: NotebookList) => (
+                        <SubNotebook child={child} />
+                      ))}
+                    </Collapse>
+                  ) : (
+                    <Collapse
+                      in={active == item.title}
+                      timeout="auto"
+                      unmountOnExit
+                    >
+                      <Loading />
+                    </Collapse>
+                  )}
+                </>
               )}
             </>
           );

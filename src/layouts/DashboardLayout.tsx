@@ -6,6 +6,7 @@ import {
   Drawer,
   Stack,
   useTheme,
+  IconButton,
 } from "@mui/material";
 import Logo from "src/components/logo";
 import AdminNavbar from "./navbar/admin/AdminNavbar";
@@ -14,10 +15,20 @@ import AccountPopover from "./navbar/common/AccountPopover";
 import { Outlet } from "react-router-dom";
 import UserNavbar from "./navbar/user/UserNavbar";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { MenuOpen } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
+import { useDispatch } from "react-redux";
+import { fetchThemeSuccess } from "src/redux/actions/theme/ThemeActions";
 
 const DashboardLayout = () => {
   const { user } = useAuthContext();
+  const dispatch = useDispatch();
   const theme = useTheme();
+  const { theme: themeSetting } = useSelector(
+    (state: RootState) => state.theme
+  );
+  const isVertical = themeSetting.Theme_Layout == "vertical";
 
   return (
     <Box sx={{ pt: 8 }}>
@@ -25,11 +36,12 @@ const DashboardLayout = () => {
       <Drawer
         variant="permanent"
         sx={{
-          width: 290,
+          // width: themeSetting.Theme_Layout == "vertical" ? 290 : 80,
           flexShrink: 0,
           height: "100%",
           [`& .MuiDrawer-paper`]: {
-            width: 290,
+            width: isVertical ? 290 : 80,
+            transition: "500ms ease width",
             boxSizing: "border-box",
             borderRight: "none",
             backgroundColor: theme.palette.background.default,
@@ -39,16 +51,58 @@ const DashboardLayout = () => {
         <Stack
           flexDirection={"row"}
           alignItems={"center"}
-          justifyContent={"space-between"}
+          justifyContent={isVertical ? "space-between" : "center"}
           gap={1}
         >
-          <Logo />
+          <Box
+            sx={{
+              width: isVertical ? "100%" : 0,
+              opacity: isVertical ? 1 : 0,
+              transition: "500ms ease all",
+            }}
+          >
+            <Logo />
+          </Box>
+          <IconButton
+            sx={{ my: 6.3 }}
+            onClick={() => {
+              dispatch(
+                fetchThemeSuccess({
+                  ...themeSetting,
+                  Theme_Layout: isVertical ? "mini" : "vertical",
+                })
+              );
+              localStorage.setItem(
+                "theme_layout",
+                isVertical ? "mini" : "vertical"
+              );
+            }}
+          >
+            {isVertical ? (
+              <MenuOpen
+                sx={{
+                  fontSize: 32,
+                  transform: "rotate(0deg)",
+                  transition: "500ms ease all",
+                }}
+              />
+            ) : (
+              <MenuOpen
+                sx={{
+                  fontSize: 32,
+                  transform: "rotate(180deg)",
+                  transition: "500ms ease all",
+                }}
+              />
+            )}
+          </IconButton>
         </Stack>
-        <Box sx={{ width: "85%", height: "inherit", margin: "0px auto" }}>
+        <Box sx={{ height: "inherit", margin: "0px auto" }}>
           <Stack
             flexDirection={"column"}
             justifyContent={"space-between"}
-            sx={{ height: "inherit" }}
+            // alignItems={"center"}
+            sx={{ height: "inherit", width: isVertical ? 260 : 50 }}
           >
             <Box>
               {user?.tempAccountType == "User" ? (
@@ -99,7 +153,8 @@ const DashboardLayout = () => {
 
         <Box
           sx={{
-            marginLeft: 37,
+            marginLeft: isVertical ? 37 : 10,
+            transition: "500ms ease margin",
             // ml: 37,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,

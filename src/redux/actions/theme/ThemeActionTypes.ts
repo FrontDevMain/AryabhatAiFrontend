@@ -10,6 +10,7 @@ export interface Theme {
   Theme_font_size: number;
   Theme_primary_colour: string;
   Theme_neutral_colour: string;
+  Theme_Layout: "mini" | "vertical";
   Setting_archive_record: number;
   SMTP_server_address: string;
   SMTP_server_port: number;

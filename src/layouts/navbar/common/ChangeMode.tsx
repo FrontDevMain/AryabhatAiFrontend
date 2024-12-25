@@ -1,5 +1,5 @@
 // @mui
-import { RadioGroup, Stack, Typography } from "@mui/material";
+import { Box, IconButton, RadioGroup, Stack, Typography } from "@mui/material";
 //
 import { StyledCard, StyledWrap, MaskControl } from "./styles";
 import LightMode from "src/assets/navbar/LightMode";
@@ -46,6 +46,21 @@ export default function ChangeMode() {
       }
     } catch (error) {}
   };
+
+  if (themeSetting.Theme_Layout !== "vertical") {
+    return (
+      <Box
+        sx={{ mx: 1, my: 3 }}
+        onClick={() =>
+          onSubmit(themeSetting.Theme_theme == "Light" ? "Dark" : "Light")
+        }
+      >
+        <IconButton>
+          {themeSetting.Theme_theme == "Light" ? <LightMode /> : <DarkMode />}
+        </IconButton>
+      </Box>
+    );
+  }
 
   return (
     <RadioGroup

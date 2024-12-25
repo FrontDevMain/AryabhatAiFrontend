@@ -4,10 +4,15 @@ import { ArrowForwardIosSharp, Dashboard } from "@mui/icons-material";
 import AdminNavConfig from "./AdminConfig";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CustomListItemButton } from "src/theme/globalStyles";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/reducers";
 
 export default function AdminNavbar() {
   const navigate = useNavigate();
   const theme = useTheme();
+  const { theme: themeSetting } = useSelector(
+    (state: RootState) => state.theme
+  );
   const { pathname } = useLocation();
   const [active, setActive] = useState(pathname);
 
@@ -25,7 +30,7 @@ export default function AdminNavbar() {
     >
       <List
         sx={{
-          maxWidth: 360,
+          // maxWidth: themeSetting.Theme_Layout == "vertical" ? "100%" : 50,
           bgcolor: theme.palette.background.default,
         }}
         component="nav"
@@ -54,9 +59,12 @@ export default function AdminNavbar() {
                   WebkitMask: `url(${`/assets/icons/adminIcons/${item.icon}.svg`}) no-repeat center / contain`,
                 }}
               />
-
-              <ListItemText primary={item.title} />
-              <ArrowForwardIosSharp sx={{ fontSize: 15 }} />
+              {themeSetting.Theme_Layout == "vertical" && (
+                <>
+                  <ListItemText primary={item.title} />
+                  <ArrowForwardIosSharp sx={{ fontSize: 15 }} />
+                </>
+              )}
             </CustomListItemButton>
           );
         })}

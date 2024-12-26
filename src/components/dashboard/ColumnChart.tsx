@@ -56,7 +56,7 @@ function ColumnChart({
       },
       plotOptions: {
         bar: {
-          columnWidth: 30,
+          columnWidth: 20,
           distributed: true,
         },
       },

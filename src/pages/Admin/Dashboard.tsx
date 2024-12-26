@@ -13,6 +13,7 @@ const CustomBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   borderRadius: 15,
   padding: 15,
+  overflow: "hidden",
 }));
 
 type dashboardDataTypes = {

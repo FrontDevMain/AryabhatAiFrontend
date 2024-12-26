@@ -1,9 +1,16 @@
 import { Icon } from "@iconify/react";
-import { BorderRight, ExpandLess, ExpandMore } from "@mui/icons-material";
+import {
+  BorderRight,
+  DeleteForever,
+  DeleteOutline,
+  ExpandLess,
+  ExpandMore,
+} from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
   Button,
+  Chip,
   Collapse,
   Divider,
   FormControlLabel,
@@ -19,6 +26,7 @@ import {
   Switch,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -29,10 +37,7 @@ import { RootState } from "src/redux/reducers";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import FormProvider, {
-  RHFRadioGroup,
-  RHFTextField,
-} from "../../components/hook-form";
+import FormProvider, { RHFTextField } from "../../components/hook-form";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
 import fetcher from "src/api/fetcher";
@@ -40,6 +45,8 @@ import { END_POINTS } from "src/api/EndPoints";
 import { fetchLlmSuccess } from "src/redux/actions/llm/LlmActions";
 import { useDispatch } from "react-redux";
 import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
+import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
+import { showToast } from "src/utils/Toast";
 
 const Android12Switch = styled(Switch)(({ theme }) => ({
   padding: 8,
@@ -84,11 +91,14 @@ type FormValuesProps = {
 };
 
 export default function LLM() {
+  const theme = useTheme();
   const { user } = useAuthContext();
   const dispatch = useDispatch();
   const [open, setOpen] = useState<number | null>();
   const { LLM } = useSelector((state: RootState) => state.llm);
   const [isShowKey, setIsShowKey] = useState<string | null>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [temp, setTemp] = useState("");
 
   //modal
   const [openModal, setOpenModal] = useState(false);
@@ -125,6 +135,10 @@ export default function LLM() {
     formState: { errors, isSubmitting, isValid },
   } = methods;
 
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const handleOpenConfirm = () => setOpenConfirm(true);
+  const handleCloseConfirm = () => setOpenConfirm(false);
+
   const onSubmit = async (data: FormValuesProps) => {
     try {
       const body = {
@@ -147,6 +161,76 @@ export default function LLM() {
       }
     } catch (err) {
       console.log(err?.message);
+    }
+  };
+
+  const handleSwitchProvider = async (providerId: string, status: boolean) => {
+    try {
+      setIsLoading(true);
+      const body = {
+        provider_id: providerId,
+        is_enabled: !status,
+      };
+      const Response = await fetcher.put(
+        END_POINTS.ADMIN.LLM.UPDATE_STATUS,
+        body
+      );
+
+      if (Response.status == 200) {
+        dispatch(
+          fetchLlmSuccess(
+            LLM.map((item) =>
+              item.provider_id == providerId
+                ? { ...item, is_enabled: !status }
+                : item
+            )
+          )
+        );
+      }
+    } catch (err) {
+      console.log(err?.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteLlm = async (id: string) => {
+    try {
+      setIsLoading(true);
+      const Response = await fetcher.delete(
+        END_POINTS.ADMIN.LLM.DELETE_MODEL(id)
+      );
+      if (Response.status == 200) {
+        dispatch(fetchLlmSuccess(LLM.filter((item) => item.model_id !== id)));
+        handleCloseConfirm();
+        showToast.success(Response.data.detail);
+      }
+    } catch (err) {
+      console.log(err?.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const checkConnectivity = async (apikey: string, modelId: string) => {
+    try {
+      setIsLoading(true);
+      const body = {
+        api_key: apikey,
+        model: modelId,
+        temperature: +temp,
+      };
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.LLM.CONNECTIVITY_CHECK,
+        body
+      );
+      if (Response.status == 200) {
+        showToast.success(Response.data.detail);
+      }
+    } catch (err) {
+      console.log(err?.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -192,6 +276,9 @@ export default function LLM() {
               />
               <FormControlLabel
                 control={<Android12Switch checked={item.is_enabled} />}
+                onClick={() =>
+                  handleSwitchProvider(item.provider_id, item.is_enabled)
+                }
                 label=""
               />
             </ListItem>
@@ -285,59 +372,61 @@ export default function LLM() {
                 subTitle="Select the models to display in the session. The selected
                     models will be displayed in the model list."
               >
-                {" "}
-                <Autocomplete
-                  value={[item.model_name]}
-                  multiple
-                  freeSolo
-                  size="small"
-                  options={[]}
-                  inputValue={""}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      fullWidth
-                      variant="outlined"
-                      autoComplete="off"
+                <Chip
+                  label={item.model_name}
+                  variant="outlined"
+                  deleteIcon={
+                    <DeleteForever
+                      sx={{
+                        fill: theme.palette.primary.main,
+                        "& :hover": {
+                          fill: theme.palette.error.main,
+                        },
+                      }}
                     />
-                  )}
+                  }
+                  onDelete={handleOpenConfirm}
                 />
               </RowType>
+              <ConfirmationModal
+                open={openConfirm}
+                handleClose={handleCloseConfirm}
+                onConfirm={() => deleteLlm(item.model_id)}
+                loading={isLoading}
+                title={"Delete Confirmation"}
+                content={
+                  "If you delete the model, Provider will be deleted. Are you sure you want to delete the Model ?"
+                }
+              />
 
               <RowType
                 title="Connectivity Check"
-                subTitle="  Test if the API Key and proxy address are filled in
+                subTitle="Test if the API Key and proxy address are filled in
                     correctly"
               >
                 <TextField
                   fullWidth
                   size="small"
-                  type={
-                    isShowKey == `${item.api_proxy_address}_${index}`
-                      ? "text"
-                      : "password"
+                  label="Tempreture"
+                  value={temp}
+                  onChange={(e) =>
+                    +e.target.value <= 1 && setTemp(e.target.value)
                   }
+                  inputProps={{ maxLength: 3 }}
+                  type={"text"}
+                  helperText={"You can provide temperature in range of 0 to 1."}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton
+                        <LoadingButton
+                          variant="contained"
                           onClick={() =>
-                            setIsShowKey(
-                              isShowKey == `${item.api_proxy_address}_${index}`
-                                ? null
-                                : `${item.api_proxy_address}_${index}`
-                            )
+                            checkConnectivity(item.apikey, item.model_id)
                           }
-                          edge="end"
+                          sx={{ right: -13 }}
                         >
-                          <Icon
-                            icon={
-                              isShowKey == `${item.api_proxy_address}_${index}`
-                                ? "eva:eye-fill"
-                                : "eva:eye-off-fill"
-                            }
-                          />
-                        </IconButton>
+                          Test{" "}
+                        </LoadingButton>
                       </InputAdornment>
                     ),
                   }}
@@ -347,6 +436,7 @@ export default function LLM() {
           </List>
         );
       })}
+
       <Modal
         open={openModal}
         onClose={handleCloseModal}

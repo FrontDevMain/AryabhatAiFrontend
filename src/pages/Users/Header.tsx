@@ -90,7 +90,7 @@ function HeaderDashboard() {
   };
 
   return (
-    <Stack direction={"row"} justifyContent={"space-between"} gap={2}>
+    <Stack direction={"row"} justifyContent={"space-between"} gap={2} mx={3}>
       <Stack direction={"row"} justifyContent={"start"} gap={2}>
         <List
           sx={{

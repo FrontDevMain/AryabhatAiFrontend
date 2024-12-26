@@ -9,8 +9,8 @@ function BarChart({
   series,
 }: {
   series: {
-    _id: string;
-    queries: number;
+    _id: string | any;
+    queries: number | any;
   }[];
 }) {
   const theme = useTheme();
@@ -18,12 +18,6 @@ function BarChart({
     (state: RootState) => state.theme
   );
   const [state, setState] = useState({
-    series: [
-      {
-        name: "",
-        data: series?.map((item) => item.queries),
-      },
-    ],
     options: {
       chart: {
         type: "bar",
@@ -56,8 +50,9 @@ function BarChart({
           show: false, // Remove X-axis ticks
         },
         labels: {
+          show: false,
           style: {
-            fontSize: theme.typography.fontSize, // Adjust font size here
+            fontSize: theme.typography.fontSize - 4, // Adjust font size here
             colors: theme.palette.text.primary, // Optional: font color
           },
         },
@@ -85,10 +80,10 @@ function BarChart({
       },
       title: {
         text: "Top quired files",
-        align: "start",
         style: {
-          fontSize: theme.typography.fontSize,
+          fontSize: theme.typography.fontSize + 8,
           color: theme.palette.text.primary,
+          fontWeight: 300,
         },
       },
     },
@@ -96,7 +91,7 @@ function BarChart({
   return (
     <ReactApexChart
       options={state.options as any}
-      series={state.series}
+      series={[{ name: "", data: series.map((item) => item.queries) }]}
       type="bar"
       height={300}
     />

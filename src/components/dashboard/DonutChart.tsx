@@ -74,8 +74,9 @@ function DonutChart({
       title: {
         text: "File Types",
         style: {
-          fontSize: theme.typography.fontSize,
+          fontSize: theme.typography.fontSize + 8,
           color: theme.palette.text.primary,
+          fontWeight: 300,
         },
       },
       responsive: [

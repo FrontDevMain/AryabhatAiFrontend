@@ -36,6 +36,9 @@ import { useDispatch } from "react-redux";
 import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
 import { CustomListItemButton } from "src/theme/globalStyles";
 import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
+import fetcher from "src/api/fetcher";
+import { END_POINTS } from "src/api/EndPoints";
+import { showToast } from "src/utils/Toast";
 
 const PrettoSlider = styled(Slider)(({ theme }) => ({
   color: theme.palette.primary.main,
@@ -107,6 +110,7 @@ export default function Settings() {
 
   const [collapse, setCollapse] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading1, setIsLoading1] = useState(false);
 
   //modal
   const [open, setOpen] = useState(false);
@@ -201,6 +205,23 @@ export default function Settings() {
         intend: "get",
       })
     );
+  };
+
+  const onSendTestEmail = async () => {
+    try {
+      setIsLoading1(true);
+      const Response = await fetcher.post(
+        END_POINTS.ADMIN.SETTINGS.SEND_TEST_EMAIL,
+        { receiver_email: themeDefaultKeys.SMTP_email_address }
+      );
+      if (Response.status == 200) {
+        showToast.success(Response.data.status);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading1(false);
+    }
   };
 
   const setAchiveDefaultDays = async (days: number) => {
@@ -631,8 +652,13 @@ export default function Settings() {
               <Stack flexDirection={"row"} justifyContent={"flex-end"} gap={2}>
                 <LoadingButton
                   variant="contained"
-                  disabled
-                  onClick={handleClose}
+                  disabled={
+                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+                      themeDefaultKeys.SMTP_email_address
+                    )
+                  }
+                  loading={isLoading1}
+                  onClick={onSendTestEmail}
                 >
                   Send Test Email
                 </LoadingButton>

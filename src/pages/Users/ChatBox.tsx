@@ -31,7 +31,9 @@ function ChatBox({ chatid }: { chatid: string | undefined }) {
 
   if (loading) {
     return (
-      <Box sx={{ m: 1, height: "calc(100vh - 230px)", overflow: "scroll" }}>
+      <Box
+        sx={{ my: 1, mx: 3, height: "calc(100vh - 230px)", overflow: "scroll" }}
+      >
         <Stack
           sx={{
             alignItems: "center",
@@ -48,7 +50,13 @@ function ChatBox({ chatid }: { chatid: string | undefined }) {
 
   return (
     <Box
-      sx={{ m: 1, height: "calc(100vh - 230px)", overflow: "scroll" }}
+      sx={{
+        my: 1,
+        mx: 3,
+        pr: 1,
+        height: "calc(100vh - 230px)",
+        overflow: "scroll",
+      }}
       ref={elementRef}
     >
       {CHAT?.messages.map((item) => (

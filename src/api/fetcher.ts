@@ -1,6 +1,7 @@
 import axios from "axios";
 import { isLoggedin } from "../utils/authGuard";
 import { showToast } from "src/utils/Toast";
+import { sentenceCase } from "change-case";
 
 const apiClient = axios.create({
   // Can set any default configurations here, such as base URL, headers, etc.
@@ -23,22 +24,26 @@ apiClient.interceptors.response.use(
           break;
         case 401:
           console.log(error.response.data.detail);
-          window.location.reload();
+          // window.location.reload();
           break;
         case 403:
           console.error("Forbidden", error.response.status);
           break;
         case 404:
-          console.error(error.response.data.detail);
+          showToast.error(error.response.data.detail);
+          break;
+        case 422:
+          error.response.data.detail.forEach((item: any) =>
+            showToast.warning(`${sentenceCase(item.loc[1])}: ${item.msg}`)
+          );
           break;
         case 500:
-          console.error("Internal server error");
+          showToast.error("Internal server error");
           break;
         default:
           console.error("Unknown error");
       }
     } else if (error.request) {
-      console.error("No response");
       // localStorage.removeItem("auth");
     } else {
       console.error("Request error");

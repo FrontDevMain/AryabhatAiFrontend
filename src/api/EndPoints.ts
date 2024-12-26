@@ -47,6 +47,9 @@ export const END_POINTS = {
     },
     SETTINGS: {
       GET_CONFIG: "app_settings/config",
+      SEND_TEST_EMAIL: "app_settings/send-test-email",
+      GET_CONNECTORS_LIST: "app_settings/allowed_database_service_provider",
+      CONFIGURE_DB: "app_settings/configure-db",
     },
     LICENSE: {
       CHECK_LICENSE_STATUS: "License/check-license-status",
@@ -59,6 +62,9 @@ export const END_POINTS = {
       CREATE_LLM: "Llms/LlmDetails",
       GET_LLM_DETAILS: "Llms/GetLlmDetails",
       LLM_PROVIDER: "Llms/LlmProvider",
+      UPDATE_STATUS: "Llms/ProviderStatus",
+      DELETE_MODEL: (id: string) => `Llms/DeleteLlmDetails?model_id=${id}`,
+      CONNECTIVITY_CHECK: "Llms/ConnectivityCheck",
     },
   },
   USER: {

@@ -11,7 +11,7 @@ import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
 import { RootState } from "src/redux/reducers";
 
 //toast container
-import { ToastContainer, Zoom } from "react-toastify";
+import { Slide, ToastContainer, Zoom } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type AuthContextTypes = {
@@ -121,7 +121,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (err) {
         console.log("found err", err);
-        dispatch({ type: "license_not_found" });
+        if (err.status == 401) {
+          logout();
+        }
+        if (err.status == 403) {
+          dispatch({ type: "license_not_found" });
+        }
       }
     } else {
       logout();
@@ -161,17 +166,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{ ...state, login, logout, initialize, updateUserType }}
     >
       <ToastContainer
-        position="top-center"
-        autoClose={5000}
+        position="top-right"
+        autoClose={3000}
         hideProgressBar
         newestOnTop={false}
-        // closeOnClick={false}
+        closeOnClick={false}
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
         theme={theme.Theme_theme.toLowerCase()}
-        transition={Zoom}
+        transition={Slide}
       />
       {children}
     </AuthContext.Provider>

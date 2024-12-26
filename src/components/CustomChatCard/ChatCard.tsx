@@ -94,7 +94,7 @@ function ChatCard({ item, loading }: { item: messageType; loading: boolean }) {
       sx={{
         alignItems: item.type == "aryabhat" ? "start" : "flex-end",
 
-        mb: item.type == "aryabhat" ? 6 : 2,
+        mb: item.type == "aryabhat" ? 5 : 2,
       }}
       key={item.message_id}
     >

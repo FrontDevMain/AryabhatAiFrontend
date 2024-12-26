@@ -9,8 +9,8 @@ function ColumnChart({
   series,
 }: {
   series: {
-    name: string;
-    session_time: number;
+    name: string | any;
+    session_time: number | any;
   }[];
 }) {
   const theme = useTheme();
@@ -18,13 +18,15 @@ function ColumnChart({
     (state: RootState) => state.theme
   );
   const [state, setState] = useState({
-    series: [
-      {
-        name: "",
-        data: series.map((item) => item.session_time),
-      },
-    ],
     options: {
+      title: {
+        text: "User Activity",
+        style: {
+          fontSize: theme.typography.fontSize + 8,
+          color: theme.palette.text.primary,
+          fontWeight: 300,
+        },
+      },
       chart: {
         height: 300,
         type: "bar",
@@ -54,7 +56,7 @@ function ColumnChart({
       },
       plotOptions: {
         bar: {
-          columnWidth: 40,
+          columnWidth: 30,
           distributed: true,
         },
       },
@@ -72,6 +74,7 @@ function ColumnChart({
         },
       },
       xaxis: {
+        categories: series.map((item) => item.name),
         axisBorder: {
           show: false, // Remove X-axis line
         },
@@ -80,11 +83,10 @@ function ColumnChart({
         },
         labels: {
           style: {
-            fontSize: theme.typography.fontSize, // Adjust font size here
+            fontSize: theme.typography.fontSize - 4, // Adjust font size here
             colors: theme.palette.text.primary, // Optional: font color
           },
         },
-        categories: series.map((item) => [item.name]),
       },
       yaxis: {
         axisBorder: {
@@ -98,6 +100,9 @@ function ColumnChart({
             fontSize: theme.typography.fontSize, // Adjust font size here
             colors: theme.palette.text.primary, // Optional: font color
           },
+          formatter: function (val: any) {
+            return val + "h";
+          },
         },
       },
     },
@@ -105,7 +110,7 @@ function ColumnChart({
   return (
     <ReactApexChart
       options={state.options as any}
-      series={state.series}
+      series={[{ name: "", data: series.map((item) => item.session_time) }]}
       type="bar"
       height={300}
     />

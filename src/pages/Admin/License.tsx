@@ -56,22 +56,22 @@ export default function License() {
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    getLicenseoverView();
-  }, []);
+  // useEffect(() => {
+  //   getLicenseoverView();
+  // }, []);
 
-  const getLicenseoverView = async () => {
-    try {
-      const Response = await fetcher.get(
-        END_POINTS.ADMIN.LICENSE.CHECK_LICENSE_OVERVIEW
-      );
-      if (Response.status == 200) {
-        setLicenseOverviewDetail(Response.data);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const getLicenseoverView = async () => {
+  //   try {
+  //     const Response = await fetcher.get(
+  //       END_POINTS.ADMIN.LICENSE.CHECK_LICENSE_OVERVIEW
+  //     );
+  //     if (Response.status == 200) {
+  //       setLicenseOverviewDetail(Response.data);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   const onUpdateLicense = async () => {
     try {
@@ -235,16 +235,14 @@ export default function License() {
               <TableBody>
                 <TableRow sx={{ border: "1px solid #dadada" }}>
                   <TableCell>
-                    <Typography>{licenseOverviewDetail.total_users}</Typography>
+                    <Typography>{license.users}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography>{license.active_users}</Typography>
                   </TableCell>
                   <TableCell>
                     <Typography>
-                      {licenseOverviewDetail.active_users}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography>
-                      {licenseOverviewDetail.remaining_users}
+                      {license.users - license.active_users}
                     </Typography>
                   </TableCell>
                 </TableRow>

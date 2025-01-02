@@ -10,6 +10,7 @@ export interface Llm {
   provider_name: string;
   model_id: string;
   model_name: string;
+  model: { model_id: string; model_name: string; isSelected: boolean }[];
   user_id: string;
   apikey: string;
   api_proxy_address: string;

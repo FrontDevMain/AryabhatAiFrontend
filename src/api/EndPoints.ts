@@ -14,6 +14,7 @@ export const END_POINTS = {
     USER_DETAILS: "users/me",
     LOGOUT: "auth/logout",
     LOGIN_WITH_GOOGLE: "auth/google",
+    REFRESH: "refresh",
     LOGIN_WITH_MICROSOFT: "auth/microsoft",
     DELETE_PROFILE: "user/delete-profile-picture",
     CHANGE_PROFILE: "user/update-profile-picture",

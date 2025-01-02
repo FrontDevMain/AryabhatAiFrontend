@@ -2,6 +2,7 @@ import axios from "axios";
 import { isLoggedin } from "../utils/authGuard";
 import { showToast } from "src/utils/Toast";
 import { sentenceCase } from "change-case";
+import { END_POINTS } from "./EndPoints";
 
 const apiClient = axios.create({
   // Can set any default configurations here, such as base URL, headers, etc.
@@ -13,28 +14,41 @@ apiClient.interceptors.response.use(
   function (response) {
     return response;
   },
-  function (error) {
+  async function (error) {
+    console.log(error);
     if (error.response) {
       switch (error.response.status) {
         case 322:
           console.error("Bad request", error);
           break;
         case 400:
-          console.error("Bad request");
+          showToast.error(error.response.data.detail);
           break;
         case 401:
           console.log(error.response.data.detail);
-          // window.location.reload();
+          if (error.config.url !== "refresh") {
+            const headers = { Authorization: "", Cookie: "" };
+            headers.Authorization = "Bearer " + localStorage.getItem("auth");
+            headers.Cookie = document.cookie;
+            console.log("headers", headers);
+            const Response = await apiClient.post(
+              END_POINTS.AUTH.REFRESH,
+              {},
+              { headers }
+            );
+            console.log("response refresh", Response);
+          }
+
           break;
         case 403:
-          console.error("Forbidden", error.response.status);
+          showToast.error(error.response.data.detail);
           break;
         case 404:
           showToast.error(error.response.data.detail);
           break;
         case 422:
           error.response.data.detail.forEach((item: any) =>
-            showToast.warning(`${sentenceCase(item.loc[1])}: ${item.msg}`)
+            showToast.error(`${sentenceCase(item.loc[1])}: ${item.msg}`)
           );
           break;
         case 500:

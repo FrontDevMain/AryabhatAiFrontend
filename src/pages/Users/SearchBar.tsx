@@ -24,8 +24,8 @@ function SearchBar() {
   const { selectedTag } = useSelector((state: RootState) => state.tag);
   const { selectedLlm } = useSelector((state: RootState) => state.llm);
   const { CHAT } = useSelector((state: RootState) => state.chat);
-  const LoginSchema = Yup.object().shape({
-    search: Yup.string(),
+  const InputSchema = Yup.object().shape({
+    search: Yup.string().required(),
   });
 
   const defaultValues = {
@@ -33,7 +33,7 @@ function SearchBar() {
   };
 
   const methods = useForm<FormValuesProps>({
-    resolver: yupResolver(LoginSchema),
+    resolver: yupResolver(InputSchema),
     defaultValues,
   });
 
@@ -48,7 +48,7 @@ function SearchBar() {
     try {
       let body = {
         user_input: data.search,
-        Model_id: selectedLlm.model_id,
+        Model_id: selectedLlm.model.find((item) => item.isSelected)?.model_id,
         Provider_id: selectedLlm.provider_id,
         chat_id: CHAT.chat_id,
         user_id: user.user_id,

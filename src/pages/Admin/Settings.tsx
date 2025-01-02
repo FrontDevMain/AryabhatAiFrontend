@@ -117,23 +117,6 @@ export default function Settings() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const themeData = {
-    user_id: "default_user",
-    Theme_logo: "string",
-    Theme_theme: "Light",
-    Theme_font_size: 14,
-    Theme_primary_colour: "#1b75bc",
-    Theme_neutral_colour: "#ffffff",
-    Setting_archive_record: 30,
-    SMTP_server_address: "localhost",
-    SMTP_server_port: 587,
-    SMTP_server_sequrity: "StartTLS",
-    SMTP_email_address: "support@diagonal.ai",
-    SMTP_username: "support@diagonal.ai",
-    SMTP_password: "string",
-    intend: "string",
-  };
-
   const LoginSchema = Yup.object().shape({
     serverAddress: Yup.string(),
     port: Yup.string(),
@@ -261,88 +244,91 @@ export default function Settings() {
           </LoadingButton>
         </Stack>
 
-        <Card
-          sx={{
-            p: 2,
-            boxShadow: "none",
-            borderRadius: 2,
-            mt: 2,
-            display: "flex",
-            flexDirection: "column",
-            bgcolor: theme.palette.background.default,
-            gap: 2,
-          }}
-        >
-          <Stack
-            direction={"row"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
+        {user?.user_accountType == "SuperAdmin" && (
+          <Card
+            sx={{
+              p: 2,
+              boxShadow: "none",
+              borderRadius: 2,
+              mt: 2,
+              display: "flex",
+              flexDirection: "column",
+              bgcolor: theme.palette.background.default,
+              gap: 2,
+            }}
           >
-            <Typography>Logo</Typography>
-            <img src={`data:image/png;base64,${themeData.Theme_logo}`} />
-          </Stack>
-          <Divider />
-
-          <Stack
-            direction={"row"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-          >
-            <Typography>Font Size</Typography>
-            <Stack sx={{ width: 300 }}>
-              <PrettoSlider
-                valueLabelDisplay="auto"
-                aria-label="pretto slider"
-                min={10}
-                max={24}
-                value={themeDefaultKeys.Theme_font_size}
-                onChange={(e: any) =>
-                  setThemeDefaultKeys({
-                    ...themeDefaultKeys,
-                    Theme_font_size: Number(e.target.value),
-                  })
-                }
+            <Stack
+              direction={"row"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+            >
+              <Typography>Logo</Typography>
+              <img
+                src={`data:image/png;base64,${themeDefaultKeys.Theme_logo}`}
               />
-              <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                <Typography fontSize={12}>A</Typography>
-                <Typography fontSize={15}>Normal</Typography>
-                <Typography fontSize={18}>A</Typography>
-              </Stack>
             </Stack>
-          </Stack>
-          <Divider />
-          <Stack
-            direction={"row"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-          >
-            <Typography>Primary Colors</Typography>
-            <Stack flexDirection={"row"} gap={1}>
-              {preset.map((item) => (
-                <span
-                  style={{
-                    height: 30,
-                    width: 30,
-                    borderRadius: "50%",
-                    backgroundColor: item.main,
-                    cursor: "pointer",
-                    border:
-                      themeDefaultKeys.Theme_primary_colour == item.main
-                        ? `3px solid ${theme.palette.text.primary}`
-                        : "none",
-                  }}
-                  onClick={() =>
+            <Divider />
+
+            <Stack
+              direction={"row"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+            >
+              <Typography>Font Size</Typography>
+              <Stack sx={{ width: 300 }}>
+                <PrettoSlider
+                  valueLabelDisplay="auto"
+                  aria-label="pretto slider"
+                  min={10}
+                  max={24}
+                  value={themeDefaultKeys.Theme_font_size}
+                  onChange={(e: any) =>
                     setThemeDefaultKeys({
                       ...themeDefaultKeys,
-                      Theme_primary_colour: item.main,
+                      Theme_font_size: Number(e.target.value),
                     })
                   }
-                ></span>
-              ))}
+                />
+                <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                  <Typography fontSize={12}>A</Typography>
+                  <Typography fontSize={15}>Normal</Typography>
+                  <Typography fontSize={18}>A</Typography>
+                </Stack>
+              </Stack>
             </Stack>
-          </Stack>
-          <Divider />
-          {/* <Stack
+            <Divider />
+            <Stack
+              direction={"row"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+            >
+              <Typography>Primary Colors</Typography>
+              <Stack flexDirection={"row"} gap={1}>
+                {preset.map((item) => (
+                  <span
+                    style={{
+                      height: 30,
+                      width: 30,
+                      borderRadius: "50%",
+                      backgroundColor: item.main,
+                      cursor: "pointer",
+                      border:
+                        themeDefaultKeys.Theme_primary_colour == item.main
+                          ? `3px solid ${theme.palette.text.primary}`
+                          : "none",
+                    }}
+                    onClick={() =>
+                      setThemeDefaultKeys({
+                        ...themeDefaultKeys,
+                        Theme_primary_colour: item.main,
+                      })
+                    }
+                  ></span>
+                ))}
+              </Stack>
+            </Stack>
+            <Divider />
+            {/* <Stack
           direction={"row"}
           justifyContent={"space-between"}
           alignItems={"center"}
@@ -380,7 +366,8 @@ export default function Settings() {
           </Stack>
         </Stack>
         <Divider /> */}
-        </Card>
+          </Card>
+        )}
 
         <Stack direction={"row"} alignItems={"center"} mt={3}>
           <Typography>System Setting</Typography>
@@ -468,7 +455,7 @@ export default function Settings() {
                     borderBottomRightRadius: 10,
                   }}
                 >
-                  {[30, 45, 60]
+                  {[15, 30, 45, 60]
                     .filter(
                       (item) => item !== themeDefaultKeys.Setting_archive_record
                     )

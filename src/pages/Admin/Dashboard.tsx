@@ -1,4 +1,4 @@
-import { Box, Grid, styled } from "@mui/material";
+import { Box, Grid, Stack, styled, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
@@ -21,13 +21,19 @@ type dashboardDataTypes = {
   total_notebook: number;
   total_files_uploaded: number;
   average_session_time: number;
-  line_plot: number;
   monthly_user_activity: {
     _id: {
       year: null | number;
       month: null | number;
     };
     user_count: number;
+  }[];
+  line_plot: {
+    title: string;
+    data: {
+      name: string;
+      data: any[];
+    }[];
   }[];
   Monthly_notebook_count: {
     _id: {
@@ -129,6 +135,26 @@ function Dashboard() {
         <Grid container mt={2} spacing={3}>
           <Grid item xs={7}>
             <CustomBox>
+              <Stack flexDirection={"row"} gap={2}>
+                <Typography
+                  sx={{
+                    fontSize: (theme) => theme.typography.fontSize + 8,
+                    color: "text.primary",
+                    fontWeight: 300,
+                  }}
+                >
+                  Total User
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: (theme) => theme.typography.fontSize + 4,
+                    color: "text.primary",
+                    fontWeight: 300,
+                  }}
+                >
+                  Active User
+                </Typography>
+              </Stack>
               <LineChart
                 series={[
                   {

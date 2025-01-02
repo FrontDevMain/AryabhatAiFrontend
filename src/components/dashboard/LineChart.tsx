@@ -3,6 +3,7 @@ import { useState, memo } from "react";
 import ReactApexChart from "react-apexcharts";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/reducers";
+import { preset } from "../settings/presets";
 
 type seriesType = {
   name: string;
@@ -34,7 +35,12 @@ function LineChart({ series }: { series: { name: string; data: number[] }[] }) {
           show: false,
         },
       },
-      colors: [theme.palette.primary.main, theme.palette.secondary.main],
+      colors: preset
+        .filter((item) => item.main != theme.palette.primary.main)
+        .map((item) => item.main) || [
+        theme.palette.primary.main,
+        theme.palette.secondary.main,
+      ],
       dataLabels: {
         enabled: false,
       },

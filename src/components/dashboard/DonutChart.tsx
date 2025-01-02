@@ -66,7 +66,7 @@ function DonutChart({
               (series[opts.seriesIndex]?.file_count /
                 series.reduce((acc, elem) => (acc += elem.file_count), 0)) *
               100
-            ).toFixed(2) +
+            ).toFixed(0) +
             "%"
           );
         },

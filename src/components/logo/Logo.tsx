@@ -25,8 +25,8 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
         sx={{
           minWidth: 96,
           width: 60,
-          p: 1,
-          py: 6,
+          p: 1.5,
+          py: 3,
           ...sx,
         }}
         {...other}

@@ -40,7 +40,7 @@ function AuthLoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().required("Email or mobile number is required"),
+    email: Yup.string().required("Please enter a valid email"),
     password: Yup.string().required("Password is required"),
   });
 

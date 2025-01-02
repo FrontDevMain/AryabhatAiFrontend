@@ -94,7 +94,7 @@ function Users() {
   const [page, setPage] = useState(1);
   const [inviteEmails, setInviteEmails] = useState("");
 
-  const [value, setValue] = useState<string[] | undefined>();
+  const [value, setValue] = useState<string[] | undefined>([]);
   const [inputValue, setInputValue] = useState("");
 
   //filter
@@ -153,7 +153,7 @@ function Users() {
   const onInvite = async () => {
     try {
       const body = {
-        emails: inviteEmails.split("\n"),
+        emails: value,
       };
       const Response = await fetcher.post(
         END_POINTS.ADMIN.ADMIN_PRIVILEGES.INVITE_USERS,
@@ -373,7 +373,7 @@ function Users() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box sx={{ ...style, width: { xs: "95%", md: 700 } }}>
           <Typography id="modal-modal-title" variant="h4" mb={3}>
             Invite Users
           </Typography>
@@ -388,7 +388,6 @@ function Users() {
               setInviteEmails(newInputValue)
             }
             onKeyDown={(event) => {
-              console.log(event);
               if (event.key === " ") {
                 if (inviteEmails.trim()) {
                   setValue((prevState: any) => [
@@ -581,7 +580,7 @@ function UserDetail({
           >
             <List disablePadding sx={{ p: 1 }} onClick={handleClosePopover}>
               <CustomListItemText onClick={handleOpenModal}>
-                Switch
+                Edit Roles
               </CustomListItemText>
               {!item.license && (
                 <CustomListItemText onClick={toggleLicense}>

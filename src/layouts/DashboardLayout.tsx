@@ -64,7 +64,7 @@ const DashboardLayout = () => {
             <Logo />
           </Box>
           <IconButton
-            sx={{ my: 6.3 }}
+            sx={{ my: 3.3 }}
             onClick={() => {
               dispatch(
                 fetchThemeSuccess({

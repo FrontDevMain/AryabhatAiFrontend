@@ -18,6 +18,7 @@ import fetcher from "src/api/fetcher";
 import { END_POINTS } from "src/api/EndPoints";
 import { PATH_AUTH } from "src/routes/path";
 import { LoadingButton } from "@mui/lab";
+import { showToast } from "src/utils/Toast";
 
 type FormValuesProps = {
   email: string;
@@ -60,6 +61,7 @@ function ForgotPassword() {
         navigate(PATH_AUTH.verifyForgotPasswordOtp, {
           state: { email: data.email },
         });
+        showToast.success(Response.data.message);
       }
     } catch (err) {
       console.log(err);

@@ -22,7 +22,7 @@ const fetchLlmFailure = () => ({
   type: FETCH_LLM_FAILURE,
 });
 
-export const updateSelectedLlm = (Llm: Llm) => ({
+export const updateSelectedLlm = (Llm: Llm | any) => ({
   type: UPDATE_SELECTED_LLM,
   payload: Llm,
 });

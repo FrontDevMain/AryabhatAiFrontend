@@ -46,10 +46,7 @@ const themeReducer = (
       return {
         ...state,
         loading: false,
-        theme: {
-          ...state,
-          ...action.payload,
-        },
+        theme: action.payload,
         error: null,
       };
     case FETCH_THEME_FAILURE:

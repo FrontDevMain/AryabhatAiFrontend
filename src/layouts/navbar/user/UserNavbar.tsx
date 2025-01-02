@@ -1,4 +1,5 @@
 import {
+  alpha,
   Box,
   Button,
   Collapse,
@@ -51,6 +52,7 @@ const CustomListSubItemButton = styled(ListItemButton)(({ theme }) => ({
     color: theme.palette.primary.main, // Selected text color
   },
   "&.Mui-selected": {
+    backgroundColor: alpha(theme.palette.primary.main, 0.1), // Selected text color
     color: theme.palette.primary.main, // Selected text color
     fontWeight: 700,
     "&:hover": {
@@ -140,7 +142,12 @@ export default function UserNavbar() {
           return (
             <>
               <CustomListItemButton
-                onClick={() => setActive(item.title)}
+                onClick={async () => {
+                  await dispatch(
+                    fetchChat(user.user_id, item.children[0]?.chat_id)
+                  );
+                  setActive(item.title);
+                }}
                 selected={active == item.title}
               >
                 <Box

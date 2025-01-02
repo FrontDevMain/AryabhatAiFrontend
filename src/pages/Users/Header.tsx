@@ -24,7 +24,7 @@ import {
 } from "@mui/material";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { sentenceCase } from "change-case";
-import { useState, memo } from "react";
+import { useState, memo, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuthContext } from "src/auth/useAuthContext";
 import GeneratePdfDocument from "src/components/CustomComponents/GeneratePdfDocument";
@@ -65,7 +65,11 @@ function HeaderDashboard() {
   const theme = useTheme();
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const listRef = useRef(null);
+
   const [open1, setOpen1] = useState(false);
+  const listRef1 = useRef(null);
+
   const [headerName, setHeaderName] = useState("");
   const { TAG, selectedTag } = useSelector((state: RootState) => state.tag);
   const { LLM, selectedLlm } = useSelector((state: RootState) => state.llm);
@@ -89,13 +93,73 @@ function HeaderDashboard() {
     setHeaderName("");
   };
 
+  // Detect clicks outside the list
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (listRef.current && !(listRef.current as any).contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    const handleClickOutside1 = (event: any) => {
+      if (
+        listRef1.current &&
+        !(listRef1.current as any).contains(event.target)
+      ) {
+        setOpen1(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside1);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside1);
+    };
+  }, []);
+
+  // var mergedData: any = [];
+
+  // LLM.map((item) => {
+  //   const alreadyExist = mergedData.find(
+  //     (entry: any) => entry.provider_id === item.provider_id
+  //   );
+  //   if (alreadyExist)
+  //     mergedData = mergedData.map((item: any) => {
+  //       if (item.provider_id == alreadyExist.provider_id) {
+  //         return {
+  //           ...item,
+  //           models: [
+  //             ...item.models,
+  //             {
+  //               model_id: item.model_id,
+  //               model_name: item.model_name,
+  //             },
+  //           ],
+  //         };
+  //       } else {
+  //         return item;
+  //       }
+  //     });
+  //   else
+  //     mergedData.push({
+  //       provider_id: item.provider_id,
+  //       provider_name: item.provider_name,
+  //       models: [
+  //         {
+  //           model_id: item.model_id,
+  //           model_name: item.model_name,
+  //         },
+  //       ],
+  //     });
+  // });
+
   return (
     <Stack direction={"row"} justifyContent={"space-between"} gap={2} mx={3}>
-      <Stack direction={"row"} justifyContent={"start"} gap={2}>
+      <Stack direction={"row"} justifyContent={"start"} gap={2} ref={listRef}>
         <List
           sx={{
-            width: 160,
-            minWidth: "fit-content",
+            width: "fit-content",
+            minWidth: 160,
             padding: 0,
           }}
           aria-labelledby="nested-list-subheader"
@@ -173,12 +237,14 @@ function HeaderDashboard() {
             </Stack>
           </Collapse>
         </List>
-        <VersionCard item={selectedLlm.model_name} />
+        {selectedLlm?.model?.map((item) => (
+          <VersionCard item={item} />
+        ))}
       </Stack>
-      <Stack flexDirection={"row"} gap={2}>
+      <Stack flexDirection={"row"} gap={2} ref={listRef1}>
         <List
           sx={{
-            width: 200,
+            minWidth: 200,
             padding: 0,
           }}
           aria-labelledby="nested-list-subheader"
@@ -388,11 +454,25 @@ function HeaderDashboard() {
   );
 }
 
-function VersionCard({ item }: { item: string }) {
+function VersionCard({ item }: { item: any }) {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const { selectedLlm } = useSelector((state: RootState) => state.llm);
+
   return (
     <ListItemButton
-      selected={true}
+      selected={item.isSelected}
+      onClick={() =>
+        dispatch(
+          updateSelectedLlm({
+            ...selectedLlm,
+            model: selectedLlm.model.map((row) => ({
+              ...row,
+              isSelected: row.model_name == item.model_name,
+            })),
+          })
+        )
+      }
       sx={{
         padding: 0,
         borderRadius: 20,
@@ -413,14 +493,17 @@ function VersionCard({ item }: { item: string }) {
       <ListItemText
         sx={{
           margin: 0,
-          padding: "8px 13px",
-          color: theme.palette.text.primary, // Hover background
+          padding: "10px 13px",
+          color: item.isSelected ? "#ffffff" : theme.palette.text.primary, // Hover background
+          "&.Mui-selected": {
+            color: "#ffffff",
+          },
           "&:hover": {
-            color: theme.palette.background.default,
+            color: "#ffffff",
           },
         }}
       >
-        <Typography color={"#ffffff"}>{item}</Typography>
+        {item.model_name}
       </ListItemText>
     </ListItemButton>
   );

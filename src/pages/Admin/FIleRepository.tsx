@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react";
 import { Close, CloseOutlined, CloudUpload, Delete } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
+  Badge,
   Box,
   Button,
   Divider,
@@ -107,6 +108,7 @@ export default function FileRepository() {
     total_pages: 0,
   });
   const [page, setPage] = useState(1);
+  const [isDataFiltered, setIsDataFiltered] = useState(false);
 
   const [file, setFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -192,22 +194,24 @@ export default function FileRepository() {
   const getAllFiles = useCallback(
     async (currentPage: number, filters: filterTypes | string) => {
       try {
+        const filterData = Object.entries(filters)
+          .filter((item) => item[1])
+          .map(
+            (item) =>
+              `&${item[0]}=${
+                item[0] == "upload_date"
+                  ? dayjs(item[1]).format("DD-MM-YYYY")
+                  : (item[1] + "")?.toLowerCase()
+              }`
+          )
+          .join("");
         const Response = await fetcher.get(
           END_POINTS.ADMIN.FILE_REPOSITORIES.GET_ALL_FILES(
             currentPage,
-            Object.entries(filters)
-              .filter((item) => item[1])
-              .map(
-                (item) =>
-                  `&${item[0]}=${
-                    item[0] == "upload_date"
-                      ? dayjs(item[1]).format("DD-MM-YYYY")
-                      : (item[1] + "")?.toLowerCase()
-                  }`
-              )
-              .join("")
+            filterData
           )
         );
+        filterData && setIsDataFiltered(true);
         if (Response.status == 200) {
           setFiles({
             ...files,
@@ -260,7 +264,9 @@ export default function FileRepository() {
         <Typography>File Repository</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
           <IconButton onClick={handleOpenPopover}>
-            <Filters />
+            <Badge badgeContent={isDataFiltered ? "+1" : 0} color="primary">
+              <Filters />
+            </Badge>
           </IconButton>
           <Popover
             id={id}
@@ -286,7 +292,7 @@ export default function FileRepository() {
             >
               <StyledWrap>
                 {Object.keys(filter)
-                  .filter((item) => item !== "sort_by")
+                  .filter((item) => !["sort_by", "sort_order"].includes(item))
                   .map((mode) => (
                     <StyledCard key={mode} selected={selectedFilerTab == mode}>
                       <Stack flexDirection={"row"} gap={1}>
@@ -294,7 +300,9 @@ export default function FileRepository() {
                           color="text.primary"
                           sx={{ whiteSpace: "nowrap", p: 2 }}
                         >
-                          {sentenceCase(mode)}
+                          {mode == "file_statuses"
+                            ? "File Status"
+                            : sentenceCase(mode)}
                         </Typography>
                       </Stack>
                       <MaskControl value={mode} />
@@ -310,6 +318,7 @@ export default function FileRepository() {
                       sx={{ width: "100%" }}
                       label="Date"
                       value={dayjs(filter.upload_date)}
+                      format="DD/MM/YYYY"
                       maxDate={dayjs(new Date())}
                       onChange={(newValue: any) =>
                         setFilter({ ...filter, upload_date: newValue })
@@ -323,7 +332,11 @@ export default function FileRepository() {
                 selectedFilerTab == "file_types") && (
                 <TextField
                   fullWidth
-                  label={sentenceCase(selectedFilerTab)}
+                  label={
+                    selectedFilerTab == "file_statuses"
+                      ? "File Status"
+                      : sentenceCase(selectedFilerTab)
+                  }
                   value={filter[selectedFilerTab]}
                   onChange={(event: any) =>
                     setFilter({
@@ -389,6 +402,7 @@ export default function FileRepository() {
                     resetFilters();
                     handleClosePopover();
                     getAllFiles(1, "");
+                    setIsDataFiltered(false);
                   }}
                 >
                   Reset

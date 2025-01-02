@@ -72,10 +72,17 @@ function AccountPopover() {
   const id = open ? "simple-popover" : undefined;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoading1, setIsLoading1] = useState(false);
 
+  // logout confirmation
   const [openConfirm, setOpenConfirm] = useState(false);
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
+
+  // profile photo delete confirmation
+  const [openConfirm1, setOpenConfirm1] = useState(false);
+  const handleOpenConfirm1 = () => setOpenConfirm1(true);
+  const handleCloseConfirm1 = () => setOpenConfirm1(false);
 
   //modal
   const [openModal, setOpenModal] = useState(false);
@@ -121,12 +128,16 @@ function AccountPopover() {
 
   const onDeleteProfile = async () => {
     try {
+      setIsLoading1(true);
       const Response = await fetcher.delete(END_POINTS.AUTH.DELETE_PROFILE);
       if (Response.status == 200) {
         initialize();
+        handleCloseConfirm1();
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading1(false);
     }
   };
 
@@ -257,22 +268,36 @@ function AccountPopover() {
                 id="file-upload"
                 type="file"
                 style={{ display: "none" }}
+                accept=".png, .jpeg"
                 onChange={onChangeProfile}
               />
               <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-                Click to Upload
+                Change Picture
               </label>{" "}
             </LoadingButton>
-            <Button
-              variant="outlined"
-              onClick={onDeleteProfile}
-              disabled={isLoading}
-            >
+            <Button variant="outlined" onClick={handleOpenConfirm1}>
               Delete Picture
             </Button>
           </Stack>
+          <Typography variant="h6" mt={2}>
+            Profile Name
+          </Typography>
+          <Typography>{user.user_firstname}</Typography>
+          <Typography variant="h6" mt={2}>
+            Email Id
+          </Typography>
+          <Typography>{user.user_email}</Typography>
         </Box>
       </Modal>
+
+      <ConfirmationModal
+        open={openConfirm1}
+        handleClose={handleCloseConfirm1}
+        onConfirm={onDeleteProfile}
+        loading={isLoading1}
+        title={"Delete Confirmation"}
+        content={"Are you sure want to Delete profile picture?"}
+      />
     </Stack>
   );
 }

@@ -9,6 +9,7 @@ import {
 } from "./TagsActionTypes";
 import fetcher from "src/api/fetcher";
 import { END_POINTS } from "src/api/EndPoints";
+import dayjs from "dayjs";
 
 // Action creators
 const fetchTagsRequest = () => ({
@@ -29,7 +30,7 @@ export const updateTags = (tagList: tagType[]) => ({
   payload: tagList,
 });
 
-export const updateSelectedTag = (tag: tagType) => ({
+export const updateSelectedTag = (tag: tagType | any) => ({
   type: UPDATE_SELECTED_TAG,
   payload: tag,
 });
@@ -50,7 +51,14 @@ export const fetchTags = (
           page_size,
           Object.entries(filterValue)
             .filter((item) => item[1])
-            .map((item) => `&${item[0]}=${item[1]}`)
+            .map(
+              (item) =>
+                `&${item[0]}=${
+                  item[0] == "created_date"
+                    ? dayjs(item[1] as Date).format("DD-MM-YYYY")
+                    : item[1]
+                }`
+            )
             .join("")
         )
       );

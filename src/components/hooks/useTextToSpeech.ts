@@ -29,6 +29,7 @@ const useTextToSpeech = (text: string) => {
       utterance.pitch = 1.0; // Adjust pitch for natural tone
       utterance.rate = 1; // Slightly faster rate for natural Indian speech
       utterance.volume = 1;
+
       synth.speak(utterance);
       setIsSpeaking(true);
     }

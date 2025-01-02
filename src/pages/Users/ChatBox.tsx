@@ -6,6 +6,8 @@ import { Loading } from "src/assets/icons/loading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import ChatCard from "src/components/CustomChatCard/ChatCard";
 import { fetchChat } from "src/redux/actions/chat/ChatActions";
+import { updateSelectedLlm } from "src/redux/actions/llm/LlmActions";
+import { updateSelectedTag } from "src/redux/actions/tags/TagsActions";
 import { RootState } from "src/redux/reducers";
 
 function ChatBox({ chatid }: { chatid: string | undefined }) {
@@ -15,11 +17,31 @@ function ChatBox({ chatid }: { chatid: string | undefined }) {
   const { loading, CHAT, queryLoading } = useSelector(
     (state: RootState) => state.chat
   );
+  const { LLM } = useSelector((state: RootState) => state.llm);
+  const { TAG } = useSelector((state: RootState) => state.tag);
 
   useEffect(() => {
     const element = elementRef.current as any;
     if (element) {
       element.scrollTop = element.scrollHeight;
+    }
+    if (CHAT.messages?.length) {
+      const { provider_id, model_id, tag } =
+        CHAT.messages[CHAT.messages.length - 1];
+      dispatch(
+        updateSelectedLlm(
+          [LLM.find((item) => item.provider_id == provider_id)].map((item) => ({
+            ...item,
+            model: item?.model.map((row) => ({
+              ...row,
+              isSelected: row.model_id == model_id,
+            })),
+          }))[0]
+        )
+      );
+      dispatch(
+        updateSelectedTag(TAG.tags.find((item) => item.tag_name == tag))
+      );
     }
   }, [CHAT]);
 

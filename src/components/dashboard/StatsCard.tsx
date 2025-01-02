@@ -20,7 +20,7 @@ type childProps = {
 
 function StatsCard({ title, data }: childProps) {
   function calculate(b: number, x: number) {
-    return b + (b * x) / 100;
+    return (((b - x) / x) * 100)?.toFixed(2);
   }
 
   if (!data) {
@@ -45,12 +45,19 @@ function StatsCard({ title, data }: childProps) {
             />
           ) : (
             "0"
-          )}
+          )}{" "}
+          <Typography variant="caption">
+            {title == "Average Session Time" ? "minutes" : ""}
+          </Typography>
         </Typography>
         <Typography sx={{ fontSize: 14 }}>
-          {calculate(data[0], data[1] || 0)}
+          {calculate(data[1], data[0] || 0)}
           {"% "}
-          {data[1] || 0 >= data[0] ? <DecreaseIcon /> : <IncreaseIcon />}
+          {+calculate(data[1], data[0]) < 0 ? (
+            <DecreaseIcon />
+          ) : (
+            <IncreaseIcon />
+          )}
         </Typography>
       </Stack>
     </CustomCard>

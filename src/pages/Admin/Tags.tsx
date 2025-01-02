@@ -200,6 +200,7 @@ function Tags() {
                       label="Date"
                       value={dayjs(filter.created_date)}
                       maxDate={dayjs(new Date())}
+                      format="DD/MM/YYYY"
                       onChange={(newValue: any) =>
                         setFilter({
                           ...filter,
@@ -284,9 +285,9 @@ function Tags() {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>Tags Name</TableCell>
-              <TableCell>Created Username</TableCell>
-              <TableCell>Created Date</TableCell>
+              <TableCell>Tag</TableCell>
+              <TableCell>Created By</TableCell>
+              <TableCell>Created On</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -357,6 +358,8 @@ function TagsRow({
 }) {
   const theme = useTheme();
   const { user } = useAuthContext();
+
+  const [isLoading, setIsLoading] = useState(false);
   const [tagName, setTagName] = useState(item.tag_name);
 
   //onclick popover
@@ -378,6 +381,7 @@ function TagsRow({
 
   const renameTags = useCallback(async () => {
     try {
+      setIsLoading(true);
       const body = {
         tag_id: item._id,
         tag_name: tagName,
@@ -394,6 +398,8 @@ function TagsRow({
       }
     } catch (err) {
       console.log(err);
+    } finally {
+      setIsLoading(false);
     }
   }, [tagName]);
 
@@ -506,9 +512,14 @@ function TagsRow({
             <Button variant="outlined" fullWidth onClick={handleCloseModal}>
               Cancel
             </Button>
-            <Button variant="contained" fullWidth onClick={renameTags}>
+            <LoadingButton
+              variant="contained"
+              fullWidth
+              onClick={renameTags}
+              loading={isLoading}
+            >
               Submit
-            </Button>
+            </LoadingButton>
           </Stack>
         </Box>
       </Modal>

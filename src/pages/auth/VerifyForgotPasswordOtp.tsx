@@ -10,6 +10,7 @@ import { PATH_AUTH } from "src/routes/path";
 import useCountdown from "src/components/hooks/useCountdown";
 import fetcher from "src/api/fetcher";
 import { END_POINTS } from "src/api/EndPoints";
+import { showToast } from "src/utils/Toast";
 
 type FormValuesProps = {
   code1: string;
@@ -69,6 +70,7 @@ function VerifyForgotPasswordOtp() {
       if (Response.status == 200) {
         resetTimer();
         start();
+        showToast.success(Response.data.message);
       }
     } catch (err) {
       console.log(err);
@@ -84,6 +86,7 @@ function VerifyForgotPasswordOtp() {
       const Response = await fetcher.post(END_POINTS.AUTH.OTP_VALIDATION, body);
       if (Response.status == 200) {
         navigate(PATH_AUTH.newPassword, { state: state });
+        showToast.success(Response.data.message);
       }
     } catch (err) {
       reset(defaultValues);

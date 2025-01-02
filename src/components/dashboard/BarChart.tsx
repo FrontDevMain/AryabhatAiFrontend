@@ -79,7 +79,7 @@ function BarChart({
         },
       },
       title: {
-        text: "Top quired files",
+        text: "Tag Search Trends",
         style: {
           fontSize: theme.typography.fontSize + 8,
           color: theme.palette.text.primary,

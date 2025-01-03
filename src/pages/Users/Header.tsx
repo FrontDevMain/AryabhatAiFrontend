@@ -39,6 +39,7 @@ import { updateSelectedTag } from "src/redux/actions/tags/TagsActions";
 import { RootState } from "src/redux/reducers";
 import { CustomListItemText } from "src/theme/globalStyles";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import GeneratePdf from "src/components/CustomComponents/GeneratePdf";
 
 const CustomListItemButton = styled(ListItemButton)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -158,7 +159,6 @@ function HeaderDashboard() {
       <Stack direction={"row"} justifyContent={"start"} gap={2} ref={listRef}>
         <List
           sx={{
-            width: "fit-content",
             minWidth: 160,
             padding: 0,
           }}
@@ -212,12 +212,14 @@ function HeaderDashboard() {
               ).map((item, index) => (
                 <CustomListItemButton
                   key={item.provider_id}
-                  style={{ paddingTop: index == 0 ? 20 : 0 }}
                   onClick={() => {
                     setOpen(!open);
                     setTimeout(() => {
                       dispatch(updateSelectedLlm(item));
                     }, 300);
+                  }}
+                  style={{
+                    paddingTop: index == 0 ? 20 : 0,
                   }}
                 >
                   <ListItemText
@@ -225,12 +227,21 @@ function HeaderDashboard() {
                       margin: 0,
                       padding: "10px 13px",
                       color: theme.palette.text.primary, // Hover background
+                      whiteSpace: "nowrap", // Prevents wrapping
+                      textOverflow: "ellipsis", // Adds ellipsis for overflowed text
                       "&:hover": {
                         color: theme.palette.background.default,
                       },
                     }}
                   >
-                    {item.provider_name}
+                    <Typography
+                      textOverflow={"ellipsis"}
+                      width={1}
+                      overflow={"hidden"}
+                    >
+                      {" "}
+                      {item.provider_name}
+                    </Typography>
                   </ListItemText>
                 </CustomListItemButton>
               ))}
@@ -322,7 +333,7 @@ function HeaderDashboard() {
           <>
             <PDFDownloadLink
               document={
-                <GeneratePdfDocument
+                <GeneratePdf
                   data={CHAT.messages}
                   llm={selectedLlm}
                   tag={selectedTag}

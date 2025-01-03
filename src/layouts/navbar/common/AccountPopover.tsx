@@ -25,6 +25,7 @@ import CustomAvatar from "src/components/avatar/Avatar";
 import ConfirmationModal from "src/components/CustomComponents/ConfirmationModal";
 import { PATH_AFTER_ADMIN_LOGIN, PATH_AFTER_USER_LOGIN } from "src/config";
 import { RootState } from "src/redux/reducers";
+import { showToast } from "src/utils/Toast";
 
 const CustomList = styled(List)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -61,7 +62,8 @@ function AccountPopover() {
     (state: RootState) => state.theme
   );
   const isVertical = themeSetting.Theme_Layout == "vertical";
-  const { user, logout, initialize, updateUserType } = useAuthContext();
+  const { user, logout, initialize, updateUserType, updateUserInfo } =
+    useAuthContext();
 
   //openpopover
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -117,7 +119,16 @@ function AccountPopover() {
         formData
       );
       if (Response.status == 200) {
-        initialize();
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result;
+          updateUserInfo({
+            ...user,
+            user_profile_picture: (base64 as string).split(",")[1],
+          });
+        };
+        reader.readAsDataURL(uploadedFile);
+        showToast.success(Response.data.message);
       }
     } catch (err) {
       console.log(err);
@@ -131,8 +142,12 @@ function AccountPopover() {
       setIsLoading1(true);
       const Response = await fetcher.delete(END_POINTS.AUTH.DELETE_PROFILE);
       if (Response.status == 200) {
-        initialize();
+        updateUserInfo({
+          ...user,
+          user_profile_picture: null,
+        });
         handleCloseConfirm1();
+        showToast.success(Response.data.message);
       }
     } catch (err) {
       console.log(err);
@@ -228,7 +243,7 @@ function AccountPopover() {
         handleClose={handleCloseConfirm}
         onConfirm={logoutUser}
         title={"Logout"}
-        content={"Are you sure want to Logout from your account?"}
+        content={"Are you sure tou want to Logout from your account?"}
       />
 
       <Modal
@@ -296,7 +311,7 @@ function AccountPopover() {
         onConfirm={onDeleteProfile}
         loading={isLoading1}
         title={"Delete Confirmation"}
-        content={"Are you sure want to Delete profile picture?"}
+        content={"Are you sure you want to delete your profile picture?"}
       />
     </Stack>
   );

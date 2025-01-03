@@ -6,8 +6,8 @@ import { END_POINTS } from "./EndPoints";
 
 const apiClient = axios.create({
   // Can set any default configurations here, such as base URL, headers, etc.
-  // baseURL: "https://aryabhat.ai/",
-  baseURL: "https://20.40.41.252/",
+  baseURL: "https://api.aryabhat.ai/",
+  // baseURL: "https://20.40.41.252/",
 });
 
 apiClient.interceptors.response.use(

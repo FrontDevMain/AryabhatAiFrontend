@@ -3,6 +3,7 @@ import { Close } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
+  Badge,
   Box,
   Button,
   Chip,
@@ -200,7 +201,14 @@ function Users() {
         <Typography>User List</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
           <IconButton onClick={handleOpenPopover}>
-            <Filters />
+            <Badge
+              badgeContent={
+                Object.entries(filter).filter((item) => !!item[1]).length
+              }
+              color="primary"
+            >
+              <Filters />
+            </Badge>
           </IconButton>
           <Popover
             id={id}
@@ -221,7 +229,6 @@ function Users() {
               value={selectedFilerTab}
               onChange={(e) => {
                 setSelectedFilterTab(e.target.value);
-                resetFilters();
               }}
             >
               <StyledWrap>

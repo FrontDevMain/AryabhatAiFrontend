@@ -39,8 +39,8 @@ const GeneratePdfDocument = ({ data, llm, tag, userName }: any) => {
       <Page size="A4" style={{ borderTop: "1px solid #dadada" }}>
         <View
           style={{
-            padding: "30px 15px 10px",
-            // borderBottom: "1px solid #dadada",
+            padding: "30px 15px 30px",
+            borderBottom: "1px solid #dadada",
             display: "flex",
             flexDirection: "row",
             gap: 1,
@@ -55,7 +55,7 @@ const GeneratePdfDocument = ({ data, llm, tag, userName }: any) => {
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            borderBottom: "1px solid #dadada",
+            // borderTop: "1px solid #dadada",
           }}
         >
           <View
@@ -86,7 +86,7 @@ const GeneratePdfDocument = ({ data, llm, tag, userName }: any) => {
                 color: "#ffffff",
               }}
             >
-              {llm?.model_name}
+              {llm?.model.find((item: any) => item?.isSelected)?.model_name}
             </Text>
           </View>
           <View
@@ -107,17 +107,11 @@ const GeneratePdfDocument = ({ data, llm, tag, userName }: any) => {
                 borderRadius: "50%",
               }}
             ></Text>
-            <Text
-              style={{
-                ...styles.Text,
-              }}
-            >
-              {tag?.tag_name}
-            </Text>
+            <Text style={styles.Text}>{tag?.tag_name}</Text>
           </View>
         </View>
 
-        <View style={{ margin: "30px 10px" }}>
+        <View style={{ margin: "30px" }}>
           {data?.map((item: any) => {
             return (
               <View
@@ -139,7 +133,17 @@ const GeneratePdfDocument = ({ data, llm, tag, userName }: any) => {
               </View>
             );
           })}
-          <Text style={{ textAlign: "center", fontSize: 20 }}>
+          <Image source={"/logo/pdfBG.png"} style={{ width: 10 }} />{" "}
+          <Text
+            style={{
+              position: "relative",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              textAlign: "center",
+              fontSize: 20,
+            }}
+          >
             **** End of the Document ****
           </Text>
           <View

@@ -7,12 +7,14 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  InputAdornment,
   Modal,
   Stack,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
 import { END_POINTS } from "src/api/EndPoints";
 import fetcher from "src/api/fetcher";
 import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
@@ -24,9 +26,16 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, { RHFTextField } from "../../components/hook-form";
 import { LoadingButton } from "@mui/lab";
 import { showToast } from "src/utils/Toast";
+import { noCase } from "change-case";
 
 type connectorsDataType = {
   isLoading: boolean;
+  filterData: {
+    database_service_provider_id: string;
+    database_icon: string;
+    database_service_provider_name: string;
+    is_default: number;
+  }[];
   data: {
     database_service_provider_id: string;
     database_icon: string;
@@ -68,8 +77,23 @@ export default function Connectors() {
   const [connectors, setConnectors] = useState<connectorsDataType>({
     isLoading: false,
     data: [],
+    filterData: [],
   });
+  const [localSearch, setLocalSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const deferredLocalSearch = useDeferredValue(localSearch);
+
+  useEffect(() => {
+    setConnectors((prevState) => ({
+      ...prevState,
+      filterData: connectors.data.filter(
+        (item) =>
+          noCase(item.database_service_provider_name) ==
+          noCase(deferredLocalSearch)
+      ),
+    }));
+  }, [deferredLocalSearch]);
 
   //modal
   const [open, setOpen] = useState(false);
@@ -130,7 +154,11 @@ export default function Connectors() {
         { connection_id: "" }
       );
       if (Response.status == 200) {
-        setConnectors({ isLoading: false, data: Response.data });
+        setConnectors({
+          isLoading: false,
+          data: Response.data,
+          filterData: Response.data,
+        });
       }
     } catch (error) {
       console.log(error);
@@ -209,50 +237,83 @@ export default function Connectors() {
 
   return (
     <RoleBasedGaurd roles={["Admin", "SuperAdmin"]}>
-      <Grid container spacing={3}>
-        {connectors.data.map((item) => {
-          return (
-            <Grid item xs={4} md={3} lg={2}>
-              <Card
-                sx={{ p: 2, boxShadow: "none", position: "relative" }}
-                onClick={() =>
-                  getConfigureDb(item.database_service_provider_id)
-                }
+      <Typography>Data Connectors</Typography>
+      <TextField
+        autoComplete="off"
+        placeholder="Search Data Connectors"
+        fullWidth
+        size="medium"
+        sx={{ my: 2 }}
+        value={localSearch}
+        onChange={(e) => setLocalSearch(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <Checkbox
-                  icon={<RadioButtonUnchecked />}
-                  checkedIcon={<CheckCircle />}
-                  checked={!!item.is_default}
-                  sx={{
-                    position: "absolute",
-                    top: 5,
-                    right: 5,
-                    zIndex: 1,
-                  }}
+                <path
+                  d="M19 19L14.657 14.657M14.657 14.657C15.3999 13.9142 15.9892 13.0322 16.3913 12.0616C16.7933 11.091 17.0002 10.0507 17.0002 9.00011C17.0002 7.94952 16.7933 6.90922 16.3913 5.9386C15.9892 4.96798 15.3999 4.08606 14.657 3.34318C13.9142 2.6003 13.0322 2.01102 12.0616 1.60897C11.091 1.20693 10.0507 1 9.00011 1C7.94952 1 6.90922 1.20693 5.9386 1.60897C4.96798 2.01102 4.08606 2.6003 3.34318 3.34318C1.84287 4.84349 1 6.87835 1 9.00011C1 11.1219 1.84287 13.1567 3.34318 14.657C4.84349 16.1574 6.87835 17.0002 9.00011 17.0002C11.1219 17.0002 13.1567 16.1574 14.657 14.657Z"
+                  stroke="#C7C7C7"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 />
+              </svg>
+            </InputAdornment>
+          ),
+        }}
+      />
+      <Stack flexDirection={"row"} gap={2} flexWrap={"wrap"}>
+        {connectors.filterData.map((item) => {
+          return (
+            <Card
+              sx={{
+                p: 2,
+                boxShadow: "none",
+                position: "relative",
+                width: 200,
+                height: 220,
+              }}
+              onClick={() => getConfigureDb(item.database_service_provider_id)}
+            >
+              <Checkbox
+                icon={<RadioButtonUnchecked />}
+                checkedIcon={<CheckCircle />}
+                checked={!!item.is_default}
+                sx={{
+                  position: "absolute",
+                  top: 5,
+                  right: 5,
+                  zIndex: 1,
+                }}
+              />
 
-                <Box
-                  sx={{
-                    height: { xs: 120, md: 180 },
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "clip",
-                  }}
-                >
-                  <img
-                    src={`data:image/png;base64,${item.database_icon}`}
-                    style={{ objectFit: "cover" }}
-                  />
-                </Box>
-                <Typography textAlign={"center"} mt={2}>
-                  {item.database_service_provider_name}
-                </Typography>
-              </Card>
-            </Grid>
+              <Box
+                sx={{
+                  height: 160,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "clip",
+                }}
+              >
+                <img
+                  src={`data:image/png;base64,${item.database_icon}`}
+                  style={{ objectFit: "cover", height: "90%" }}
+                />
+              </Box>
+              <Typography textAlign={"center"} mt={1}>
+                {item.database_service_provider_name}
+              </Typography>
+            </Card>
           );
         })}
-      </Grid>
+      </Stack>
       <Modal
         open={open}
         onClose={handleClose}

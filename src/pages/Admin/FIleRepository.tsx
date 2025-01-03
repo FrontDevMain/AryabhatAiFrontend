@@ -211,7 +211,6 @@ export default function FileRepository() {
             filterData
           )
         );
-        filterData && setIsDataFiltered(true);
         if (Response.status == 200) {
           setFiles({
             ...files,
@@ -264,7 +263,12 @@ export default function FileRepository() {
         <Typography>File Repository</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
           <IconButton onClick={handleOpenPopover}>
-            <Badge badgeContent={isDataFiltered ? "+1" : 0} color="primary">
+            <Badge
+              badgeContent={
+                Object.entries(filter).filter((item) => !!item[1]).length
+              }
+              color="primary"
+            >
               <Filters />
             </Badge>
           </IconButton>
@@ -287,7 +291,6 @@ export default function FileRepository() {
               value={selectedFilerTab}
               onChange={(e) => {
                 setSelectedFilterTab(e.target.value);
-                resetFilters();
               }}
             >
               <StyledWrap>

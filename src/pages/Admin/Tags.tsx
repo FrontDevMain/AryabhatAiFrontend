@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import { LoadingButton } from "@mui/lab";
 import {
+  Badge,
   Box,
   Button,
   IconButton,
@@ -49,6 +50,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import RoleBasedGaurd from "src/auth/RoleBasedGaurd";
+import { useLocation } from "react-router-dom";
+import { showToast } from "src/utils/Toast";
 
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -102,6 +105,11 @@ function Tags() {
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
+  // create tag confirmation
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const handleOpenConfirm = () => setOpenConfirm(true);
+  const handleCloseConfirm = () => setOpenConfirm(false);
+
   useEffect(() => {
     dispatch(fetchTags(page, 10, filter));
   }, [page]);
@@ -117,9 +125,10 @@ function Tags() {
         body
       );
       if (Response.status == 200) {
-        dispatch(updateTags([Response.data, ...TAG.tags]));
+        dispatch(updateTags([...TAG.tags, Response.data]));
         setTagName("");
         handleCloseModal();
+        handleCloseConfirm();
       }
     } catch (err) {
       console.log(err);
@@ -151,7 +160,14 @@ function Tags() {
         <Typography>Tags List</Typography>
         <Stack direction={"row"} alignItems={"center"} gap={2}>
           <IconButton onClick={handleOpenPopover}>
-            <Filters />
+            <Badge
+              badgeContent={
+                Object.entries(filter).filter((item) => !!item[1]).length
+              }
+              color="primary"
+            >
+              <Filters />
+            </Badge>
           </IconButton>
           <Popover
             id={id}
@@ -172,7 +188,6 @@ function Tags() {
               value={selectedFilerTab}
               onChange={(e) => {
                 setSelectedFilterTab(e.target.value);
-                resetFilters();
               }}
             >
               <StyledWrap>
@@ -205,8 +220,6 @@ function Tags() {
                         setFilter({
                           ...filter,
                           created_date: newValue,
-                          tag_name: "",
-                          username: "",
                         })
                       }
                     />
@@ -221,9 +234,7 @@ function Tags() {
                   onChange={(event: any) =>
                     setFilter({
                       ...filter,
-                      created_date: null,
                       tag_name: event.target.value?.toLowerCase(),
-                      username: "",
                     })
                   }
                 />
@@ -237,8 +248,6 @@ function Tags() {
                     setFilter({
                       ...filter,
                       created_date: null,
-                      tag_name: "",
-                      username: event.target.value?.toLowerCase(),
                     })
                   }
                 />
@@ -339,12 +348,21 @@ function Tags() {
             <Button variant="outlined" fullWidth onClick={handleCloseModal}>
               Cancel
             </Button>
-            <Button variant="contained" fullWidth onClick={createTag}>
+            <Button variant="contained" fullWidth onClick={handleOpenConfirm}>
               Submit
             </Button>
           </Stack>
         </Box>
       </Modal>
+
+      <ConfirmationModal
+        open={openConfirm}
+        handleClose={handleCloseConfirm}
+        onConfirm={createTag}
+        // loading={isLoading}
+        title={"Confirmation"}
+        content={`Are you sure you want to create ${tagName} tag?`}
+      />
     </RoleBasedGaurd>
   );
 }
@@ -374,6 +392,11 @@ function TagsRow({
   const handleOpenConfirm = () => setOpenConfirm(true);
   const handleCloseConfirm = () => setOpenConfirm(false);
 
+  // Rename tag confirmation
+  const [openConfirm1, setOpenConfirm1] = useState(false);
+  const handleOpenConfirm1 = () => setOpenConfirm1(true);
+  const handleCloseConfirm1 = () => setOpenConfirm1(false);
+
   //modal
   const [openModal, setOpenModal] = useState(false);
   const handleOpenModal = () => setOpenModal(true);
@@ -395,6 +418,7 @@ function TagsRow({
         updateTagList("rename", Response.data);
         handleCloseModal();
         handleClosePopover();
+        handleCloseConfirm1();
       }
     } catch (err) {
       console.log(err);
@@ -411,6 +435,7 @@ function TagsRow({
       if (Response.status == 200) {
         updateTagList("delete", item._id);
         handleClosePopover();
+        // showToast.success(Response.data);
       }
     } catch (err) {
       console.log(err);
@@ -515,14 +540,26 @@ function TagsRow({
             <LoadingButton
               variant="contained"
               fullWidth
-              onClick={renameTags}
-              loading={isLoading}
+              onClick={handleOpenConfirm1}
             >
               Submit
             </LoadingButton>
           </Stack>
         </Box>
       </Modal>
+      <ConfirmationModal
+        open={openConfirm1}
+        handleClose={handleCloseConfirm1}
+        onConfirm={renameTags}
+        loading={isLoading}
+        title={"Confirmation"}
+        content={
+          <Typography>
+            Are you sure you want to edit tag from{" "}
+            <strong>{item.tag_name} </strong> to <strong>{tagName}</strong>?
+          </Typography>
+        }
+      />
     </>
   );
 }

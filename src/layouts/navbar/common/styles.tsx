@@ -30,7 +30,7 @@ type StyledCardProps = {
 export const StyledCard = styled(CardActionArea, {
   shouldForwardProp: (prop) => prop !== "selected",
 })<StyledCardProps>(({ selected, theme }) => ({
-  height: 52,
+  height: 42,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

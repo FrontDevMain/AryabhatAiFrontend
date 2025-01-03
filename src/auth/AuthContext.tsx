@@ -11,7 +11,7 @@ import { fetchTheme } from "src/redux/actions/theme/ThemeActions";
 import { RootState } from "src/redux/reducers";
 
 //toast container
-import { Slide, ToastContainer, Zoom } from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 type AuthContextTypes = {
@@ -36,6 +36,7 @@ type AuthContextTypes = {
   logout: () => void;
   initialize: () => void;
   updateUserType: (val: string) => void;
+  updateUserInfo: (val: AuthContextTypes["user"]) => void;
 };
 
 export const AuthContext = createContext<AuthContextTypes | null>(null);
@@ -121,10 +122,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (err) {
         console.log("found err", err);
-        if (err.status == 401) {
+        if (err?.status == 401) {
           logout();
         }
-        if (err.status == 403) {
+        if (err?.status == 403) {
           dispatch({ type: "license_not_found" });
         }
       }
@@ -148,6 +149,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const updateUserInfo = (data: AuthContextTypes["user"]) => {
+    dispatch({
+      type: "login",
+      payload: data,
+    });
+  };
+
   const updateUserType = async (val: string) => {
     if (val == "User") {
       await reduxDispatch(fetchNotebookList(state.user.user_id));
@@ -163,7 +171,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ ...state, login, logout, initialize, updateUserType }}
+      value={{
+        ...state,
+        login,
+        logout,
+        initialize,
+        updateUserType,
+        updateUserInfo,
+      }}
     >
       <ToastContainer
         position="top-right"
